@@ -4,11 +4,25 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
-app = Flask(__name__, template_folder="../templates", static_folder="../static")
+# IMPORTANT: correct paths for Vercel
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+TEMPLATE_DIR = os.path.join(BASE_DIR, "../templates")
+STATIC_DIR = os.path.join(BASE_DIR, "../static")
+
+app = Flask(__name__, template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
 
 app.config['SECRET_KEY'] = 'supersecretkey'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
-app.config['UPLOAD_FOLDER'] = 'static/uploads'
+
+# SQLite must use absolute path in serverless
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, "database.db")
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Upload folder absolute path
+UPLOAD_FOLDER = os.path.join(STATIC_DIR, "uploads")
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Make sure upload folder exists
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 db = SQLAlchemy(app)
 
@@ -39,7 +53,7 @@ def load_user(user_id):
 def home():
     return redirect(url_for("login"))
 
-@app.route("/login", methods=["GET","POST"])
+@app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         user = User.query.filter_by(username=request.form['username']).first()
@@ -62,7 +76,7 @@ def class_notes(class_number):
     notes = Note.query.filter_by(class_number=class_number).all()
     return render_template("class_notes.html", notes=notes, class_number=class_number)
 
-@app.route("/admin", methods=["GET","POST"])
+@app.route("/admin", methods=["GET", "POST"])
 @login_required
 def admin():
     if current_user.role != "admin":
@@ -72,7 +86,7 @@ def admin():
         file = request.files['file']
         class_number = request.form['class_number']
 
-        if file.filename.endswith(".pdf"):
+        if file and file.filename.endswith(".pdf"):
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
             file.save(filepath)
 
@@ -95,16 +109,16 @@ def logout():
 with app.app_context():
     db.create_all()
 
-    # Create admin if not exists
     if not User.query.filter_by(username="admin").first():
-        admin = User(
+        admin_user = User(
             username="admin",
             password=generate_password_hash("admin123"),
             role="admin"
         )
-        db.session.add(admin)
+        db.session.add(admin_user)
         db.session.commit()
 
-# Required for Vercel
-def handler(request):
-    return app
+# IMPORTANT:
+# DO NOT add handler()
+# DO NOT add app.run()
+# Vercel automatically detects "app"
