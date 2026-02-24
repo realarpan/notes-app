@@ -4,7 +4,8 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
-# IMPORTANT: correct paths for Vercel
+# ================= PATH SETUP =================
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(BASE_DIR, "../templates")
 STATIC_DIR = os.path.join(BASE_DIR, "../static")
@@ -12,16 +13,11 @@ STATIC_DIR = os.path.join(BASE_DIR, "../static")
 app = Flask(__name__, template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
 
 app.config['SECRET_KEY'] = 'supersecretkey'
-
-# SQLite must use absolute path in serverless
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, "database.db")
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'  # In-memory DB for Vercel
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Upload folder absolute path
 UPLOAD_FOLDER = os.path.join(STATIC_DIR, "uploads")
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-# Make sure upload folder exists
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 db = SQLAlchemy(app)
@@ -104,19 +100,23 @@ def logout():
     logout_user()
     return redirect(url_for("login"))
 
-# ============ INIT DB =============
+# ================= DATABASE INIT =================
 
-with app.app_context():
-    db.create_all()
+try:
+    with app.app_context():
+        db.create_all()
 
-    if not User.query.filter_by(username="admin").first():
-        admin_user = User(
-            username="admin",
-            password=generate_password_hash("admin123"),
-            role="admin"
-        )
-        db.session.add(admin_user)
-        db.session.commit()
+        if not User.query.filter_by(username="admin").first():
+            admin_user = User(
+                username="admin",
+                password=generate_password_hash("admin123"),
+                role="admin"
+            )
+            db.session.add(admin_user)
+            db.session.commit()
+
+except Exception as e:
+    print("Database initialization error:", e)
 
 # IMPORTANT:
 # DO NOT add handler()
