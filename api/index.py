@@ -144,7 +144,3 @@ def logout():
     return redirect(url_for("login"))
 
 # ================= INIT DATABASE =================
-@app.route("/generate")
-def generate():
-    from werkzeug.security import generate_password_hash
-    return generate_password_hash("Arpan120508")
