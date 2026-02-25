@@ -50,12 +50,23 @@ def load_user(user_id):
 def home():
     return redirect(url_for("login"))
 
-@app.route("/login", methods=["GET", "POST"])
+@@app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        user = User.query.filter_by(username=request.form["username"]).first()
+        username = request.form["username"]
+        password = request.form["password"]
 
-        if user and check_password_hash(user.password, request.form["password"]):
+        print("Entered username:", username)
+
+        user = User.query.filter_by(username=username).first()
+
+        if not user:
+            print("User not found")
+        else:
+            print("Stored hash:", user.password)
+            print("Password match:", check_password_hash(user.password, password))
+
+        if user and check_password_hash(user.password, password):
             login_user(user)
 
             if user.role == "admin":
