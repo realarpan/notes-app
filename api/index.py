@@ -138,11 +138,21 @@ with app.app_context():
     db.create_all()
 
     admin_exists = User.query.filter_by(username="admin").first()
-    if not admin_exists:
-        admin_user = User(
-            username="admin",
-            password=generate_password_hash("admin123"),
-            role="admin"
-        )
-        db.session.add(admin_user)
-        db.session.commit()
+if not admin_exists:
+    admin_user = User(
+        username="admin",
+        password=generate_password_hash("admin123"),
+        role="admin"
+    )
+    db.session.add(admin_user)
+
+user_exists = User.query.filter_by(username="student").first()
+if not user_exists:
+    student_user = User(
+        username="student",
+        password=generate_password_hash("student123"),
+        role="user"
+    )
+    db.session.add(student_user)
+
+db.session.commit()
