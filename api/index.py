@@ -133,7 +133,3 @@ def logout():
     return redirect(url_for("login"))
 
 # ================= INIT DATABASE =================
-        db.session.add(student_user)
-
-    db.session.commit()
-db.session.commit()
