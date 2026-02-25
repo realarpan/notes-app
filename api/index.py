@@ -102,11 +102,15 @@ def logout():
 
 # ================= DATABASE INIT =================
 
-try:
-    with app.app_context():
+# ================= DATABASE INIT =================
+
+with app.app_context():
+    try:
         db.create_all()
 
-        if not User.query.filter_by(username="admin").first():
+        # Create default admin only if not exists
+        existing_admin = User.query.filter_by(username="admin").first()
+        if not existing_admin:
             admin_user = User(
                 username="admin",
                 password=generate_password_hash("admin123"),
@@ -115,8 +119,10 @@ try:
             db.session.add(admin_user)
             db.session.commit()
 
-except Exception as e:
-    print("Database initialization error:", e)
+        print("Database initialized successfully")
+
+    except Exception as e:
+        print("Database initialization failed:", str(e))
 
 # IMPORTANT:
 # DO NOT add handler()
