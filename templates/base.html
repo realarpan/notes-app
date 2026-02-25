@@ -8,71 +8,106 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f5f7fa;
+            background: linear-gradient(135deg, #f9fafb, #eef2f7);
+            min-height: 100vh;
         }
 
+        /* Glass Navbar */
         .navbar {
-            background-color: white !important;
-            border-bottom: 1px solid #eaeaea;
+            background: rgba(255, 255, 255, 0.7) !important;
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
 
         .navbar-brand {
-            font-weight: 600;
-            color: #111 !important;
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: -0.5px;
         }
 
-        .btn-danger {
-            background-color: #ff4d4f;
+        /* Modern Cards */
+        .card {
             border: none;
+            border-radius: 16px;
+            transition: all 0.25s ease;
         }
 
-        .btn-danger:hover {
-            background-color: #e63946;
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
         }
 
+        /* Buttons */
+        .btn-dark {
+            background-color: #111827;
+            border: none;
+            border-radius: 8px;
+        }
+
+        .btn-outline-secondary {
+            border-radius: 8px;
+        }
+
+        /* Footer */
         footer {
-            background: linear-gradient(135deg, #111827, #1f2937);
-            color: #d1d5db;
+            background: #111827;
+            color: #9ca3af;
         }
 
         footer strong {
             color: white;
-            font-weight: 500;
+        }
+
+        h2 {
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        /* Smooth fade animation */
+        .container {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 
-<body class="d-flex flex-column min-vh-100">
+<body class="d-flex flex-column">
 
 <nav class="navbar px-4 py-3">
     <span class="navbar-brand">Notes Portal</span>
+
     {% if current_user.is_authenticated %}
-    <a href="/logout" class="btn btn-sm btn-danger">Logout</a>
+    <a href="/logout" class="btn btn-sm btn-dark">Logout</a>
     {% endif %}
 </nav>
 
 <div class="container mt-5 flex-grow-1">
+
     {% with messages = get_flashed_messages() %}
       {% if messages %}
-        <div class="alert alert-info shadow-sm">
+        <div class="alert alert-info shadow-sm rounded-4">
           {{ messages[0] }}
         </div>
       {% endif %}
     {% endwith %}
+
     {% block content %}{% endblock %}
+
 </div>
 
 <footer class="text-center py-4 mt-auto">
-    <div class="container">
-        <small>
-            Made with ❤️ by <strong>Arpan</strong>
-        </small>
-    </div>
+    <small>
+        Made with ❤️ by <strong>Arpan</strong>
+    </small>
 </footer>
 
 </body>
