@@ -4,21 +4,16 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
-# ================= PATH SETUP =================
+# ================= APP CONFIG =================
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(BASE_DIR, "../templates")
-STATIC_DIR = os.path.join(BASE_DIR, "../static")
 
-app = Flask(__name__, template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
+app = Flask(__name__, template_folder=TEMPLATE_DIR)
 
-app.config['SECRET_KEY'] = 'supersecretkey'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL")
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-UPLOAD_FOLDER = os.path.join(STATIC_DIR, "uploads")
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config["SECRET_KEY"] = "supersecretkey"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
@@ -29,19 +24,23 @@ login_manager.login_view = "login"
 # ================= MODELS =================
 
 class User(UserMixin, db.Model):
+    __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(200))
-    role = db.Column(db.String(10))  # admin or student
+    role = db.Column(db.String(20))
 
 class Note(db.Model):
+    __tablename__ = "notes"
     id = db.Column(db.Integer, primary_key=True)
     class_number = db.Column(db.Integer)
-    filename = db.Column(db.String(200))
+    pdf_url = db.Column(db.String(500))
+
+# ================= LOGIN MANAGER =================
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return db.session.get(User, int(user_id))
 
 # ================= ROUTES =================
 
@@ -52,13 +51,17 @@ def home():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        user = User.query.filter_by(username=request.form['username']).first()
-        if user and check_password_hash(user.password, request.form['password']):
+        user = User.query.filter_by(username=request.form["username"]).first()
+
+        if user and check_password_hash(user.password, request.form["password"]):
             login_user(user)
+
             if user.role == "admin":
                 return redirect(url_for("admin"))
             return redirect(url_for("dashboard"))
+
         flash("Invalid credentials")
+
     return render_template("login.html")
 
 @app.route("/dashboard")
@@ -79,18 +82,14 @@ def admin():
         return "Access Denied"
 
     if request.method == "POST":
-        file = request.files['file']
-        class_number = request.form['class_number']
+        class_number = request.form["class_number"]
+        pdf_url = request.form["pdf_url"]
 
-        if file and file.filename.endswith(".pdf"):
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-            file.save(filepath)
+        note = Note(class_number=class_number, pdf_url=pdf_url)
+        db.session.add(note)
+        db.session.commit()
 
-            note = Note(class_number=class_number, filename=file.filename)
-            db.session.add(note)
-            db.session.commit()
-
-            flash("PDF Uploaded Successfully")
+        flash("Note added successfully")
 
     return render_template("admin.html")
 
@@ -100,31 +99,17 @@ def logout():
     logout_user()
     return redirect(url_for("login"))
 
-# ================= DATABASE INIT =================
-
-# ================= DATABASE INIT =================
+# ================= INIT DATABASE =================
 
 with app.app_context():
-    try:
-        db.create_all()
+    db.create_all()
 
-        # Create default admin only if not exists
-        existing_admin = User.query.filter_by(username="admin").first()
-        if not existing_admin:
-            admin_user = User(
-                username="admin",
-                password=generate_password_hash("admin123"),
-                role="admin"
-            )
-            db.session.add(admin_user)
-            db.session.commit()
-
-        print("Database initialized successfully")
-
-    except Exception as e:
-        print("Database initialization failed:", str(e))
-
-# IMPORTANT:
-# DO NOT add handler()
-# DO NOT add app.run()
-# Vercel automatically detects "app"
+    admin_exists = User.query.filter_by(username="admin").first()
+    if not admin_exists:
+        admin_user = User(
+            username="admin",
+            password=generate_password_hash("admin123"),
+            role="admin"
+        )
+        db.session.add(admin_user)
+        db.session.commit()
