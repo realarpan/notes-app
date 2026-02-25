@@ -2,7 +2,9 @@ from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 import os
+import requests
 
 # ================= APP CONFIG =================
 
@@ -83,13 +85,44 @@ def admin():
 
     if request.method == "POST":
         class_number = request.form["class_number"]
-        pdf_url = request.form["pdf_url"]
+        file = request.files.get("file")
 
-        note = Note(class_number=class_number, pdf_url=pdf_url)
+        if not file:
+            flash("No file selected")
+            return redirect(url_for("admin"))
+
+        # Limit file size (10MB safety)
+        if request.content_length > 10 * 1024 * 1024:
+            return "File too large (Max 10MB)"
+
+        filename = secure_filename(file.filename)
+        temp_path = f"/tmp/{filename}"
+        file.save(temp_path)
+
+        SUPABASE_URL = os.environ.get("SUPABASE_URL")
+        SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+
+        upload_url = f"{SUPABASE_URL}/storage/v1/object/notes/{filename}"
+
+        headers = {
+            "apikey": SUPABASE_KEY,
+            "Authorization": f"Bearer {SUPABASE_KEY}",
+            "Content-Type": "application/pdf"
+        }
+
+        with open(temp_path, "rb") as f:
+            response = requests.post(upload_url, headers=headers, data=f)
+
+        if response.status_code not in [200, 201]:
+            return f"Upload failed: {response.text}"
+
+        public_url = f"{SUPABASE_URL}/storage/v1/object/public/notes/{filename}"
+
+        note = Note(class_number=class_number, pdf_url=public_url)
         db.session.add(note)
         db.session.commit()
 
-        flash("Note added successfully")
+        flash("PDF uploaded successfully")
 
     return render_template("admin.html")
 
