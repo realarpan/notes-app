@@ -6,8 +6,6 @@ from werkzeug.utils import secure_filename
 import os
 import requests
 
-# ================= APP CONFIG =================
-
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(BASE_DIR, "../templates")
 
@@ -23,8 +21,6 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
-# ================= MODELS =================
-
 class User(UserMixin, db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
@@ -38,13 +34,9 @@ class Note(db.Model):
     class_number = db.Column(db.Integer)
     pdf_url = db.Column(db.String(500))
 
-# ================= LOGIN MANAGER =================
-
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(User, int(user_id))
-
-# ================= ROUTES =================
 
 @app.route("/")
 def home():
@@ -142,5 +134,3 @@ def admin():
 def logout():
     logout_user()
     return redirect(url_for("login"))
-
-# ================= INIT DATABASE =================
