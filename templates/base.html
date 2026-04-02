@@ -4,97 +4,38 @@
     <title>Notes Portal</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f9fafb, #eef2f7);
-            min-height: 100vh;
-        }
-
-        /* Glass Navbar */
-        .navbar {
-            background: rgba(255, 255, 255, 0.7) !important;
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-
-        .navbar-brand {
-            font-weight: 700;
-            font-size: 1.2rem;
-            letter-spacing: -0.5px;
-        }
-
-        /* Modern Cards */
-        .card {
-            border: none;
-            border-radius: 16px;
-            transition: all 0.25s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-        }
-
-        /* Buttons */
-        .btn-dark {
-            background-color: #111827;
-            border: none;
-            border-radius: 8px;
-        }
-
-        .btn-outline-secondary {
-            border-radius: 8px;
-        }
-
-        /* Footer */
-        footer {
-            background: #111827;
-            color: #9ca3af;
-        }
-
-        footer strong {
-            color: white;
-        }
-
-        h2 {
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-
-        /* Smooth fade animation */
-        .container {
-            animation: fadeIn 0.5s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 
-<body class="d-flex flex-column">
+<body class="bg-gradient-to-br from-black via-gray-900 to-black text-white min-h-screen flex flex-col">
 
-<nav class="navbar px-4 py-3">
-    <span class="navbar-brand">Notes Portal</span>
+<!-- NAVBAR -->
+<nav class="flex justify-between items-center px-6 py-4 bg-white/5 backdrop-blur-lg border-b border-white/10">
+    <h1 class="text-xl font-semibold tracking-tight">📘 Notes Portal</h1>
 
     {% if current_user.is_authenticated %}
-    <a href="/logout" class="btn btn-sm btn-dark">Logout</a>
+    <a href="/logout" class="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-sm">
+        Logout
+    </a>
     {% endif %}
 </nav>
 
-<div class="container mt-5 flex-grow-1">
+<!-- CONTENT -->
+<div class="flex-grow p-6 max-w-5xl mx-auto w-full">
 
     {% with messages = get_flashed_messages() %}
       {% if messages %}
-        <div class="alert alert-info shadow-sm rounded-4">
+        <div class="mb-4 p-3 bg-blue-500/20 border border-blue-400/30 rounded-lg">
           {{ messages[0] }}
         </div>
       {% endif %}
@@ -104,10 +45,9 @@
 
 </div>
 
-<footer class="text-center py-4 mt-auto">
-    <small>
-        Made with ❤️ by <strong>Arpan</strong>
-    </small>
+<!-- FOOTER -->
+<footer class="text-center py-6 text-gray-400 text-sm">
+    Made with ❤️ by <span class="text-white font-semibold">Arpan</span>
 </footer>
 
 </body>
