@@ -3,88 +3,56 @@
 
 <div class="flex justify-center items-center mt-20">
 
-```
-<div id="loginCard" class="bg-white/10 backdrop-blur-xl p-8 rounded-2xl shadow-2xl w-80 border border-white/10 transition-all duration-300">
+<div id="loginCard" class="bg-white/10 backdrop-blur-xl p-8 rounded-2xl shadow-2xl w-80 border border-white/10 transition">
     
     <!-- Heading -->
-    <h2 class="text-2xl font-semibold mb-8 text-center tracking-tight">
+    <h2 class="text-2xl font-semibold mb-6 text-center tracking-tight">
         Welcome Back
     </h2>
 
-    <!-- Error Message -->
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <div id="errorBox" class="mb-4 text-sm text-red-400 text-center bg-red-500/10 py-2 rounded-lg">
-        {{ messages[0] }}
-    </div>
-    {% endif %}
-    {% endwith %}
-
     <!-- Form -->
-    <form method="POST" id="loginForm" class="space-y-5">
+    <form method="POST" id="loginForm">
 
-        <!-- Username Floating -->
-        <div class="relative">
-            <input 
-                name="username" 
-                required
-                class="peer w-full p-3 bg-gray-800/80 text-white rounded-lg placeholder-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Username"
-            >
-            <label class="absolute left-3 top-3 text-gray-400 text-sm transition-all 
-                peer-placeholder-shown:top-3 
-                peer-placeholder-shown:text-base 
-                peer-placeholder-shown:text-gray-500
-                peer-focus:-top-2 
-                peer-focus:text-xs 
-                peer-focus:text-blue-400 
-                bg-black/40 px-1 rounded">
-                Username
-            </label>
-        </div>
+        <!-- Username -->
+        <input 
+            name="username" 
+            placeholder="Username"
+            required
+            class="w-full mb-4 p-3 rounded-lg bg-gray-800/80 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+        >
 
-        <!-- Password Floating -->
-        <div class="relative">
+        <!-- Password with Toggle -->
+        <div class="relative mb-2">
             <input 
                 type="password" 
                 name="password" 
                 id="password"
-                required
                 placeholder="Password"
+                required
+                class="w-full p-3 pr-10 rounded-lg bg-gray-800/80 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                 onkeyup="checkCaps(event)"
-                class="peer w-full p-3 pr-10 bg-gray-800/80 text-white rounded-lg placeholder-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
 
-            <label class="absolute left-3 top-3 text-gray-400 text-sm transition-all 
-                peer-placeholder-shown:top-3 
-                peer-placeholder-shown:text-base 
-                peer-placeholder-shown:text-gray-500
-                peer-focus:-top-2 
-                peer-focus:text-xs 
-                peer-focus:text-blue-400 
-                bg-black/40 px-1 rounded">
-                Password
-            </label>
-
-            <!-- Eye -->
+            <!-- Eye Icon -->
             <button type="button" onclick="togglePassword()" 
                 class="absolute right-3 top-3 text-gray-400 hover:text-white text-sm">
                 👁️
             </button>
         </div>
 
-        <!-- Caps Lock -->
-        <p id="capsWarning" class="text-xs text-yellow-400 hidden -mt-3">
+        <!-- Caps Lock Warning -->
+        <p id="capsWarning" class="text-xs text-yellow-400 mb-3 hidden">
             Caps Lock is ON
         </p>
 
         <!-- Button -->
         <button 
             id="loginBtn"
-            class="w-full bg-blue-600 hover:bg-blue-700 py-2.5 rounded-lg font-medium transition-all duration-200 flex justify-center items-center gap-2 shadow-lg shadow-blue-600/20 hover:scale-[1.02] active:scale-[0.98]">
+            class="w-full bg-blue-600 hover:bg-blue-700 py-2.5 rounded-lg font-medium transition shadow-lg shadow-blue-600/20 flex justify-center items-center gap-2">
             
             <span id="btnText">Login</span>
 
+            <!-- Spinner -->
             <svg id="spinner" class="hidden w-4 h-4 animate-spin" viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="10" stroke="white" stroke-width="3" fill="none" opacity="0.3"/>
                 <path d="M22 12a10 10 0 0 1-10 10" stroke="white" stroke-width="3"/>
@@ -94,15 +62,15 @@
 
     </form>
 
-    <!-- Footer -->
-    <div class="mt-6 border-t border-white/10 pt-4">
-        <p class="text-[11px] text-gray-400 text-center leading-relaxed">
-            Access is restricted. Credentials are securely issued by the developer only.
-        </p>
-    </div>
+    <!-- Divider -->
+    <div class="my-5 border-t border-white/10"></div>
+
+    <!-- Footer Note -->
+    <p class="text-[11px] text-gray-400 text-center leading-relaxed">
+        Access is restricted. Login credentials are securely provided by the developer only.
+    </p>
 
 </div>
-```
 
 </div>
 
@@ -117,7 +85,7 @@
   100% { transform: translateX(0); }
 }
 .shake {
-  animation: shake 0.35s;
+  animation: shake 0.3s;
 }
 </style>
 
@@ -129,7 +97,7 @@ function togglePassword() {
     input.type = input.type === "password" ? "text" : "password";
 }
 
-// Caps Lock
+// Caps Lock detection
 function checkCaps(event) {
     const warning = document.getElementById("capsWarning");
     if (event.getModifierState("CapsLock")) {
@@ -150,11 +118,12 @@ document.getElementById("loginForm").addEventListener("submit", function() {
     spinner.classList.remove("hidden");
 });
 
-// Error animation
+// ERROR SHAKE if Flask sends flash message
 window.onload = function() {
     const hasError = {{ 'true' if get_flashed_messages() else 'false' }};
     if (hasError) {
-        document.getElementById("loginCard").classList.add("shake");
+        const card = document.getElementById("loginCard");
+        card.classList.add("shake");
     }
 };
 </script>
