@@ -3,8 +3,7 @@
 
 <div class="max-w-6xl mx-auto mt-10 px-4">
 
-```
-<!-- 🔝 Header -->
+<!-- Header -->
 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-10">
     
     <div>
@@ -16,32 +15,31 @@
         </p>
     </div>
 
-    <!-- Search (UI only for now) -->
+    <!-- Search -->
     <input 
+        id="searchInput"
         type="text" 
         placeholder="Search classes..."
         class="px-4 py-2 rounded-lg bg-gray-800/80 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-64"
     >
 </div>
 
-<!-- 📚 Class Grid -->
+<!-- Class Grid -->
 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
 
     {% for i in range(1,12) %}
     <a href="/class/{{i}}" 
-       class="group bg-white/5 backdrop-blur-lg p-6 rounded-2xl text-center border border-white/10 hover:border-blue-500/40 hover:bg-white/10 hover:scale-[1.04] transition-all duration-200 shadow-lg">
+       class="class-card group bg-white/5 backdrop-blur-lg p-6 rounded-2xl text-center border border-white/10 hover:border-blue-500/40 hover:bg-white/10 hover:scale-[1.04] transition-all duration-200 shadow-lg"
+       data-name="class {{i}}">
 
-        <!-- Icon -->
         <div class="text-3xl mb-3 group-hover:scale-110 transition">
             📘
         </div>
 
-        <!-- Title -->
         <h3 class="text-lg font-semibold">
             Class {{i}}
         </h3>
 
-        <!-- Subtext -->
         <p class="text-xs text-gray-400 mt-1">
             View Notes
         </p>
@@ -51,12 +49,42 @@
 
 </div>
 
-<!-- ✨ Extra Section (Optional polish) -->
-<div class="mt-16 text-center text-gray-500 text-sm">
-    Choose a class to explore available study materials
+<!-- No Results -->
+<div id="noResults" class="hidden text-center mt-10 text-gray-400">
+    No classes found
 </div>
-```
 
 </div>
+
+<!-- Search Script -->
+
+<script>
+const searchInput = document.getElementById("searchInput");
+const cards = document.querySelectorAll(".class-card");
+const noResults = document.getElementById("noResults");
+
+searchInput.addEventListener("keyup", function() {
+    const value = this.value.toLowerCase();
+    let visible = 0;
+
+    cards.forEach(card => {
+        const name = card.getAttribute("data-name");
+
+        if (name.includes(value)) {
+            card.style.display = "block";
+            visible++;
+        } else {
+            card.style.display = "none";
+        }
+    });
+
+    // Show "No results"
+    if (visible === 0) {
+        noResults.classList.remove("hidden");
+    } else {
+        noResults.classList.add("hidden");
+    }
+});
+</script>
 
 {% endblock %}
