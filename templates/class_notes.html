@@ -7,12 +7,12 @@
 
 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
 
+```
 <h2 class="text-3xl font-semibold tracking-tight">
     Class {{ class_number }} Notes
 </h2>
 
 <div class="flex gap-2 w-full md:w-auto">
-    <!-- Search -->
     <input 
         id="searchNotes"
         type="text" 
@@ -20,22 +20,22 @@
         class="px-4 py-2 rounded-lg bg-gray-800/80 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
     >
 
-    <!-- Voice -->
     <button onclick="startVoice()" 
         class="px-3 bg-gray-700 rounded-lg hover:bg-gray-600">
         Voice Search
     </button>
 </div>
+```
 
 </div>
 
 <!-- 🔘 Filters -->
 
 <div class="flex gap-2 mb-6 flex-wrap">
-    <button onclick="setFilter('all')" class="filter-btn px-3 py-1 bg-blue-600 rounded-lg text-sm">All Lessons</button>
-    <button onclick="setFilter('first')" class="filter-btn px-3 py-1 bg-gray-700 rounded-lg text-sm">First Term Examination (1-7)</button>
-    <button onclick="setFilter('second')" class="filter-btn px-3 py-1 bg-gray-700 rounded-lg text-sm">Second Term Examination (8-14)</button>
-    <button onclick="setFilter('third')" class="filter-btn px-3 py-1 bg-gray-700 rounded-lg text-sm">Third Term Examination (15-20)</button>
+    <button onclick="setFilter('all', this)" class="filter-btn px-3 py-1 bg-blue-600 rounded-lg text-sm">All Lessons</button>
+    <button onclick="setFilter('first', this)" class="filter-btn px-3 py-1 bg-gray-700 rounded-lg text-sm">First Term (1-7)</button>
+    <button onclick="setFilter('second', this)" class="filter-btn px-3 py-1 bg-gray-700 rounded-lg text-sm">Second Term (8-14)</button>
+    <button onclick="setFilter('third', this)" class="filter-btn px-3 py-1 bg-gray-700 rounded-lg text-sm">Third Term (15-20)</button>
 </div>
 
 {% set lesson_titles = [
@@ -49,28 +49,33 @@
 <div class="space-y-4">
 
 {% if notes %}
-{% for note in notes %} <div class="note-card bg-white/5 backdrop-blur-lg p-5 rounded-xl flex justify-between items-center hover:bg-white/10 transition border border-white/10"
-          data-title="{{ lesson_titles[loop.index0]|lower }}">
+{% for note in notes %}
 
-        <span class="title font-medium text-lg">
-            {{ lesson_titles[loop.index0] }}
-        </span>
+<div class="note-card bg-white/5 backdrop-blur-lg p-5 rounded-xl flex justify-between items-center hover:bg-white/10 transition border border-white/10"
+     data-title="{{ lesson_titles[loop.index0] if loop.index0 < lesson_titles|length else 'extra lesson' }}">
 
-        <div class="flex gap-3">
-            <button onclick="openPDF('{{ note.pdf_url }}')"
-               class="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm">
-               View
-            </button>
+```
+<span class="title font-medium text-lg">
+    {{ lesson_titles[loop.index0] if loop.index0 < lesson_titles|length else "Extra Lesson" }}
+</span>
 
-            <a href="{{ note.pdf_url }}" download
-               class="px-3 py-1 bg-green-600 hover:bg-green-700 rounded-lg text-sm">
-               Download
-            </a>
-        </div>
-    </div>
+<div class="flex gap-3">
+    <button onclick="openPDF('{{ note.pdf_url or '' }}')"
+       class="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm">
+       View
+    </button>
+
+    <a href="{{ note.pdf_url or '' }}" download
+       class="px-3 py-1 bg-green-600 hover:bg-green-700 rounded-lg text-sm">
+       Download
+    </a>
+</div>
+```
+
+</div>
 {% endfor %}
-
-{% else %} <p class="text-gray-400">No notes uploaded by the admin yet.</p>
+{% else %}
+<p class="text-gray-400">No notes uploaded by the admin yet.</p>
 {% endif %}
 
 </div>
@@ -81,6 +86,8 @@
 
 </div>
 
+<!-- 🔥 SCRIPT -->
+
 <script>
 const input = document.getElementById("searchNotes");
 const notes = document.querySelectorAll(".note-card");
@@ -88,7 +95,6 @@ const noResults = document.getElementById("noResults");
 
 let activeFilter = "all";
 
-// word → number
 const map = {
  "one":1,"two":2,"three":3,"four":4,"five":5,
  "six":6,"seven":7,"eight":8,"nine":9,"ten":10,
@@ -97,15 +103,10 @@ const map = {
  "nineteen":19,"twenty":20
 };
 
-// 🔥 typo tolerance (ONLY for text, not numbers)
 function fuzzyMatch(text, query){
     if(text.includes(query)) return true;
-
     let words = text.split(" ");
-    return words.some(word=>{
-        let dist = levenshtein(word, query);
-        return dist <= 2;
-    });
+    return words.some(word=>levenshtein(word, query) <= 2);
 }
 
 function levenshtein(a, b){
@@ -115,15 +116,9 @@ function levenshtein(a, b){
 
     for(let i=1;i<=b.length;i++){
         for(let j=1;j<=a.length;j++){
-            if(b[i-1] === a[j-1]){
-                matrix[i][j] = matrix[i-1][j-1];
-            } else {
-                matrix[i][j] = Math.min(
-                    matrix[i-1][j-1] + 1,
-                    matrix[i][j-1] + 1,
-                    matrix[i-1][j] + 1
-                );
-            }
+            matrix[i][j] = b[i-1] === a[j-1]
+                ? matrix[i-1][j-1]
+                : Math.min(matrix[i-1][j-1]+1, matrix[i][j-1]+1, matrix[i-1][j]+1);
         }
     }
     return matrix[b.length][a.length];
@@ -138,7 +133,6 @@ function applySearch(){
         let title = note.getAttribute("data-title");
         let titleEl = note.querySelector(".title");
 
-        // reset title
         titleEl.innerHTML = title;
 
         let show = true;
@@ -151,7 +145,6 @@ function applySearch(){
         words.forEach(word=>{
             let matched = false;
 
-            // ✅ NUMBER FIRST (FIX)
             let num = !isNaN(word) ? parseInt(word) : map[word];
 
             if(num && start !== null){
@@ -161,7 +154,6 @@ function applySearch(){
                 }
             }
 
-            // ✅ TEXT MATCH ONLY IF NOT NUMBER
             if(!num && fuzzyMatch(title, word)){
                 matched = true;
             }
@@ -169,7 +161,6 @@ function applySearch(){
             if(!matched) show = false;
         });
 
-        // ✅ FILTER FIX
         if(activeFilter !== "all" && start !== null){
             if(activeFilter === "first" && !(start >= 1 && start <= 7)) show = false;
             if(activeFilter === "second" && !(start >= 8 && start <= 14)) show = false;
@@ -180,7 +171,6 @@ function applySearch(){
             note.style.display = "flex";
             visible++;
 
-            // ✅ CLEAN HIGHLIGHT (ONLY NUMBER)
             if(matchedNumber){
                 titleEl.innerHTML = title.replace(
                     new RegExp(`(${matchedNumber})`, "g"),
@@ -198,8 +188,7 @@ function applySearch(){
 
 input.addEventListener("input", applySearch);
 
-// 🔘 filters
-function setFilter(type){
+function setFilter(type, el){
     activeFilter = type;
 
     document.querySelectorAll(".filter-btn").forEach(btn=>{
@@ -207,12 +196,10 @@ function setFilter(type){
         btn.classList.add("bg-gray-700");
     });
 
-    event.target.classList.add("bg-blue-600");
-
+    el.classList.add("bg-blue-600");
     applySearch();
 }
 
-// 🎤 voice search
 function startVoice(){
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     recognition.lang = "en-US";
@@ -229,3 +216,5 @@ function startVoice(){
     recognition.start();
 }
 </script>
+
+{% endblock %}
