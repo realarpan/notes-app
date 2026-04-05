@@ -5,7 +5,6 @@
 
 <div id="loginCard" class="bg-white/10 backdrop-blur-xl p-8 rounded-2xl shadow-2xl w-80 border border-white/10 transition">
 
-```
 <!-- Heading -->
 <h2 class="text-2xl font-semibold mb-6 text-center tracking-tight">
     Welcome Back
@@ -66,7 +65,7 @@
 
 <!-- 🔒 Security Badge -->
 <div class="text-[11px] text-gray-400 text-center flex items-center justify-center gap-1">
-    🔒 Secured with encrypted authentication & cloud storage
+    All data is encrypted during transmission and securely stored, with access restricted to authenticated systems.
 </div>
 
 <!-- 📜 Terms -->
@@ -76,7 +75,6 @@
         Terms & Privacy
     </span>
 </p>
-```
 
 </div>
 
@@ -86,19 +84,21 @@
 
 <div id="privacyModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50">
 
-```
 <div class="bg-gray-900 p-6 rounded-2xl max-w-md w-full border border-white/10">
     
     <h2 class="text-xl font-semibold mb-4">Privacy & Security</h2>
 
     <p class="text-sm text-gray-300 leading-relaxed">
-        This platform uses secure authentication systems and encrypted communication (HTTPS) 
-        to protect user access. Notes are stored using reliable cloud infrastructure such as 
-        Supabase and AWS, with controlled access policies.
-        <br><br>
-        Sensitive data is never exposed publicly, and server-side validation ensures protection 
-        against unauthorized access attempts. Industry-standard practices are followed to maintain 
-        high levels of security and data integrity.
+    The system operates on a session-based authentication model with secure credential handling and encrypted 
+    transport layers (HTTPS/TLS), preventing interception or exposure of sensitive information during transmission.
+    <br><br>
+    Persistent data is hosted on cloud-native infrastructure (Supabase, AWS) with role-based access control (RBAC), 
+    secure storage policies, and restricted API access. All resources are protected behind controlled endpoints, 
+    eliminating direct exposure to public networks.
+    <br><br>
+    Backend validation enforces strict request sanitization and authorization checks, reducing vulnerabilities 
+    including unauthorized access attempts, data leakage, and injection-based exploits. The architecture follows 
+    standard security principles such as least privilege, isolation, and controlled execution environments.
     </p>
 
     <button onclick="closeModal()" 
@@ -107,7 +107,6 @@
     </button>
 
 </div>
-```
 
 </div>
 
