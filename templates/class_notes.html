@@ -7,7 +7,6 @@
 
 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
 
-```
 <h2 class="text-3xl font-semibold tracking-tight">
     Class {{ class_number }} Notes
 </h2>
@@ -24,19 +23,19 @@
     <!-- Voice -->
     <button onclick="startVoice()" 
         class="px-3 bg-gray-700 rounded-lg hover:bg-gray-600">
-        🎤
+        Voice Search
     </button>
 </div>
-```
 
 </div>
 
 <!-- 🔘 Filters -->
 
 <div class="flex gap-2 mb-6 flex-wrap">
-    <button onclick="setFilter('all')" class="filter-btn px-3 py-1 bg-blue-600 rounded-lg text-sm">All</button>
-    <button onclick="setFilter('first')" class="filter-btn px-3 py-1 bg-gray-700 rounded-lg text-sm">1-10</button>
-    <button onclick="setFilter('second')" class="filter-btn px-3 py-1 bg-gray-700 rounded-lg text-sm">11-20</button>
+    <button onclick="setFilter('all')" class="filter-btn px-3 py-1 bg-blue-600 rounded-lg text-sm">All Lessons</button>
+    <button onclick="setFilter('first')" class="filter-btn px-3 py-1 bg-gray-700 rounded-lg text-sm">First Term Examination (1-7)</button>
+    <button onclick="setFilter('second')" class="filter-btn px-3 py-1 bg-gray-700 rounded-lg text-sm">Second Term Examination (8-14)</button>
+    <button onclick="setFilter('third')" class="filter-btn px-3 py-1 bg-gray-700 rounded-lg text-sm">Third Term Examination (15-20)</button>
 </div>
 
 {% set lesson_titles = [
@@ -53,7 +52,6 @@
 {% for note in notes %} <div class="note-card bg-white/5 backdrop-blur-lg p-5 rounded-xl flex justify-between items-center hover:bg-white/10 transition border border-white/10"
           data-title="{{ lesson_titles[loop.index0]|lower }}">
 
-```
         <span class="title font-medium text-lg">
             {{ lesson_titles[loop.index0] }}
         </span>
@@ -71,15 +69,14 @@
         </div>
     </div>
 {% endfor %}
-```
 
-{% else %} <p class="text-gray-400">No notes available yet.</p>
+{% else %} <p class="text-gray-400">No notes uploaded by the admin yet.</p>
 {% endif %}
 
 </div>
 
 <div id="noResults" class="hidden text-center mt-10 text-gray-400">
-    No matching lessons found
+    No matching lessons found.
 </div>
 
 </div>
@@ -102,54 +99,86 @@ const map = {
  "nineteen":19,"twenty":20
 };
 
-// simple typo tolerance
-function similar(a,b){
-    return a.includes(b) || b.includes(a);
+// 🔥 better typo tolerance (edit distance)
+function fuzzyMatch(text, query){
+    if(text.includes(query)) return true;
+
+    let t = text.split(" ");
+    return t.some(word=>{
+        let dist = levenshtein(word, query);
+        return dist <= 2; // allow 2 mistakes
+    });
+}
+
+function levenshtein(a, b){
+    const matrix = Array.from({length: b.length + 1}, () => []);
+    for(let i=0;i<=b.length;i++) matrix[i][0] = i;
+    for(let j=0;j<=a.length;j++) matrix[0][j] = j;
+
+    for(let i=1;i<=b.length;i++){
+        for(let j=1;j<=a.length;j++){
+            if(b[i-1] === a[j-1]){
+                matrix[i][j] = matrix[i-1][j-1];
+            } else {
+                matrix[i][j] = Math.min(
+                    matrix[i-1][j-1] + 1,
+                    matrix[i][j-1] + 1,
+                    matrix[i-1][j] + 1
+                );
+            }
+        }
+    }
+    return matrix[b.length][a.length];
 }
 
 function applySearch(){
     let value = input.value.toLowerCase().trim();
-    let words = value.split(" ");
+    let words = value.split(/\s+/);
     let visible = 0;
 
     notes.forEach(note=>{
         let title = note.getAttribute("data-title");
         let titleEl = note.querySelector(".title");
 
-        titleEl.innerHTML = title; // reset
+        titleEl.innerHTML = title;
         let show = true;
+
+        let match = title.match(/(\d+)\s*-\s*(\d+)/);
+        let start = match ? parseInt(match[1]) : null;
+        let end = match ? parseInt(match[2]) : null;
 
         words.forEach(word=>{
             let matched = false;
 
+            // 🔥 number detection (9 / nine / Nine)
             let num = !isNaN(word) ? parseInt(word) : map[word];
 
-            let match = title.match(/(\d+)\s*-\s*(\d+)/);
-            if(num && match){
-                let start = parseInt(match[1]);
-                let end = parseInt(match[2]);
-                if(num>=start && num<=end) matched = true;
+            if(num && start !== null){
+                if(num >= start && num <= end){
+                    matched = true;
+                }
             }
 
-            if(similar(title, word)) matched = true;
+            // 🔥 fuzzy text match
+            if(fuzzyMatch(title, word)){
+                matched = true;
+            }
 
             if(!matched) show = false;
         });
 
-        // filter logic
-        if(activeFilter !== "all"){
-            let match = title.match(/(\d+)\s*-\s*(\d+)/);
-            if(match){
-                let start = parseInt(match[1]);
-                if(activeFilter === "first" && start > 10) show = false;
-                if(activeFilter === "second" && start <= 10) show = false;
-            }
+        // 🔥 YOUR TERM FILTER LOGIC (FIXED)
+        if(activeFilter !== "all" && start !== null){
+            if(activeFilter === "first" && !(start >= 1 && start <= 7)) show = false;
+            if(activeFilter === "second" && !(start >= 8 && start <= 14)) show = false;
+            if(activeFilter === "third" && !(start >= 15 && start <= 20)) show = false;
         }
 
         if(show){
             note.style.display = "flex";
             visible++;
 
+            // 🔥 highlight
             words.forEach(w=>{
                 if(w){
                     let regex = new RegExp(`(${w})`,"gi");
@@ -166,31 +195,42 @@ function applySearch(){
     noResults.classList.toggle("hidden", visible !== 0);
 }
 
-input.addEventListener("keyup", applySearch);
+input.addEventListener("input", applySearch);
 
-// filters
+// 🔘 filters
 function setFilter(type){
     activeFilter = type;
+
     document.querySelectorAll(".filter-btn").forEach(btn=>{
         btn.classList.remove("bg-blue-600");
         btn.classList.add("bg-gray-700");
     });
+
     event.target.classList.add("bg-blue-600");
+
     applySearch();
 }
 
-// voice search
+// 🎤 voice search (improved)
 function startVoice(){
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     recognition.lang = "en-US";
+    recognition.interimResults = false;
 
     recognition.onresult = function(event){
-        input.value = event.results[0][0].transcript;
+        let text = event.results[0][0].transcript;
+        input.value = text.toLowerCase();
         applySearch();
+    };
+
+    recognition.onerror = function(){
+        alert("Voice search not supported in your browser");
     };
 
     recognition.start();
 }
+</script>
+
 </script>
 
 {% endblock %}
