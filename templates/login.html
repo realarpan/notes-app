@@ -65,7 +65,7 @@
 
 <!-- 🔒 Security Badge -->
 <div class="text-[11px] text-gray-400 text-center flex items-center justify-center gap-1">
-    All data is encrypted during transmission and securely stored, with access restricted to authenticated systems.
+    Administrator-uploaded content is delivered through secure database systems, with controlled access enforced via authenticated sessions and backend security layers.
 </div>
 
 <!-- 📜 Terms -->
@@ -177,14 +177,6 @@ window.onload = function() {
         document.getElementById("loginCard").classList.add("shake");
     }
 
-    // Show last login
-    let lastLogin = localStorage.getItem("lastLogin");
-    if(lastLogin){
-        const info = document.createElement("p");
-        info.className = "text-xs text-gray-400 text-center mt-3";
-        info.innerText = "Last login: " + lastLogin;
-        document.getElementById("loginCard").appendChild(info);
-    }
 };
 </script>
 
