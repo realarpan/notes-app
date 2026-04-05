@@ -7,7 +7,6 @@
 
 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
 
-```
 <h2 class="text-3xl font-semibold tracking-tight">
     Class {{ class_number }} Notes
 </h2>
@@ -25,7 +24,6 @@
         Voice Search
     </button>
 </div>
-```
 
 </div>
 
@@ -54,7 +52,6 @@
 <div class="note-card bg-white/5 backdrop-blur-lg p-5 rounded-xl flex justify-between items-center hover:bg-white/10 transition border border-white/10"
      data-title="{{ lesson_titles[loop.index0] if loop.index0 < lesson_titles|length else 'extra lesson' }}">
 
-```
 <span class="title font-medium text-lg">
     {{ lesson_titles[loop.index0] if loop.index0 < lesson_titles|length else "Extra Lesson" }}
 </span>
@@ -70,7 +67,6 @@
        Download
     </a>
 </div>
-```
 
 </div>
 {% endfor %}
