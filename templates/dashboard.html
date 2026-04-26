@@ -4,13 +4,17 @@
 <div class="max-w-6xl mx-auto mt-10 px-4">
 
 <!-- Header -->
-
 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-10">
 
 <div>
-    <h1 class="text-3xl font-semibold tracking-tight">
-        Welcome 👋
+    <h1 class="text-3xl font-semibold tracking-tight flex items-center gap-2">
+        Welcome,
+        <span class="text-blue-400 capitalize font-medium">
+            {{ current_user.username }}
+        </span>
+        👋
     </h1>
+
     <p class="text-gray-400 text-sm mt-1">
         Select your class to access notes
     </p>
@@ -27,15 +31,14 @@
 
     <button onclick="startVoice()" 
         id="voiceBtn"
-        class="px-3 bg-gray-700 rounded-lg hover:bg-gray-600">
-        Voice Search
+        class="px-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition">
+        🎤
     </button>
 </div>
 
 </div>
 
 <!-- Class Grid -->
-
 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
 
 {% for i in range(1,12) %}
@@ -61,7 +64,6 @@
 </div>
 
 <!-- No Results -->
-
 <div id="noResults" class="hidden text-center mt-10 text-gray-400">
     No classes found
 </div>
@@ -69,7 +71,6 @@
 </div>
 
 <!-- 🔥 SCRIPT -->
-
 <script>
 const searchInput = document.getElementById("searchInput");
 const cards = document.querySelectorAll(".class-card");
@@ -78,7 +79,7 @@ const voiceBtn = document.getElementById("voiceBtn");
 
 // 🔍 SEARCH
 function applySearch(){
-    const value = searchInput.value.toLowerCase();
+    const value = searchInput.value.toLowerCase().trim();
     let visible = 0;
 
     cards.forEach(card => {
