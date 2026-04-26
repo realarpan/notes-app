@@ -134,23 +134,3 @@ def admin():
 def logout():
     logout_user()
     return redirect(url_for("login"))
-
-@app.route("/create-user")
-def create_user():
-    password = generate_password_hash("Jc@b#8583X")
-
-    # prevent duplicate
-    existing = User.query.filter_by(username="Jacob").first()
-    if existing:
-        return "User already exists"
-
-    user = User(
-        username="Jacob",
-        password=password,
-        role="user"
-    )
-
-    db.session.add(user)
-    db.session.commit()
-
-    return f"User created with hash: {password}"
