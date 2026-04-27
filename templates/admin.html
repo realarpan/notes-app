@@ -133,12 +133,47 @@
 
 </div>
 
+<!-- 🔥 UPLOAD HISTORY -->
+<div class="mt-10 bg-white/5 p-6 rounded-2xl border border-white/10">
+
+<h3 class="text-lg font-medium mb-4">Upload History</h3>
+
+<div class="space-y-3 max-h-[300px] overflow-y-auto">
+
+{% for log in logs %}
+<div class="flex justify-between items-center bg-white/5 p-3 rounded-lg border border-white/10">
+
+<div>
+    <p class="text-sm">
+        <span class="text-blue-400">{{ log.uploaded_by }}</span>
+        uploaded to
+        <span class="text-green-400">Class {{ log.class_number }}</span>
+    </p>
+
+    <p class="text-xs text-gray-400">
+        {{ log.filename }}
+    </p>
+</div>
+
+<div class="text-xs text-gray-400">
+    {{ log.timestamp.strftime("%d %b %Y, %I:%M %p") }}
+</div>
+
+</div>
+{% else %}
+<p class="text-gray-400 text-sm">No uploads yet</p>
+{% endfor %}
+
+</div>
+
+</div>
+
 </div>
 
 <!-- SCRIPT -->
 <script>
 
-// ===== DRAG & DROP =====
+// DRAG & DROP
 const dropZone = document.getElementById("dropZone");
 const fileInput = document.getElementById("fileInput");
 const fileName = document.getElementById("fileName");
@@ -173,13 +208,13 @@ dropZone.addEventListener("drop", (e) => {
     }
 });
 
-// ===== LOADING =====
+// LOADING
 document.getElementById("uploadForm").addEventListener("submit", () => {
     document.getElementById("btnText").innerText = "Uploading...";
     document.getElementById("spinner").classList.remove("hidden");
 });
 
-// ===== SEARCH =====
+// SEARCH
 const search = document.getElementById("searchNotes");
 const items = document.querySelectorAll(".note-item");
 
@@ -192,7 +227,7 @@ search.addEventListener("input", () => {
     });
 });
 
-// ===== DEVICE INFO =====
+// DEVICE INFO
 async function getDeviceInfo() {
     const ua = navigator.userAgent;
 
