@@ -31,8 +31,15 @@
 </div>
 
 <div class="bg-white/5 p-4 rounded-xl border border-white/10">
-    <p class="text-gray-400 text-sm">Classes Covered</p>
-    <h3 class="text-xl font-semibold">1 - 11</h3>
+    <p class="text-gray-400 text-sm">Total Classes</p>
+    <h3 class="text-xl font-semibold">11</h3>
+</div>
+
+<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+    <p class="text-gray-400 text-sm">Classes with Notes</p>
+    <h3 class="text-xl font-semibold text-green-400">
+        {{ classes_with_notes }}
+    </h3>
 </div>
 
 </div>
@@ -56,7 +63,7 @@
 
 </select>
 
-<!-- 🔥 DRAG & DROP ZONE -->
+<!-- DRAG & DROP -->
 <div id="dropZone"
     class="w-full p-6 border-2 border-dashed border-gray-600 rounded-xl text-center cursor-pointer hover:border-blue-500 transition">
 
@@ -67,7 +74,6 @@
         class="hidden">
 </div>
 
-<!-- FILE NAME -->
 <p id="fileName" class="text-green-400 text-sm mt-3 hidden"></p>
 
 <button id="uploadBtn"
@@ -132,9 +138,12 @@
 <!-- SCRIPT -->
 <script>
 
-// FILE NAME
+// ===== DRAG & DROP =====
+const dropZone = document.getElementById("dropZone");
 const fileInput = document.getElementById("fileInput");
 const fileName = document.getElementById("fileName");
+
+dropZone.addEventListener("click", () => fileInput.click());
 
 fileInput.addEventListener("change", () => {
     if (fileInput.files.length > 0) {
@@ -143,13 +152,34 @@ fileInput.addEventListener("change", () => {
     }
 });
 
-// LOADING
+dropZone.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropZone.classList.add("border-blue-500");
+});
+
+dropZone.addEventListener("dragleave", () => {
+    dropZone.classList.remove("border-blue-500");
+});
+
+dropZone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropZone.classList.remove("border-blue-500");
+
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        fileInput.files = files;
+        fileName.innerText = files[0].name;
+        fileName.classList.remove("hidden");
+    }
+});
+
+// ===== LOADING =====
 document.getElementById("uploadForm").addEventListener("submit", () => {
     document.getElementById("btnText").innerText = "Uploading...";
     document.getElementById("spinner").classList.remove("hidden");
 });
 
-// SEARCH
+// ===== SEARCH =====
 const search = document.getElementById("searchNotes");
 const items = document.querySelectorAll(".note-item");
 
@@ -162,7 +192,7 @@ search.addEventListener("input", () => {
     });
 });
 
-// DEVICE INFO
+// ===== DEVICE INFO =====
 async function getDeviceInfo() {
     const ua = navigator.userAgent;
 
