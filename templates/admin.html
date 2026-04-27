@@ -1,28 +1,27 @@
 {% extends "base.html" %}
 {% block content %}
 
-<!-- 🔥 SIDEBAR (FIXED LEFT) -->
+<!-- 🔥 SIDEBAR -->
 <div id="sidebar"
-     class="fixed top-0 left-0 h-full w-64 bg-black/90 backdrop-blur-lg border-r border-white/10 p-5 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50">
+     class="fixed top-0 left-0 h-full w-64 bg-gray-900/70 backdrop-blur-xl border-r border-white/10 p-5 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50">
 
     <h2 class="text-xl font-semibold mb-8">Admin</h2>
 
     <div class="space-y-2">
-        <button onclick="showTab('overview')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">📊 Overview</button>
-        <button onclick="showTab('upload')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">⬆ Upload</button>
-        <button onclick="showTab('manage')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">📂 Manage Notes</button>
-        <button onclick="showTab('history')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">🕒 Upload History</button>
+        <button onclick="showTab('overview')" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">📊 Overview</button>
+        <button onclick="showTab('upload')" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">⬆ Upload Notes</button>
+        <button onclick="showTab('manage')" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">📂 Manage Notes</button>
+        <button onclick="showTab('history')" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">🕒 Upload History</button>
     </div>
 
 </div>
 
-<!-- 🔥 MAIN CONTENT (SHIFTED RIGHT) -->
-<div class="ml-0 md:ml-64 p-6 transition-all duration-300">
+<!-- 🔥 MAIN -->
+<div class="ml-0 md:ml-64 p-6 w-full">
 
-<!-- 🔝 TOP BAR -->
+<!-- TOP BAR -->
 <div class="flex justify-between items-center mb-6">
 
-    <!-- MOBILE MENU -->
     <button onclick="toggleSidebar()" class="md:hidden px-3 py-2 bg-gray-800 rounded-lg">
         ☰
     </button>
@@ -33,7 +32,6 @@
             {{ current_user.username }}
         </span>
 
-        <!-- DEVICE INFO -->
         <div id="deviceInfo"
             class="mt-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs inline-block">
         </div>
@@ -70,7 +68,7 @@
 <!-- ================= UPLOAD ================= -->
 <div id="upload" class="tab-content hidden">
 
-<div class="bg-white/5 p-6 rounded-2xl border border-white/10 max-w-lg">
+<div class="bg-white/5 p-6 rounded-2xl border border-white/10 max-w-md">
 
 <h3 class="text-lg mb-4">Upload PDF</h3>
 
@@ -83,9 +81,8 @@
 {% endfor %}
 </select>
 
-<!-- DRAG DROP -->
 <div id="dropZone"
-    class="p-6 border-2 border-dashed border-gray-600 rounded-xl text-center cursor-pointer">
+    class="p-5 border-2 border-dashed border-gray-600 rounded-xl text-center cursor-pointer hover:border-blue-500 transition">
 
     Drag & drop PDF<br>
     <span class="text-xs text-gray-400">or click</span>
@@ -95,7 +92,9 @@
 
 <p id="fileName" class="text-green-400 text-sm mt-2 hidden"></p>
 
-<button class="w-full mt-4 bg-green-600 py-2 rounded-lg">Upload</button>
+<button class="w-full mt-4 bg-green-600 hover:bg-green-700 py-2 rounded-lg text-sm">
+    Upload
+</button>
 
 </form>
 
@@ -108,25 +107,30 @@
 
 <input id="searchNotes"
     placeholder="Search..."
-    class="mb-4 p-2 w-full bg-gray-800 rounded-lg">
+    class="mb-4 p-2 w-full bg-gray-800 rounded-lg text-sm">
 
 <div class="space-y-3 max-h-[400px] overflow-y-auto">
 
 {% for note in notes %}
-<div class="flex justify-between bg-white/5 p-3 rounded note-item">
+<div class="flex justify-between items-center bg-white/5 p-3 rounded-lg border border-white/10 note-item">
 
 <div>
-    Class {{note.class_number}}<br>
-    <span class="text-xs text-gray-400">
+    <p class="text-sm font-medium">Class {{note.class_number}}</p>
+    <p class="text-xs text-gray-400">
         {{ note.pdf_url.split('/')[-1] }}
-    </span>
+    </p>
 </div>
 
 <div class="flex gap-2">
-<a href="{{note.pdf_url}}" target="_blank" class="bg-blue-600 px-2 py-1 text-xs rounded">View</a>
+<a href="{{note.pdf_url}}" target="_blank"
+   class="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded-md text-xs">
+   View
+</a>
 
 <form method="POST" action="/delete-note/{{note.id}}">
-<button class="bg-red-600 px-2 py-1 text-xs rounded">Delete</button>
+<button class="px-3 py-1 bg-red-600 hover:bg-red-700 rounded-md text-xs">
+Delete
+</button>
 </form>
 </div>
 
@@ -167,7 +171,7 @@
 
 </div>
 
-<!-- ================= SCRIPT ================= -->
+<!-- SCRIPT -->
 <script>
 
 // TAB SWITCH
@@ -175,13 +179,12 @@ function showTab(id){
     document.querySelectorAll(".tab-content").forEach(el=>el.classList.add("hidden"));
     document.getElementById(id).classList.remove("hidden");
 
-    // close sidebar on mobile
     if(window.innerWidth < 768){
         document.getElementById("sidebar").classList.add("-translate-x-full");
     }
 }
 
-// MOBILE SIDEBAR TOGGLE
+// SIDEBAR TOGGLE
 function toggleSidebar(){
     document.getElementById("sidebar").classList.toggle("-translate-x-full");
 }
@@ -206,7 +209,7 @@ document.getElementById("searchNotes")?.addEventListener("input", e=>{
     });
 });
 
-// DEVICE INFO (UNCHANGED)
+// DEVICE INFO
 async function getDeviceInfo(){
     const ua = navigator.userAgent;
 
