@@ -1,18 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="max-w-5xl mx-auto mt-10 px-4">
+<div class="max-w-6xl mx-auto mt-10 px-4">
 
 <!-- HEADER -->
 <div class="flex justify-between items-center mb-8">
     <div>
-        <h2 class="text-3xl font-semibold tracking-tight">Admin Panel</h2>
-        <p class="text-gray-400 text-sm mt-1">
-            Upload and manage notes securely
-        </p>
+        <h2 class="text-3xl font-semibold">Admin Panel</h2>
+        <p class="text-gray-400 text-sm">Manage notes & uploads</p>
     </div>
 
-    <!-- USER + DEVICE INFO -->
     <div class="text-sm text-gray-400 text-right">
         Logged in as 
         <span class="text-white font-medium capitalize">
@@ -21,147 +18,161 @@
 
         <div id="deviceInfo"
             class="inline-block mt-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs text-gray-400">
-            Detecting device...
         </div>
     </div>
 </div>
 
-<!-- MAIN CARD -->
-<div class="bg-white/5 backdrop-blur-xl p-8 rounded-2xl border border-white/10 shadow-2xl">
+<!-- STATS -->
+<div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+
+<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+    <p class="text-gray-400 text-sm">Total Notes</p>
+    <h3 class="text-xl font-semibold">{{ notes|length }}</h3>
+</div>
+
+<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+    <p class="text-gray-400 text-sm">Classes Covered</p>
+    <h3 class="text-xl font-semibold">1 - 11</h3>
+</div>
+
+</div>
+
+<!-- GRID -->
+<div class="grid md:grid-cols-2 gap-8">
+
+<!-- UPLOAD -->
+<div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+
+<h3 class="text-lg font-medium mb-4">Upload PDF</h3>
 
 <form method="POST" enctype="multipart/form-data" id="uploadForm">
 
-    <!-- CLASS SELECT -->
-    <label class="text-sm text-gray-400 mb-2 block">Select Class</label>
-    <select name="class_number"
-        class="w-full mb-6 p-3 rounded-lg bg-gray-800/80 text-white focus:ring-2 focus:ring-blue-500 outline-none">
-        
-        {% for i in range(1,12) %}
-        <option value="{{i}}">Class {{i}}</option>
-        {% endfor %}
-    </select>
+<select name="class_number"
+    class="w-full mb-4 p-3 rounded-lg bg-gray-800 text-white">
+    
+{% for i in range(1,12) %}
+<option value="{{i}}">Class {{i}}</option>
+{% endfor %}
 
-    <!-- FILE UPLOAD -->
-    <label class="text-sm text-gray-400 mb-2 block">Upload PDF</label>
+</select>
 
-    <div id="dropArea"
-        class="border-2 border-dashed border-white/20 rounded-xl p-6 text-center hover:border-blue-500/40 transition cursor-pointer bg-gray-900/40">
+<input type="file" name="file" id="fileInput"
+    class="w-full mb-3 text-sm text-gray-300">
 
-        <p class="text-gray-400 text-sm mb-2">
-            Drag & drop PDF here or click to browse
-        </p>
+<p id="fileName" class="text-green-400 text-sm mb-3 hidden"></p>
 
-        <input type="file" name="file" id="fileInput" accept="application/pdf"
-            class="hidden">
+<button id="uploadBtn"
+    class="w-full bg-green-600 hover:bg-green-700 py-2 rounded-lg flex justify-center gap-2">
 
-        <button type="button" onclick="document.getElementById('fileInput').click()"
-            class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm mt-2">
-            Choose File
-        </button>
+    <span id="btnText">Upload</span>
 
-        <p id="fileName" class="text-green-400 text-sm mt-3 hidden"></p>
-    </div>
-
-    <!-- BUTTON -->
-    <button id="uploadBtn"
-        class="w-full mt-6 bg-green-600 hover:bg-green-700 py-3 rounded-xl font-medium flex justify-center items-center gap-2 transition shadow-lg shadow-green-600/20">
-
-        <span id="btnText">Upload PDF</span>
-
-        <svg id="spinner" class="hidden w-4 h-4 animate-spin" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" stroke="white" stroke-width="3" fill="none" opacity="0.3"/>
-            <path d="M22 12a10 10 0 0 1-10 10" stroke="white" stroke-width="3"/>
-        </svg>
-
-    </button>
+    <span id="spinner" class="hidden animate-spin">⏳</span>
+</button>
 
 </form>
 
 </div>
 
+<!-- MANAGE -->
+<div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+
+<h3 class="text-lg font-medium mb-4">Manage Notes</h3>
+
+<input id="searchNotes"
+    placeholder="Search notes..."
+    class="w-full mb-4 p-2 rounded-lg bg-gray-800 text-white text-sm">
+
+<div class="space-y-3 max-h-[400px] overflow-y-auto">
+
+{% for note in notes %}
+<div class="flex justify-between items-center bg-white/5 p-3 rounded-lg border border-white/10 note-item">
+
+<div>
+    <p class="text-sm font-medium">Class {{ note.class_number }}</p>
+    <p class="text-xs text-gray-400 truncate max-w-[150px]">
+        {{ note.pdf_url.split('/')[-1] }}
+    </p>
 </div>
 
-<!-- 🔥 SCRIPT -->
+<div class="flex gap-2">
+
+<a href="{{ note.pdf_url }}" target="_blank"
+   class="px-2 py-1 bg-blue-600 rounded text-xs">
+   View
+</a>
+
+<form method="POST" action="/delete-note/{{note.id}}">
+    <button class="px-2 py-1 bg-red-600 rounded text-xs">
+        Delete
+    </button>
+</form>
+
+</div>
+
+</div>
+{% endfor %}
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- SCRIPT -->
 <script>
-// FILE SELECT
+
+// FILE NAME
 const fileInput = document.getElementById("fileInput");
 const fileName = document.getElementById("fileName");
-const dropArea = document.getElementById("dropArea");
 
-fileInput.addEventListener("change", function() {
-    if (this.files.length > 0) {
-        fileName.innerText = "Selected: " + this.files[0].name;
-        fileName.classList.remove("hidden");
-    }
-});
-
-// DRAG & DROP
-dropArea.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    dropArea.classList.add("border-blue-500");
-});
-
-dropArea.addEventListener("dragleave", () => {
-    dropArea.classList.remove("border-blue-500");
-});
-
-dropArea.addEventListener("drop", (e) => {
-    e.preventDefault();
-    fileInput.files = e.dataTransfer.files;
-
+fileInput.addEventListener("change", () => {
     if (fileInput.files.length > 0) {
-        fileName.innerText = "Selected: " + fileInput.files[0].name;
+        fileName.innerText = fileInput.files[0].name;
         fileName.classList.remove("hidden");
     }
-
-    dropArea.classList.remove("border-blue-500");
 });
 
-// LOADING STATE
-document.getElementById("uploadForm").addEventListener("submit", function() {
-    const btn = document.getElementById("uploadBtn");
-    const text = document.getElementById("btnText");
-    const spinner = document.getElementById("spinner");
-
-    btn.disabled = true;
-    text.innerText = "Uploading...";
-    spinner.classList.remove("hidden");
+// LOADING
+document.getElementById("uploadForm").addEventListener("submit", () => {
+    document.getElementById("btnText").innerText = "Uploading...";
+    document.getElementById("spinner").classList.remove("hidden");
 });
 
-// DEVICE + LOCATION
+// SEARCH
+const search = document.getElementById("searchNotes");
+const items = document.querySelectorAll(".note-item");
+
+search.addEventListener("input", () => {
+    const val = search.value.toLowerCase();
+
+    items.forEach(item => {
+        const text = item.innerText.toLowerCase();
+        item.style.display = text.includes(val) ? "flex" : "none";
+    });
+});
+
+// DEVICE INFO
 async function getDeviceInfo() {
-    let device = "Desktop";
     const ua = navigator.userAgent;
 
-    if (/mobile/i.test(ua)) device = "Mobile";
-    if (/tablet|ipad/i.test(ua)) device = "Tablet";
+    let device = /mobile/i.test(ua) ? "Mobile" : "Desktop";
+    let browser = ua.includes("Edg") ? "Edge" : ua.includes("Chrome") ? "Chrome" : "Browser";
 
-    // OS
-    let os = "Unknown OS";
-    if (ua.includes("Win")) os = "Windows";
-    else if (ua.includes("Mac")) os = "MacOS";
-    else if (ua.includes("Android")) os = "Android";
-    else if (ua.includes("iPhone")) os = "iOS";
-
-    // Browser
-    let browser = "Browser";
-    if (ua.includes("Chrome")) browser = "Chrome";
-    else if (ua.includes("Safari")) browser = "Safari";
-    else if (ua.includes("Firefox")) browser = "Firefox";
-
-    // Location (IP-based)
-    let locationText = "Unknown location";
+    let location = "";
     try {
         const res = await fetch("https://ipapi.co/json/");
         const data = await res.json();
-        locationText = `${data.city}, ${data.country_name}`;
-    } catch (e) {}
+        location = `${data.city}`;
+    } catch {}
 
     document.getElementById("deviceInfo").innerText =
-        `${device} • ${os} • ${browser} • ${locationText}`;
+        `${device} • ${browser} • ${location}`;
 }
 
 getDeviceInfo();
+
 </script>
 
 {% endblock %}
