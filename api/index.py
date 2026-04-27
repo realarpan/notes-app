@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
 import os
 import requests
@@ -21,6 +21,9 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
+
+# ================= MODELS =================
+
 class User(UserMixin, db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
@@ -28,19 +31,25 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(200))
     role = db.Column(db.String(20))
 
+
 class Note(db.Model):
     __tablename__ = "notes"
     id = db.Column(db.Integer, primary_key=True)
     class_number = db.Column(db.Integer)
     pdf_url = db.Column(db.String(500))
 
+
+# ================= LOGIN =================
+
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(User, int(user_id))
 
+
 @app.route("/")
 def home():
     return redirect(url_for("login"))
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -48,15 +57,7 @@ def login():
         username = request.form["username"]
         password = request.form["password"]
 
-        print("Entered username:", username)
-
         user = User.query.filter_by(username=username).first()
-
-        if not user:
-            print("User not found")
-        else:
-            print("Stored hash:", user.password)
-            print("Password match:", check_password_hash(user.password, password))
 
         if user and check_password_hash(user.password, password):
             login_user(user)
@@ -69,16 +70,25 @@ def login():
 
     return render_template("login.html")
 
+
+# ================= DASHBOARD =================
+
 @app.route("/dashboard")
 @login_required
 def dashboard():
     return render_template("dashboard.html")
+
+
+# ================= CLASS NOTES =================
 
 @app.route("/class/<int:class_number>")
 @login_required
 def class_notes(class_number):
     notes = Note.query.filter_by(class_number=class_number).all()
     return render_template("class_notes.html", notes=notes, class_number=class_number)
+
+
+# ================= ADMIN PANEL =================
 
 @app.route("/admin", methods=["GET", "POST"])
 @login_required
@@ -94,9 +104,9 @@ def admin():
             flash("No file selected")
             return redirect(url_for("admin"))
 
-        # Limit file size (10MB safety)
-        if request.content_length > 10 * 1024 * 1024:
-            return "File too large (Max 10MB)"
+        if request.content_length and request.content_length > 10 * 1024 * 1024:
+            flash("File too large (Max 10MB)")
+            return redirect(url_for("admin"))
 
         filename = secure_filename(file.filename)
         temp_path = f"/tmp/{filename}"
@@ -127,7 +137,31 @@ def admin():
 
         flash("PDF uploaded successfully")
 
-    return render_template("admin.html")
+    # 🔥 IMPORTANT: SEND NOTES TO TEMPLATE
+    notes = Note.query.order_by(Note.id.desc()).all()
+
+    return render_template("admin.html", notes=notes)
+
+
+# ================= DELETE NOTE =================
+
+@app.route("/delete-note/<int:id>", methods=["POST"])
+@login_required
+def delete_note(id):
+    if current_user.role != "admin":
+        return "Access Denied"
+
+    note = Note.query.get(id)
+
+    if note:
+        db.session.delete(note)
+        db.session.commit()
+        flash("Note deleted")
+
+    return redirect(url_for("admin"))
+
+
+# ================= LOGOUT =================
 
 @app.route("/logout")
 @login_required
