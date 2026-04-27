@@ -82,17 +82,6 @@
 
 <!-- 🔥 BADGE STYLES -->
 <style>
-.badge {
-    font-size: 10px;
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-}
-
 /* 🔥 BASE BADGE */
 .badge {
     font-size: 10px;
@@ -103,64 +92,68 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    backdrop-filter: blur(8px);
+    background: #0f172a; /* dark base */
 }
 
-/* ⚡ SAME STYLE FOR ADMIN + TEACHER (CURRENT STYLE) */
+/* ⚡ CURRENT STYLE (USED FOR BOTH ADMIN + TEACHER) */
 .admin,
 .user {
-    color: #ffffff;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.85);
+    color: #e5e7eb;
 
-    /* ✨ SHARP NEON GLOW */
+    /* dark glass look */
+    background: linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.08),
+        rgba(255,255,255,0.02)
+    );
+
+    border: 1px solid rgba(255,255,255,0.6);
+
+    /* ✨ CRISP EDGE GLOW (not messy white) */
     box-shadow:
-        0 0 4px rgba(255,255,255,0.9),
-        0 0 10px rgba(255,255,255,0.8),
-        0 0 18px rgba(255,255,255,0.6);
+        inset 0 0 6px rgba(255,255,255,0.15),
+        0 0 6px rgba(255,255,255,0.25);
 
     text-shadow:
-        0 0 4px rgba(255,255,255,0.9),
-        0 0 8px rgba(255,255,255,0.7);
+        0 0 2px rgba(255,255,255,0.5);
 }
 
-/* 🔴 SMALL LIVE DOT (like CURRENT badge) */
+/* 🔴 SMALL LIVE DOT (like CURRENT) */
 .admin::before,
 .user::before {
     content: "";
     width: 6px;
     height: 6px;
-    background: #ffffff;
+    background: #22c55e; /* green live dot */
     border-radius: 50%;
 
     box-shadow:
-        0 0 6px #ffffff,
-        0 0 10px #ffffff;
+        0 0 6px #22c55e,
+        0 0 10px #22c55e;
 }
 
-/* 🔥 PULSE ANIMATION (subtle) */
-@keyframes pulseGlow {
+/* 🔥 SUBTLE BREATHING EFFECT */
+@keyframes currentGlow {
     0% {
         box-shadow:
-            0 0 4px rgba(255,255,255,0.8),
-            0 0 10px rgba(255,255,255,0.6);
+            inset 0 0 6px rgba(255,255,255,0.1),
+            0 0 4px rgba(255,255,255,0.2);
     }
     50% {
         box-shadow:
-            0 0 8px rgba(255,255,255,1),
-            0 0 20px rgba(255,255,255,0.9);
+            inset 0 0 8px rgba(255,255,255,0.2),
+            0 0 8px rgba(255,255,255,0.35);
     }
     100% {
         box-shadow:
-            0 0 4px rgba(255,255,255,0.8),
-            0 0 10px rgba(255,255,255,0.6);
+            inset 0 0 6px rgba(255,255,255,0.1),
+            0 0 4px rgba(255,255,255,0.2);
     }
 }
 
-/* apply animation */
 .admin,
 .user {
-    animation: pulseGlow 2s infinite ease-in-out;
+    animation: currentGlow 2.5s ease-in-out infinite;
 }
 </style>
 
