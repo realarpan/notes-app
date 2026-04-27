@@ -1,5 +1,7 @@
-flask
-flask_sqlalchemy
-flask_login
-psycopg2-binary
-requests
+Flask==3.0.3
+Flask-SQLAlchemy==3.1.1
+Flask-Login==0.6.3
+psycopg2-binary==2.9.9
+requests==2.32.3
+SQLAlchemy==2.0.29
+greenlet==3.0.3
