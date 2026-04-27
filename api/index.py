@@ -5,6 +5,7 @@ from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
 import os
 import requests
+from datetime import datetime
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(BASE_DIR, "../templates")
@@ -37,6 +38,16 @@ class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     class_number = db.Column(db.Integer)
     pdf_url = db.Column(db.String(500))
+
+
+# 🔥 NEW: UPLOAD LOG MODEL
+class UploadLog(db.Model):
+    __tablename__ = "upload_logs"
+    id = db.Column(db.Integer, primary_key=True)
+    filename = db.Column(db.String(200))
+    class_number = db.Column(db.Integer)
+    uploaded_by = db.Column(db.String(100))
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 # ================= LOGIN =================
@@ -131,22 +142,33 @@ def admin():
 
         public_url = f"{SUPABASE_URL}/storage/v1/object/public/notes/{filename}"
 
+        # ✅ SAVE NOTE
         note = Note(class_number=class_number, pdf_url=public_url)
         db.session.add(note)
+
+        # 🔥 SAVE LOG
+        log = UploadLog(
+            filename=filename,
+            class_number=class_number,
+            uploaded_by=current_user.username
+        )
+        db.session.add(log)
+
         db.session.commit()
 
         flash("PDF uploaded successfully")
 
-    # ✅ GET ALL NOTES
+    # ✅ GET DATA
     notes = Note.query.order_by(Note.id.desc()).all()
+    logs = UploadLog.query.order_by(UploadLog.timestamp.desc()).limit(10).all()
 
-    # ✅ COUNT UNIQUE CLASSES WITH NOTES
     classes_with_notes = db.session.query(Note.class_number).distinct().count()
 
     return render_template(
         "admin.html",
         notes=notes,
-        classes_with_notes=classes_with_notes
+        classes_with_notes=classes_with_notes,
+        logs=logs
     )
 
 
@@ -175,3 +197,9 @@ def delete_note(id):
 def logout():
     logout_user()
     return redirect(url_for("login"))
+
+
+# ================= CREATE TABLES =================
+# Run once locally if needed
+with app.app_context():
+     db.create_all()
