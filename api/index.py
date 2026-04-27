@@ -197,9 +197,3 @@ def delete_note(id):
 def logout():
     logout_user()
     return redirect(url_for("login"))
-
-
-# ================= CREATE TABLES =================
-# Run once locally if needed
-with app.app_context():
-     db.create_all()
