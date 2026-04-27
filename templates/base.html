@@ -31,11 +31,11 @@
 </nav>
 
 <!-- CONTENT -->
-<div class="flex-grow p-6 max-w-5xl mx-auto w-full">
+<div class="flex-grow w-full">
 
     {% with messages = get_flashed_messages() %}
       {% if messages %}
-        <div class="mb-4 p-3 bg-blue-500/20 border border-blue-400/30 rounded-lg">
+        <div class="m-6 p-3 bg-blue-500/20 border border-blue-400/30 rounded-lg">
           {{ messages[0] }}
         </div>
       {% endif %}
