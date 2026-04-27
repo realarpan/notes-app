@@ -6,6 +6,7 @@
 <!-- Header -->
 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-10">
 
+<!-- LEFT -->
 <div>
     <h1 class="text-3xl font-semibold tracking-tight flex items-center gap-3 flex-wrap">
         Welcome,
@@ -14,6 +15,7 @@
             {{ current_user.username }}
         </span>
 
+        <!-- 🔥 ROLE BADGE -->
         {% if current_user.role == "admin" %}
             <span class="badge admin">ADMIN</span>
         {% else %}
@@ -28,7 +30,7 @@
     </p>
 </div>
 
-<!-- 🔍 Search + 🎤 Voice -->
+<!-- RIGHT -->
 <div class="flex gap-2 w-full md:w-64">
     <input 
         id="searchInput"
@@ -86,26 +88,41 @@
     border-radius: 999px;
     font-weight: 700;
     letter-spacing: 1px;
-    backdrop-filter: blur(10px);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
 }
 
-/* ADMIN */
+/* ADMIN (Green Glow) */
 .admin {
     color: #22c55e;
     background: rgba(34,197,94,0.1);
     border: 1px solid rgba(34,197,94,0.4);
-    box-shadow: 0 0 8px rgba(34,197,94,0.5);
+    box-shadow:
+        0 0 6px rgba(34,197,94,0.6),
+        0 0 14px rgba(34,197,94,0.4);
 }
 
-/* USER */
+/* USER → CURRENT (White Neon Glow) */
 .user {
     color: #ffffff;
     background: rgba(255,255,255,0.08);
     border: 1px solid rgba(255,255,255,0.4);
     box-shadow: 
-        0 0 6px rgba(255,255,255,0.6),
-        0 0 14px rgba(255,255,255,0.4),
-        0 0 22px rgba(255,255,255,0.2);
+        0 0 6px rgba(255,255,255,0.8),
+        0 0 14px rgba(255,255,255,0.5),
+        0 0 24px rgba(255,255,255,0.3);
+}
+
+/* subtle pulse effect */
+.user::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 6px #fff;
+    display: inline-block;
 }
 </style>
 
@@ -137,7 +154,7 @@ function applySearch(){
 
 searchInput.addEventListener("input", applySearch);
 
-// VOICE
+// VOICE SEARCH
 function startVoice(){
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
