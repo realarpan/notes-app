@@ -3,11 +3,11 @@
 
 <!-- SIDEBAR -->
 <div id="sidebar"
-     class="fixed top-0 left-0 h-full w-64 bg-gray-900/70 backdrop-blur-xl border-r border-white/10 p-5 transform -translate-x-full md:translate-x-0 transition duration-300 z-50">
+     class="fixed top-0 left-0 h-full w-64 bg-gray-900/80 backdrop-blur-xl border-r border-white/10 p-5 transform -translate-x-full md:translate-x-0 transition duration-300 z-50">
 
     <h2 class="text-xl font-semibold mb-8">Admin</h2>
 
-    <div class="space-y-2">
+    <div class="space-y-2 text-sm">
         <button onclick="showTab('overview')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">📊 Overview</button>
         <button onclick="showTab('upload')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">⬆ Upload</button>
         <button onclick="showTab('manage')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">📂 Manage</button>
@@ -15,9 +15,12 @@
     </div>
 </div>
 
-<!-- MAIN -->
-<div class="ml-0 md:ml-64 p-4 md:p-6 w-full overflow-x-hidden">
-<!-- TOP -->
+<!-- MAIN WRAPPER -->
+<div class="ml-0 md:ml-64 w-full">
+
+<div class="w-full max-w-screen-xl mx-auto p-4 md:p-6">
+
+<!-- TOP BAR -->
 <div class="flex justify-between items-center mb-6">
 
     <button onclick="toggleSidebar()" class="md:hidden px-3 py-2 bg-gray-800 rounded-lg">
@@ -40,7 +43,7 @@
 <!-- OVERVIEW -->
 <div id="overview" class="tab-content">
 
-<div class="grid grid-cols-2 md:grid-cols-3 gap-4 w-full">
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
 
 <div class="bg-white/5 p-4 rounded-xl border border-white/10">
     <p class="text-gray-400 text-sm">Total Notes</p>
@@ -70,22 +73,22 @@
 
 <form method="POST" enctype="multipart/form-data">
 
-<select name="class_number" class="w-full mb-4 p-3 bg-gray-800 rounded-lg">
+<select name="class_number" class="w-full mb-4 p-3 bg-gray-800 rounded-lg text-sm">
 {% for i in range(1,12) %}
 <option value="{{i}}">Class {{i}}</option>
 {% endfor %}
 </select>
 
 <div id="dropZone"
-     class="p-5 border-2 border-dashed border-gray-600 rounded-lg text-center cursor-pointer">
+     class="p-5 border-2 border-dashed border-gray-600 rounded-lg text-center cursor-pointer text-sm">
 
     Drop PDF or click
     <input type="file" name="file" id="fileInput" class="hidden">
 </div>
 
-<p id="fileName" class="text-green-400 text-sm mt-2 hidden"></p>
+<p id="fileName" class="text-green-400 text-sm mt-2 hidden truncate"></p>
 
-<button class="w-full mt-4 bg-green-600 py-2 rounded-lg text-sm">
+<button class="w-full mt-4 bg-green-600 py-2 rounded-lg text-sm hover:bg-green-700">
 Upload
 </button>
 
@@ -106,21 +109,21 @@ Upload
 {% for note in notes %}
 <div class="flex justify-between items-center bg-white/5 p-3 rounded-lg border note-item">
 
-<div>
+<div class="min-w-0">
     <p class="text-sm">Class {{note.class_number}}</p>
-    <p class="text-xs text-gray-400 break-all max-w-[140px]">
+    <p class="text-xs text-gray-400 truncate max-w-[140px]">
         {{ note.pdf_url.split('/')[-1] }}
     </p>
 </div>
 
-<div class="flex gap-2">
+<div class="flex gap-2 flex-shrink-0">
 <a href="{{note.pdf_url}}" target="_blank"
-   class="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs">
+   class="px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs whitespace-nowrap">
 View
 </a>
 
 <form method="POST" action="/delete-note/{{note.id}}">
-<button class="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-xs">
+<button class="px-2 py-1 bg-red-600 hover:bg-red-700 rounded text-xs whitespace-nowrap">
 Delete
 </button>
 </form>
@@ -145,7 +148,7 @@ Delete
 {{ current_user.username }} → Class {{note.class_number}}
 </p>
 
-<p class="text-xs text-gray-400 break-all">
+<p class="text-xs text-gray-400 truncate">
 {{ note.pdf_url.split('/')[-1] }}
 </p>
 
@@ -161,20 +164,23 @@ ID: {{note.id}}
 </div>
 
 </div>
+</div>
 
 <!-- SCRIPT -->
 <script>
 
+// tab switch
 function showTab(id){
     document.querySelectorAll(".tab-content").forEach(el=>el.classList.add("hidden"));
     document.getElementById(id).classList.remove("hidden");
 }
 
+// sidebar toggle
 function toggleSidebar(){
     document.getElementById("sidebar").classList.toggle("-translate-x-full");
 }
 
-// drag drop
+// drag & drop
 const dz = document.getElementById("dropZone");
 const fi = document.getElementById("fileInput");
 const fn = document.getElementById("fileName");
@@ -182,8 +188,10 @@ const fn = document.getElementById("fileName");
 dz.onclick = ()=>fi.click();
 
 fi.onchange = ()=>{
-    fn.innerText = fi.files[0].name;
-    fn.classList.remove("hidden");
+    if(fi.files.length){
+        fn.innerText = fi.files[0].name;
+        fn.classList.remove("hidden");
+    }
 };
 
 // search
@@ -194,7 +202,7 @@ document.getElementById("searchNotes")?.addEventListener("input", e=>{
     });
 });
 
-// device info
+// device info (kept)
 async function getDeviceInfo(){
     const ua = navigator.userAgent;
 
