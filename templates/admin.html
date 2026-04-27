@@ -1,30 +1,34 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="flex min-h-[80vh]">
+<!-- 🔥 MAIN LAYOUT -->
+<div class="flex min-h-screen">
 
-<!-- 🔥 SIDEBAR -->
-<div class="w-64 bg-white/5 border-r border-white/10 p-5 hidden md:block">
+<!-- ================= SIDEBAR ================= -->
+<div id="sidebar"
+     class="w-64 bg-black/40 backdrop-blur-lg border-r border-white/10 p-5 hidden md:block">
 
-    <h2 class="text-xl font-semibold mb-6">Admin</h2>
+    <h2 class="text-xl font-semibold mb-8">Admin</h2>
 
-    <div class="space-y-2 text-sm">
-        <button onclick="switchTab('overview')" class="tab-btn w-full text-left px-3 py-2 rounded-lg bg-blue-600">Overview</button>
-        <button onclick="switchTab('manage')" class="tab-btn w-full text-left px-3 py-2 rounded-lg bg-gray-700">Manage Notes</button>
-        <button onclick="switchTab('history')" class="tab-btn w-full text-left px-3 py-2 rounded-lg bg-gray-700">Upload History</button>
+    <div class="space-y-2">
+        <button onclick="showTab('overview')" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">📊 Overview</button>
+        <button onclick="showTab('upload')" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">⬆ Upload</button>
+        <button onclick="showTab('manage')" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">📂 Manage Notes</button>
+        <button onclick="showTab('history')" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">🕒 Upload History</button>
     </div>
 
 </div>
 
-<!-- 🔥 MAIN CONTENT -->
-<div class="flex-1 p-4 md:p-8">
+<!-- ================= CONTENT ================= -->
+<div class="flex-1 p-6">
 
-<!-- HEADER -->
-<div class="flex justify-between items-center mb-8">
-    <div>
-        <h2 class="text-3xl font-semibold">Admin Dashboard</h2>
-        <p class="text-gray-400 text-sm">Control everything here</p>
-    </div>
+<!-- 🔝 TOP BAR -->
+<div class="flex justify-between items-center mb-6">
+
+    <!-- MOBILE MENU -->
+    <button onclick="toggleSidebar()" class="md:hidden px-3 py-2 bg-gray-800 rounded-lg">
+        ☰
+    </button>
 
     <div class="text-sm text-gray-400 text-right">
         Logged in as 
@@ -32,16 +36,18 @@
             {{ current_user.username }}
         </span>
 
+        <!-- DEVICE INFO (NOT REMOVED) -->
         <div id="deviceInfo"
             class="mt-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs inline-block">
         </div>
     </div>
+
 </div>
 
-<!-- 🔥 OVERVIEW -->
+<!-- ================= OVERVIEW ================= -->
 <div id="overview" class="tab-content">
 
-<div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+<div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
 
 <div class="bg-white/5 p-4 rounded-xl border border-white/10">
     <p class="text-gray-400 text-sm">Total Notes</p>
@@ -49,7 +55,7 @@
 </div>
 
 <div class="bg-white/5 p-4 rounded-xl border border-white/10">
-    <p class="text-gray-400 text-sm">Total Classes</p>
+    <p class="text-gray-400 text-sm">Classes</p>
     <h3 class="text-xl font-semibold">11</h3>
 </div>
 
@@ -64,77 +70,67 @@
 
 </div>
 
-<!-- 🔥 MANAGE -->
-<div id="manage" class="tab-content hidden">
+<!-- ================= UPLOAD ================= -->
+<div id="upload" class="tab-content hidden">
 
-<div class="grid md:grid-cols-2 gap-8">
+<div class="bg-white/5 p-6 rounded-2xl border border-white/10 max-w-lg">
 
-<!-- UPLOAD -->
-<div class="bg-white/5 p-6 rounded-2xl border border-white/10">
-
-<h3 class="text-lg font-medium mb-4">Upload PDF</h3>
+<h3 class="text-lg mb-4">Upload PDF</h3>
 
 <form method="POST" enctype="multipart/form-data" id="uploadForm">
 
 <select name="class_number"
     class="w-full mb-4 p-3 rounded-lg bg-gray-800 text-white">
-    
 {% for i in range(1,12) %}
 <option value="{{i}}">Class {{i}}</option>
 {% endfor %}
-
 </select>
 
 <!-- DRAG DROP -->
 <div id="dropZone"
-    class="w-full p-6 border-2 border-dashed border-gray-600 rounded-xl text-center cursor-pointer hover:border-blue-500 transition">
+    class="p-6 border-2 border-dashed border-gray-600 rounded-xl text-center cursor-pointer">
 
-    <p class="text-gray-400 text-sm">Drag & drop PDF</p>
-    <p class="text-xs text-gray-500">or click</p>
+    Drag & drop PDF<br>
+    <span class="text-xs text-gray-400">or click</span>
 
-    <input type="file" name="file" id="fileInput" accept="application/pdf" class="hidden">
+    <input type="file" name="file" id="fileInput" class="hidden">
 </div>
 
-<p id="fileName" class="text-green-400 text-sm mt-3 hidden"></p>
+<p id="fileName" class="text-green-400 text-sm mt-2 hidden"></p>
 
-<button class="w-full mt-4 bg-green-600 hover:bg-green-700 py-2 rounded-lg">
-    Upload
-</button>
+<button class="w-full mt-4 bg-green-600 py-2 rounded-lg">Upload</button>
 
 </form>
 
 </div>
 
-<!-- NOTES LIST -->
-<div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+</div>
 
-<h3 class="text-lg font-medium mb-4">All Notes</h3>
+<!-- ================= MANAGE ================= -->
+<div id="manage" class="tab-content hidden">
 
 <input id="searchNotes"
     placeholder="Search..."
-    class="w-full mb-4 p-2 rounded-lg bg-gray-800 text-white text-sm">
+    class="mb-4 p-2 w-full bg-gray-800 rounded-lg">
 
 <div class="space-y-3 max-h-[400px] overflow-y-auto">
 
 {% for note in notes %}
-<div class="flex justify-between items-center bg-white/5 p-3 rounded-lg border border-white/10 note-item">
+<div class="flex justify-between bg-white/5 p-3 rounded note-item">
 
 <div>
-    <p class="text-sm font-medium">Class {{ note.class_number }}</p>
-    <p class="text-xs text-gray-400 truncate max-w-[150px]">
+    Class {{note.class_number}}<br>
+    <span class="text-xs text-gray-400">
         {{ note.pdf_url.split('/')[-1] }}
-    </p>
+    </span>
 </div>
 
 <div class="flex gap-2">
-
-<a href="{{ note.pdf_url }}" target="_blank"
-   class="px-2 py-1 bg-blue-600 rounded text-xs">View</a>
+<a href="{{note.pdf_url}}" target="_blank" class="bg-blue-600 px-2 py-1 text-xs rounded">View</a>
 
 <form method="POST" action="/delete-note/{{note.id}}">
-<button class="px-2 py-1 bg-red-600 rounded text-xs">Delete</button>
+<button class="bg-red-600 px-2 py-1 text-xs rounded">Delete</button>
 </form>
-
 </div>
 
 </div>
@@ -144,32 +140,25 @@
 
 </div>
 
-</div>
-
-</div>
-
-<!-- 🔥 HISTORY -->
+<!-- ================= HISTORY ================= -->
 <div id="history" class="tab-content hidden">
 
-<div class="bg-white/5 p-6 rounded-2xl border border-white/10">
-
-<h3 class="text-lg font-medium mb-4">Upload History</h3>
-
-<div class="space-y-4">
+<div class="space-y-3">
 
 {% for note in notes %}
-<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+<div class="bg-white/5 p-4 rounded-lg border border-white/10">
 
-<p class="text-sm text-green-400">
-    {{ current_user.username }} uploaded to Class {{ note.class_number }}
+<p class="text-sm">
+    {{ current_user.username }} uploaded to 
+    <span class="text-blue-400">Class {{note.class_number}}</span>
 </p>
 
-<p class="text-sm text-gray-300 mt-1">
+<p class="text-xs text-gray-400">
     {{ note.pdf_url.split('/')[-1] }}
 </p>
 
 <p class="text-xs text-gray-500 mt-1">
-    Recently uploaded
+    {{ note.id }}
 </p>
 
 </div>
@@ -180,62 +169,56 @@
 </div>
 
 </div>
-
-</div>
 </div>
 
-<!-- 🔥 SCRIPT -->
+<!-- ================= SCRIPT ================= -->
 <script>
 
 // TAB SWITCH
-function switchTab(tab){
-    document.querySelectorAll(".tab-content").forEach(t => t.classList.add("hidden"));
-    document.getElementById(tab).classList.remove("hidden");
+function showTab(id){
+    document.querySelectorAll(".tab-content").forEach(el=>el.classList.add("hidden"));
+    document.getElementById(id).classList.remove("hidden");
+}
 
-    document.querySelectorAll(".tab-btn").forEach(btn=>{
-        btn.classList.remove("bg-blue-600");
-        btn.classList.add("bg-gray-700");
-    });
-
-    event.target.classList.add("bg-blue-600");
+// MOBILE SIDEBAR
+function toggleSidebar(){
+    document.getElementById("sidebar").classList.toggle("hidden");
 }
 
 // DRAG DROP
-const dropZone = document.getElementById("dropZone");
-const fileInput = document.getElementById("fileInput");
-const fileName = document.getElementById("fileName");
+const dz = document.getElementById("dropZone");
+const fi = document.getElementById("fileInput");
+const fn = document.getElementById("fileName");
 
-dropZone.addEventListener("click", ()=>fileInput.click());
+dz.onclick = ()=>fi.click();
 
-fileInput.addEventListener("change", ()=>{
-    fileName.innerText = fileInput.files[0].name;
-    fileName.classList.remove("hidden");
-});
+fi.onchange = ()=>{
+    fn.innerText = fi.files[0].name;
+    fn.classList.remove("hidden");
+};
 
 // SEARCH
-const search = document.getElementById("searchNotes");
-if(search){
-search.addEventListener("input", ()=>{
-    const val = search.value.toLowerCase();
+document.getElementById("searchNotes")?.addEventListener("input", e=>{
+    const val = e.target.value.toLowerCase();
     document.querySelectorAll(".note-item").forEach(item=>{
         item.style.display = item.innerText.toLowerCase().includes(val) ? "flex" : "none";
     });
 });
-}
 
-// DEVICE INFO (KEEPED ✅)
-async function getDeviceInfo() {
+// DEVICE INFO (kept)
+async function getDeviceInfo(){
     const ua = navigator.userAgent;
 
     let device = /mobile/i.test(ua) ? "Mobile" : "Desktop";
-    let browser = ua.includes("Edg") ? "Edge" : ua.includes("Chrome") ? "Chrome" : "Browser";
+    let browser = ua.includes("Edg") ? "Edge" :
+                  ua.includes("Chrome") ? "Chrome" : "Browser";
 
     let location = "";
-    try {
+    try{
         const res = await fetch("https://ipapi.co/json/");
         const data = await res.json();
         location = data.city;
-    } catch {}
+    }catch{}
 
     document.getElementById("deviceInfo").innerText =
         `${device} • ${browser} • ${location}`;
