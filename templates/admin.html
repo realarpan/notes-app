@@ -12,11 +12,17 @@
         </p>
     </div>
 
-    <div class="text-sm text-gray-400">
+    <!-- USER + DEVICE INFO -->
+    <div class="text-sm text-gray-400 text-right">
         Logged in as 
         <span class="text-white font-medium capitalize">
             {{ current_user.username }}
         </span>
+
+        <div id="deviceInfo"
+            class="inline-block mt-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs text-gray-400">
+            Detecting device...
+        </div>
     </div>
 </div>
 
@@ -35,7 +41,7 @@
         {% endfor %}
     </select>
 
-    <!-- FILE UPLOAD BOX -->
+    <!-- FILE UPLOAD -->
     <label class="text-sm text-gray-400 mb-2 block">Upload PDF</label>
 
     <div id="dropArea"
@@ -77,11 +83,11 @@
 
 <!-- 🔥 SCRIPT -->
 <script>
+// FILE SELECT
 const fileInput = document.getElementById("fileInput");
 const fileName = document.getElementById("fileName");
 const dropArea = document.getElementById("dropArea");
 
-// FILE SELECT
 fileInput.addEventListener("change", function() {
     if (this.files.length > 0) {
         fileName.innerText = "Selected: " + this.files[0].name;
@@ -121,6 +127,41 @@ document.getElementById("uploadForm").addEventListener("submit", function() {
     text.innerText = "Uploading...";
     spinner.classList.remove("hidden");
 });
+
+// DEVICE + LOCATION
+async function getDeviceInfo() {
+    let device = "Desktop";
+    const ua = navigator.userAgent;
+
+    if (/mobile/i.test(ua)) device = "Mobile";
+    if (/tablet|ipad/i.test(ua)) device = "Tablet";
+
+    // OS
+    let os = "Unknown OS";
+    if (ua.includes("Win")) os = "Windows";
+    else if (ua.includes("Mac")) os = "MacOS";
+    else if (ua.includes("Android")) os = "Android";
+    else if (ua.includes("iPhone")) os = "iOS";
+
+    // Browser
+    let browser = "Browser";
+    if (ua.includes("Chrome")) browser = "Chrome";
+    else if (ua.includes("Safari")) browser = "Safari";
+    else if (ua.includes("Firefox")) browser = "Firefox";
+
+    // Location (IP-based)
+    let locationText = "Unknown location";
+    try {
+        const res = await fetch("https://ipapi.co/json/");
+        const data = await res.json();
+        locationText = `${data.city}, ${data.country_name}`;
+    } catch (e) {}
+
+    document.getElementById("deviceInfo").innerText =
+        `${device} • ${os} • ${browser} • ${locationText}`;
+}
+
+getDeviceInfo();
 </script>
 
 {% endblock %}
