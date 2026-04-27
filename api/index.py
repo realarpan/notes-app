@@ -137,10 +137,17 @@ def admin():
 
         flash("PDF uploaded successfully")
 
-    # 🔥 IMPORTANT: SEND NOTES TO TEMPLATE
+    # ✅ GET ALL NOTES
     notes = Note.query.order_by(Note.id.desc()).all()
 
-    return render_template("admin.html", notes=notes)
+    # ✅ COUNT UNIQUE CLASSES WITH NOTES
+    classes_with_notes = db.session.query(Note.class_number).distinct().count()
+
+    return render_template(
+        "admin.html",
+        notes=notes,
+        classes_with_notes=classes_with_notes
+    )
 
 
 # ================= DELETE NOTE =================
