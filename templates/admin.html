@@ -1,13 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="max-w-6xl mx-auto mt-10 px-4">
+<div class="flex min-h-[80vh]">
+
+<!-- 🔥 SIDEBAR -->
+<div class="w-64 bg-white/5 border-r border-white/10 p-5 hidden md:block">
+
+    <h2 class="text-xl font-semibold mb-6">Admin</h2>
+
+    <div class="space-y-2 text-sm">
+        <button onclick="switchTab('overview')" class="tab-btn w-full text-left px-3 py-2 rounded-lg bg-blue-600">Overview</button>
+        <button onclick="switchTab('manage')" class="tab-btn w-full text-left px-3 py-2 rounded-lg bg-gray-700">Manage Notes</button>
+        <button onclick="switchTab('history')" class="tab-btn w-full text-left px-3 py-2 rounded-lg bg-gray-700">Upload History</button>
+    </div>
+
+</div>
+
+<!-- 🔥 MAIN CONTENT -->
+<div class="flex-1 p-4 md:p-8">
 
 <!-- HEADER -->
 <div class="flex justify-between items-center mb-8">
     <div>
-        <h2 class="text-3xl font-semibold">Admin Panel</h2>
-        <p class="text-gray-400 text-sm">Manage notes & uploads</p>
+        <h2 class="text-3xl font-semibold">Admin Dashboard</h2>
+        <p class="text-gray-400 text-sm">Control everything here</p>
     </div>
 
     <div class="text-sm text-gray-400 text-right">
@@ -17,12 +33,14 @@
         </span>
 
         <div id="deviceInfo"
-            class="inline-block mt-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs text-gray-400">
+            class="mt-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs inline-block">
         </div>
     </div>
 </div>
 
-<!-- STATS -->
+<!-- 🔥 OVERVIEW -->
+<div id="overview" class="tab-content">
+
 <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
 
 <div class="bg-white/5 p-4 rounded-xl border border-white/10">
@@ -44,7 +62,11 @@
 
 </div>
 
-<!-- GRID -->
+</div>
+
+<!-- 🔥 MANAGE -->
+<div id="manage" class="tab-content hidden">
+
 <div class="grid md:grid-cols-2 gap-8">
 
 <!-- UPLOAD -->
@@ -63,38 +85,33 @@
 
 </select>
 
-<!-- DRAG & DROP -->
+<!-- DRAG DROP -->
 <div id="dropZone"
     class="w-full p-6 border-2 border-dashed border-gray-600 rounded-xl text-center cursor-pointer hover:border-blue-500 transition">
 
-    <p class="text-gray-400 text-sm">Drag & drop PDF here</p>
-    <p class="text-xs text-gray-500 mt-1">or click to browse</p>
+    <p class="text-gray-400 text-sm">Drag & drop PDF</p>
+    <p class="text-xs text-gray-500">or click</p>
 
-    <input type="file" name="file" id="fileInput" accept="application/pdf"
-        class="hidden">
+    <input type="file" name="file" id="fileInput" accept="application/pdf" class="hidden">
 </div>
 
 <p id="fileName" class="text-green-400 text-sm mt-3 hidden"></p>
 
-<button id="uploadBtn"
-    class="w-full mt-4 bg-green-600 hover:bg-green-700 py-2 rounded-lg flex justify-center gap-2">
-
-    <span id="btnText">Upload</span>
-    <span id="spinner" class="hidden animate-spin">⏳</span>
-
+<button class="w-full mt-4 bg-green-600 hover:bg-green-700 py-2 rounded-lg">
+    Upload
 </button>
 
 </form>
 
 </div>
 
-<!-- MANAGE -->
+<!-- NOTES LIST -->
 <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
 
-<h3 class="text-lg font-medium mb-4">Manage Notes</h3>
+<h3 class="text-lg font-medium mb-4">All Notes</h3>
 
 <input id="searchNotes"
-    placeholder="Search notes..."
+    placeholder="Search..."
     class="w-full mb-4 p-2 rounded-lg bg-gray-800 text-white text-sm">
 
 <div class="space-y-3 max-h-[400px] overflow-y-auto">
@@ -112,14 +129,10 @@
 <div class="flex gap-2">
 
 <a href="{{ note.pdf_url }}" target="_blank"
-   class="px-2 py-1 bg-blue-600 rounded text-xs">
-   View
-</a>
+   class="px-2 py-1 bg-blue-600 rounded text-xs">View</a>
 
 <form method="POST" action="/delete-note/{{note.id}}">
-    <button class="px-2 py-1 bg-red-600 rounded text-xs">
-        Delete
-    </button>
+<button class="px-2 py-1 bg-red-600 rounded text-xs">Delete</button>
 </form>
 
 </div>
@@ -133,35 +146,33 @@
 
 </div>
 
-<!-- 🔥 UPLOAD HISTORY -->
-<div class="mt-10 bg-white/5 p-6 rounded-2xl border border-white/10">
+</div>
+
+<!-- 🔥 HISTORY -->
+<div id="history" class="tab-content hidden">
+
+<div class="bg-white/5 p-6 rounded-2xl border border-white/10">
 
 <h3 class="text-lg font-medium mb-4">Upload History</h3>
 
-<div class="space-y-3 max-h-[300px] overflow-y-auto">
+<div class="space-y-4">
 
-{% for log in logs %}
-<div class="flex justify-between items-center bg-white/5 p-3 rounded-lg border border-white/10">
+{% for note in notes %}
+<div class="bg-white/5 p-4 rounded-xl border border-white/10">
 
-<div>
-    <p class="text-sm">
-        <span class="text-blue-400">{{ log.uploaded_by }}</span>
-        uploaded to
-        <span class="text-green-400">Class {{ log.class_number }}</span>
-    </p>
+<p class="text-sm text-green-400">
+    {{ current_user.username }} uploaded to Class {{ note.class_number }}
+</p>
 
-    <p class="text-xs text-gray-400">
-        {{ log.filename }}
-    </p>
-</div>
+<p class="text-sm text-gray-300 mt-1">
+    {{ note.pdf_url.split('/')[-1] }}
+</p>
 
-<div class="text-xs text-gray-400">
-    {{ log.timestamp.strftime("%d %b %Y, %I:%M %p") }}
-</div>
+<p class="text-xs text-gray-500 mt-1">
+    Recently uploaded
+</p>
 
 </div>
-{% else %}
-<p class="text-gray-400 text-sm">No uploads yet</p>
 {% endfor %}
 
 </div>
@@ -170,64 +181,49 @@
 
 </div>
 
-<!-- SCRIPT -->
+</div>
+</div>
+
+<!-- 🔥 SCRIPT -->
 <script>
 
-// DRAG & DROP
+// TAB SWITCH
+function switchTab(tab){
+    document.querySelectorAll(".tab-content").forEach(t => t.classList.add("hidden"));
+    document.getElementById(tab).classList.remove("hidden");
+
+    document.querySelectorAll(".tab-btn").forEach(btn=>{
+        btn.classList.remove("bg-blue-600");
+        btn.classList.add("bg-gray-700");
+    });
+
+    event.target.classList.add("bg-blue-600");
+}
+
+// DRAG DROP
 const dropZone = document.getElementById("dropZone");
 const fileInput = document.getElementById("fileInput");
 const fileName = document.getElementById("fileName");
 
-dropZone.addEventListener("click", () => fileInput.click());
+dropZone.addEventListener("click", ()=>fileInput.click());
 
-fileInput.addEventListener("change", () => {
-    if (fileInput.files.length > 0) {
-        fileName.innerText = fileInput.files[0].name;
-        fileName.classList.remove("hidden");
-    }
-});
-
-dropZone.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    dropZone.classList.add("border-blue-500");
-});
-
-dropZone.addEventListener("dragleave", () => {
-    dropZone.classList.remove("border-blue-500");
-});
-
-dropZone.addEventListener("drop", (e) => {
-    e.preventDefault();
-    dropZone.classList.remove("border-blue-500");
-
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-        fileInput.files = files;
-        fileName.innerText = files[0].name;
-        fileName.classList.remove("hidden");
-    }
-});
-
-// LOADING
-document.getElementById("uploadForm").addEventListener("submit", () => {
-    document.getElementById("btnText").innerText = "Uploading...";
-    document.getElementById("spinner").classList.remove("hidden");
+fileInput.addEventListener("change", ()=>{
+    fileName.innerText = fileInput.files[0].name;
+    fileName.classList.remove("hidden");
 });
 
 // SEARCH
 const search = document.getElementById("searchNotes");
-const items = document.querySelectorAll(".note-item");
-
-search.addEventListener("input", () => {
+if(search){
+search.addEventListener("input", ()=>{
     const val = search.value.toLowerCase();
-
-    items.forEach(item => {
-        const text = item.innerText.toLowerCase();
-        item.style.display = text.includes(val) ? "flex" : "none";
+    document.querySelectorAll(".note-item").forEach(item=>{
+        item.style.display = item.innerText.toLowerCase().includes(val) ? "flex" : "none";
     });
 });
+}
 
-// DEVICE INFO
+// DEVICE INFO (KEEPED ✅)
 async function getDeviceInfo() {
     const ua = navigator.userAgent;
 
@@ -238,13 +234,12 @@ async function getDeviceInfo() {
     try {
         const res = await fetch("https://ipapi.co/json/");
         const data = await res.json();
-        location = `${data.city}`;
+        location = data.city;
     } catch {}
 
     document.getElementById("deviceInfo").innerText =
         `${device} • ${browser} • ${location}`;
 }
-
 getDeviceInfo();
 
 </script>
