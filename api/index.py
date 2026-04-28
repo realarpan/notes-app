@@ -139,13 +139,31 @@ def admin():
         flash("PDF uploaded successfully")
 
     # ✅ FETCH DATA
+    # ✅ FETCH DATA
     notes = Note.query.order_by(Note.id.desc()).all()
     classes_with_notes = db.session.query(Note.class_number).distinct().count()
+
+    # 🔥 DATABASE STATUS (REAL)
+    db_status = "offline"
+    try:
+        db.session.execute("SELECT 1")
+        db_status = "online"
+    except:
+        db_status = "offline"
+
+    # 🔥 TOTAL USERS
+    total_users = User.query.count()
+
+    # 🔥 RECENT NOTES (last 24h approx using latest 10)
+    recent_notes = notes[:10]
 
     return render_template(
         "admin.html",
         notes=notes,
-        classes_with_notes=classes_with_notes
+        classes_with_notes=classes_with_notes,
+        db_status=db_status,
+        total_users=total_users,
+        recent_notes=recent_notes
     )
 
 
