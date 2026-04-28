@@ -1,54 +1,65 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="flex h-screen overflow-hidden bg-gradient-to-br from-black via-gray-900 to-black text-white">
+<div class="flex h-screen overflow-hidden">
 
 <!-- ================= SIDEBAR ================= -->
 <div id="sidebar"
-class="fixed md:relative z-50 h-full w-64 bg-black/90 border-r border-white/10 transition-all duration-300 flex flex-col">
+class="fixed md:relative z-50 h-full w-64 bg-black/80 backdrop-blur-xl border-r border-white/10 transform -translate-x-full md:translate-x-0 transition duration-300 flex flex-col">
 
 <div class="p-5 text-lg font-semibold border-b border-white/10">
-🚀 Admin Panel
+Dashboard
 </div>
 
 <div class="flex-1 p-3 space-y-2 text-sm">
 
-<button onclick="showTab('overview', this)" class="tab-btn w-full px-3 py-2 rounded-lg hover:bg-white/10">📊 Overview</button>
+<button onclick="showTab('overview', this)" class="tab-btn flex items-center gap-3 w-full px-3 py-2 rounded-lg hover:bg-white/10">
+📊 <span>Overview</span>
+</button>
 
-<button onclick="showTab('upload', this)" class="tab-btn w-full px-3 py-2 rounded-lg hover:bg-white/10">⬆ Upload</button>
+<button onclick="showTab('upload', this)" class="tab-btn flex items-center gap-3 w-full px-3 py-2 rounded-lg hover:bg-white/10">
+⬆ <span>Upload</span>
+</button>
 
-<button onclick="showTab('manage', this)" class="tab-btn w-full px-3 py-2 rounded-lg hover:bg-white/10">📂 Notes</button>
+<button onclick="showTab('manage', this)" class="tab-btn flex items-center gap-3 w-full px-3 py-2 rounded-lg hover:bg-white/10">
+📂 <span>Notes</span>
+</button>
 
-<button onclick="showTab('history', this)" class="tab-btn w-full px-3 py-2 rounded-lg hover:bg-white/10">🕒 History</button>
+<button onclick="showTab('history', this)" class="tab-btn flex items-center gap-3 w-full px-3 py-2 rounded-lg hover:bg-white/10">
+🕒 <span>History</span>
+</button>
 
 </div>
 
 <div class="p-3 border-t border-white/10">
 <button onclick="toggleSidebar()" class="w-full text-xs bg-gray-800 py-2 rounded">
-Toggle Sidebar
+Toggle
 </button>
 </div>
 
 </div>
 
+
 <!-- ================= MAIN ================= -->
 <div class="flex-1 flex flex-col overflow-hidden">
 
 <!-- TOPBAR -->
-<div class="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-black/60 backdrop-blur">
+<div class="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-gradient-to-r from-black to-gray-900">
 
 <div class="flex items-center gap-3">
 <button onclick="toggleSidebar()" class="md:hidden">☰</button>
+
 <input placeholder="Search..."
 class="px-3 py-1 bg-gray-800 rounded text-sm outline-none">
 </div>
 
-<div class="text-right text-sm">
+<div class="text-sm text-right">
 {{ current_user.username }}
 <div id="deviceInfo" class="text-xs text-gray-400"></div>
 </div>
 
 </div>
+
 
 <!-- ================= CONTENT ================= -->
 <div class="flex-1 overflow-y-auto p-4 space-y-6">
@@ -56,90 +67,135 @@ class="px-3 py-1 bg-gray-800 rounded text-sm outline-none">
 <!-- ================= OVERVIEW ================= -->
 <div id="overview" class="tab-content">
 
-<!-- ===== CARDS ===== -->
-<div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+<!-- ===== TOP CARDS ===== -->
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
 
-<div class="card">
-<p>Total Notes</p>
-<h2>{{ notes|length }}</h2>
+<div class="bg-gradient-to-br from-gray-900 to-black p-4 rounded-xl border border-white/10 hover:bg-white/10 transition">
+<p class="text-xs text-gray-400">Total Notes</p>
+<h3 class="text-2xl font-semibold">{{ notes|length }}</h3>
 </div>
 
-<div class="card">
-<p>Classes</p>
-<h2>{{ classes_with_notes }}</h2>
+<div class="bg-gradient-to-br from-gray-900 to-black p-4 rounded-xl border border-white/10 hover:bg-white/10 transition">
+<p class="text-xs text-gray-400">Active Classes</p>
+<h3 class="text-2xl font-semibold">{{ classes_with_notes }}</h3>
 </div>
 
-<div class="card">
-<p>Users</p>
-<h2>{{ total_users }}</h2>
+<div class="bg-gradient-to-br from-gray-900 to-black p-4 rounded-xl border border-white/10 hover:bg-white/10 transition">
+<p class="text-xs text-gray-400">Uploads (24h)</p>
+<h3 class="text-2xl font-semibold">{{ recent_uploads }}</h3>
 </div>
 
-<div class="card">
-<p>Uploads (24h)</p>
-<h2>{{ recent_uploads }}</h2>
+<div class="bg-gradient-to-br from-gray-900 to-black p-4 rounded-xl border border-white/10 hover:bg-white/10 transition">
+<p class="text-xs text-gray-400">Users</p>
+<h3 class="text-2xl font-semibold">{{ total_users }}</h3>
 </div>
 
-<div class="card">
-<p>Database</p>
+<div class="bg-gradient-to-br from-gray-900 to-black p-4 rounded-xl border border-white/10 hover:bg-white/10 transition">
+<p class="text-xs text-gray-400">Database</p>
+
 {% if db_status == "online" %}
-<h2 class="text-green-400">● {{ db_ping }} ms</h2>
+<h3 class="font-semibold
+{% if db_ping < 150 %}text-green-400
+{% elif db_ping < 400 %}text-yellow-400
+{% else %}text-red-400{% endif %}">
+● {{ db_ping }} ms
+</h3>
 {% else %}
-<h2 class="text-red-400">● Offline</h2>
+<h3 class="text-red-400 font-semibold">● Offline</h3>
 {% endif %}
-</div>
 
 </div>
 
-<!-- ===== GRID ===== -->
-<div class="grid md:grid-cols-3 gap-4 mt-6">
+</div>
+
+
+<!-- ===== SECOND ROW ===== -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
 
 <!-- RECENT UPLOADS -->
-<div class="panel col-span-2">
-<h3>Recent Uploads</h3>
+<div class="bg-white/5 p-4 rounded-xl border border-white/10 col-span-2">
+<h3 class="text-sm text-gray-300 mb-3">Recent Uploads</h3>
 
+<div class="space-y-2 text-xs">
 {% for note in recent_notes %}
-<div class="row">
-<span>{{ note.pdf_url.split('/')[-1] }}</span>
-<span class="text-gray-400">Class {{ note.class_number }}</span>
+<div class="flex justify-between border-b border-white/5 pb-1">
+
+<span class="truncate text-gray-300">
+{{ note.pdf_url.split('/')[-1] }}
+</span>
+
+<span class="text-gray-500">
+Class {{ note.class_number }}
+</span>
+
 </div>
 {% endfor %}
-
+</div>
 </div>
 
-<!-- SYSTEM HEALTH -->
-<div class="panel">
-<h3>System Health</h3>
 
-<div class="row"><span>Host</span><span>{{ host }}</span></div>
-<div class="row"><span>API Ping</span><span>{{ api_ping }} ms</span></div>
-<div class="row"><span>Uptime</span><span>{{ uptime }}</span></div>
+<!-- SYSTEM STATUS -->
+<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+<h3 class="text-sm text-gray-300 mb-3">System Health</h3>
 
-<div class="row">
+<div class="space-y-2 text-xs text-gray-400">
+
+<div class="flex justify-between">
+<span>Host</span>
+<span class="text-white">{{ host }}</span>
+</div>
+
+<div class="flex justify-between">
+<span>Backend</span>
+<span class="text-white">Flask</span>
+</div>
+
+<div class="flex justify-between">
+<span>Storage</span>
+<span class="text-white">Supabase</span>
+</div>
+
+<div class="flex justify-between">
+<span>DB Latency</span>
+<span class="text-white">{{ db_ping }} ms</span>
+</div>
+
+<div class="flex justify-between">
 <span>Status</span>
-{% if db_ping and db_ping < 150 %}
+
+{% if db_ping < 150 %}
 <span class="text-green-400">● Healthy</span>
-{% elif db_ping and db_ping < 400 %}
+{% elif db_ping < 400 %}
 <span class="text-yellow-400">● Moderate</span>
 {% else %}
 <span class="text-red-400">● Slow</span>
 {% endif %}
-</div>
 
 </div>
 
 </div>
 
-<!-- ===== USERS ===== -->
-<div class="panel mt-6">
-<h3>Users</h3>
+</div>
 
-<div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+</div>
+
+
+<!-- ===== USERS PANEL ===== -->
+<div class="bg-white/5 p-4 rounded-xl border border-white/10 mt-6">
+
+<h3 class="text-sm text-gray-300 mb-3">Users</h3>
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
 
 {% for user in users %}
-<div class="user-card">
-<div class="avatar">{{ user.username[0]|upper }}</div>
-<p>{{ user.username }}</p>
-<span>{{ user.role }}</span>
+<div class="bg-black/40 p-3 rounded-lg border border-white/10 hover:bg-white/10 transition">
+
+<p class="text-white">{{ user.username }}</p>
+
+<p class="text-gray-400">
+{{ user.role }}
+</p>
+
 </div>
 {% endfor %}
 
@@ -147,220 +203,179 @@ class="px-3 py-1 bg-gray-800 rounded text-sm outline-none">
 
 </div>
 
+
 <!-- ===== ACTIVITY ===== -->
-<div class="panel mt-6">
-<h3>Activity</h3>
+<div class="bg-white/5 p-4 rounded-xl border border-white/10 mt-6">
 
-<div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+<h3 class="text-sm text-gray-300 mb-3">Activity</h3>
 
-<div>
-<p class="text-gray-400 text-xs">Uploads Today</p>
-<h2>{{ recent_uploads }}</h2>
-</div>
-
-<div>
-<p class="text-gray-400 text-xs">Users</p>
-<h2>{{ total_users }}</h2>
-</div>
-
-<div>
-<p class="text-gray-400 text-xs">Latency</p>
-<h2>{{ db_ping }} ms</h2>
-</div>
-
-<div>
-<p class="text-gray-400 text-xs">Uptime</p>
-<h2>{{ uptime }}</h2>
+<div class="text-xs text-gray-400 space-y-2">
+<div>Uploads today: {{ recent_uploads }}</div>
+<div>Total users: {{ total_users }}</div>
+<div>System latency: {{ db_ping }} ms</div>
+<div>Server uptime: 99.9%</div>
 </div>
 
 </div>
 
 </div>
 
-</div>
 
 <!-- ================= UPLOAD ================= -->
 <div id="upload" class="tab-content hidden">
-<div class="panel max-w-md">
+
+<div class="bg-white/5 p-6 rounded-xl max-w-md">
 
 <form method="POST" enctype="multipart/form-data">
 
-<select name="class_number" class="input">
+<select name="class_number"
+class="w-full mb-4 p-3 bg-gray-800 rounded text-sm">
 {% for i in range(1,12) %}
 <option value="{{i}}">Class {{i}}</option>
 {% endfor %}
 </select>
 
-<div id="dropZone" class="drop">
+<div id="dropZone"
+class="p-6 border-2 border-dashed border-gray-600 rounded text-center cursor-pointer">
 Upload PDF
-<input type="file" name="file" id="fileInput" hidden>
+<input type="file" name="file" id="fileInput" class="hidden">
 </div>
 
-<p id="fileName" class="text-green-400 text-sm hidden"></p>
+<p id="fileName" class="text-green-400 text-sm mt-2 hidden"></p>
 
-<button class="btn">Upload</button>
+<button class="w-full mt-4 bg-green-600 py-2 rounded text-sm">
+Upload
+</button>
 
 </form>
 
 </div>
+
+</div>
+
+
+<!-- ================= MANAGE ================= -->
+<div id="manage" class="tab-content hidden">
+
+<input id="searchNotes"
+class="mb-4 w-full p-2 bg-gray-800 rounded text-sm"
+placeholder="Search notes">
+
+<div class="space-y-3">
+
+{% for note in notes %}
+<div class="flex justify-between items-center bg-white/5 p-3 rounded note-item">
+
+<div>
+<p class="text-sm">Class {{note.class_number}}</p>
+<p class="text-xs text-gray-400 truncate max-w-[150px]">
+{{ note.pdf_url.split('/')[-1] }}
+</p>
+</div>
+
+<div class="flex gap-2">
+<a href="{{note.pdf_url}}" target="_blank"
+class="bg-blue-600 px-2 py-1 text-xs rounded">View</a>
+
+<form method="POST" action="/delete-note/{{note.id}}">
+<button onclick="return confirm('Delete?')"
+class="bg-red-600 px-2 py-1 text-xs rounded">Delete</button>
+</form>
 </div>
 
 </div>
+{% endfor %}
+
+</div>
+
+</div>
+
+
+<!-- ================= HISTORY ================= -->
+<div id="history" class="tab-content hidden">
+
+<div class="space-y-3">
+
+{% for log in logs %}
+<div class="bg-white/5 p-3 rounded">
+
+<p class="text-sm">
+{{ log.uploaded_by }} → Class {{ log.class_number }}
+</p>
+
+<p class="text-xs text-gray-400">
+{{ log.filename }}
+</p>
+
+<p class="text-xs text-gray-500">
+{{ log.timestamp.strftime("%d %b %Y, %I:%M %p") }}
+</p>
+
+</div>
+{% endfor %}
+
+</div>
+
+</div>
+
 </div>
 </div>
+</div>
 
-<!-- ================= STYLES ================= -->
-<style>
-.card{
-background: linear-gradient(145deg,#0a0a0a,#111);
-padding:16px;
-border-radius:12px;
-border:1px solid rgba(255,255,255,0.05);
-}
-.card h2{font-size:22px;margin-top:5px}
-
-.panel{
-background: rgba(255,255,255,0.03);
-padding:16px;
-border-radius:12px;
-border:1px solid rgba(255,255,255,0.05);
-}
-
-.panel h3{margin-bottom:10px;color:#ccc}
-
-.row{
-display:flex;
-justify-content:space-between;
-padding:6px 0;
-border-bottom:1px solid rgba(255,255,255,0.05);
-font-size:12px;
-}
-
-.user-card{
-background:#0a0a0a;
-padding:12px;
-border-radius:10px;
-text-align:center;
-border:1px solid rgba(255,255,255,0.05);
-}
-
-.avatar{
-width:40px;
-height:40px;
-border-radius:50%;
-background:#22c55e;
-display:flex;
-align-items:center;
-justify-content:center;
-margin:auto;
-margin-bottom:6px;
-font-weight:bold;
-}
-
-.input{
-width:100%;
-padding:10px;
-background:#111;
-border-radius:8px;
-margin-bottom:10px;
-}
-
-.drop{
-padding:20px;
-border:2px dashed #444;
-text-align:center;
-cursor:pointer;
-border-radius:10px;
-}
-
-.btn{
-width:100%;
-background:#16a34a;
-padding:10px;
-border-radius:8px;
-margin-top:10px;
-}
-</style>
 
 <!-- ================= SCRIPT ================= -->
 <script>
 
-// TAB SWITCH (FIXED)
 function showTab(id, el){
 document.querySelectorAll(".tab-content").forEach(x=>x.classList.add("hidden"));
 document.getElementById(id).classList.remove("hidden");
 
-// active highlight
 document.querySelectorAll(".tab-btn").forEach(btn=>btn.classList.remove("bg-white/10"));
 el.classList.add("bg-white/10");
 }
 
-// ✅ IMPORTANT: default tab load
-window.onload = () => {
-const firstTab = document.querySelector(".tab-btn");
-if(firstTab){
-firstTab.click();
-}
-};
+document.querySelector(".tab-btn")?.click();
 
-// SIDEBAR FIX
 function toggleSidebar(){
-const sb = document.getElementById("sidebar");
-sb.classList.toggle("hidden");
+document.getElementById("sidebar").classList.toggle("-translate-x-full");
 }
 
-// FILE UPLOAD
 const dz = document.getElementById("dropZone");
 const fi = document.getElementById("fileInput");
 const fn = document.getElementById("fileName");
 
-if(dz){
 dz.onclick = ()=>fi.click();
-}
 
-if(fi){
 fi.onchange = ()=>{
 if(fi.files.length){
 fn.innerText = fi.files[0].name;
 fn.classList.remove("hidden");
 }
 };
-}
 
-// SEARCH
-const search = document.getElementById("searchNotes");
-if(search){
-search.addEventListener("input", e=>{
+document.getElementById("searchNotes")?.addEventListener("input", e=>{
 const val = e.target.value.toLowerCase();
 document.querySelectorAll(".note-item").forEach(item=>{
 item.style.display = item.innerText.toLowerCase().includes(val) ? "flex" : "none";
 });
 });
-}
 
-// DEVICE INFO (REAL)
 async function getDeviceInfo(){
 const ua = navigator.userAgent;
 
 let device = /mobile/i.test(ua) ? "Mobile" : "Desktop";
-
-let browser = "Unknown";
-if(ua.includes("Chrome") && !ua.includes("Edg")) browser = "Chrome";
-else if(ua.includes("Firefox")) browser = "Firefox";
-else if(ua.includes("Safari") && !ua.includes("Chrome")) browser = "Safari";
-else if(ua.includes("Edg")) browser = "Edge";
+let browser = ua.includes("Chrome") ? "Chrome" : "Browser";
 
 let location = "";
 try{
 const res = await fetch("https://ipapi.co/json/");
 const data = await res.json();
-location = data.city || "";
+location = data.city;
 }catch{}
 
 document.getElementById("deviceInfo").innerText =
-`${device} • ${browser}${location ? " • " + location : ""}`;
+`${device} • ${browser} • ${location}`;
 }
-
 getDeviceInfo();
 
 </script>
