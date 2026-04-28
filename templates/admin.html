@@ -70,23 +70,147 @@ class="px-3 py-1 bg-gray-800 rounded text-sm outline-none">
 <!-- ================= OVERVIEW ================= -->
 <div id="overview" class="tab-content">
 
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+<!-- STATS CARDS -->
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
 
-<div class="bg-white/5 p-4 rounded-xl">
-<p class="text-gray-400 text-sm">Total Notes</p>
+<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+<p class="text-gray-400 text-xs">TOTAL NOTES</p>
 <h3 class="text-xl font-semibold">{{ notes|length }}</h3>
 </div>
 
-<div class="bg-white/5 p-4 rounded-xl">
-<p class="text-gray-400 text-sm">Classes</p>
-<h3 class="text-xl font-semibold">11</h3>
-</div>
-
-<div class="bg-white/5 p-4 rounded-xl">
-<p class="text-gray-400 text-sm">With Notes</p>
+<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+<p class="text-gray-400 text-xs">CLASSES ACTIVE</p>
 <h3 class="text-xl font-semibold text-green-400">
 {{ classes_with_notes }}
 </h3>
+</div>
+
+<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+<p class="text-gray-400 text-xs">RECENT UPLOADS</p>
+<h3 class="text-xl font-semibold">
+{{ logs|length }}
+</h3>
+</div>
+
+<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+<p class="text-gray-400 text-xs">SYSTEM STATUS</p>
+<h3 class="text-sm font-semibold text-green-400">
+● ONLINE
+</h3>
+</div>
+
+</div>
+
+
+<!-- GRID -->
+<div class="grid md:grid-cols-2 gap-6 mt-6">
+
+<!-- LEFT SIDE -->
+<div class="space-y-6">
+
+<!-- ACTIVITY FEED -->
+<div class="bg-black/40 border border-green-500/20 p-4 rounded-xl">
+
+<p class="text-green-400 text-xs mb-3">RECENT ACTIVITY</p>
+
+<div class="space-y-2 text-xs font-mono">
+
+{% for log in logs %}
+<p class="text-green-300">
+> {{ log.uploaded_by }} uploaded {{ log.filename }}
+</p>
+{% endfor %}
+
+</div>
+
+</div>
+
+
+<!-- QUICK INSIGHTS -->
+<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+
+<p class="text-gray-400 text-xs mb-3">INSIGHTS</p>
+
+<div class="text-sm space-y-2">
+
+<p>📌 Most Active Class:
+<span class="text-blue-400">Class {{ notes[0].class_number if notes else '-' }}</span>
+</p>
+
+<p>📂 Total Stored Files:
+<span class="text-green-400">{{ notes|length }}</span>
+</p>
+
+<p>🕒 Last Upload:
+<span class="text-gray-300">
+{{ logs[0].timestamp.strftime("%d %b, %I:%M %p") if logs else '-' }}
+</span>
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- RIGHT SIDE -->
+<div class="space-y-6">
+
+<!-- FAKE SYSTEM METRICS -->
+<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+
+<p class="text-gray-400 text-xs mb-3">SYSTEM METRICS</p>
+
+<div class="space-y-3 text-xs">
+
+<div>
+<p>CPU Usage</p>
+<div class="w-full bg-gray-800 h-2 rounded">
+<div class="bg-green-500 h-2 rounded w-[35%]"></div>
+</div>
+</div>
+
+<div>
+<p>Storage</p>
+<div class="w-full bg-gray-800 h-2 rounded">
+<div class="bg-blue-500 h-2 rounded w-[60%]"></div>
+</div>
+</div>
+
+<div>
+<p>Network</p>
+<div class="w-full bg-gray-800 h-2 rounded">
+<div class="bg-purple-500 h-2 rounded w-[20%]"></div>
+</div>
+</div>
+
+</div>
+
+</div>
+
+
+<!-- TERMINAL BOX -->
+<div class="bg-black border border-green-500/30 p-4 rounded-xl h-[200px] overflow-y-auto">
+
+<p class="text-green-400 text-xs mb-2">SYSTEM LOG</p>
+
+<div class="text-green-300 text-xs font-mono space-y-1">
+
+<p>> Initializing system...</p>
+<p>> Connecting to database...</p>
+<p>> Auth success</p>
+
+{% for log in logs %}
+<p>> {{ log.filename }} uploaded ✔</p>
+{% endfor %}
+
+<p class="animate-pulse">> _</p>
+
+</div>
+
+</div>
+
 </div>
 
 </div>
