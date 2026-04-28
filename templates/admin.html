@@ -8,187 +8,210 @@
     <h2 class="text-xl font-semibold mb-8">Admin</h2>
 
     <div class="space-y-2 text-sm">
-        <button onclick="showTab('overview')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">📊 Overview</button>
-        <button onclick="showTab('upload')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">⬆ Upload</button>
-        <button onclick="showTab('manage')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">📂 Manage</button>
-        <button onclick="showTab('history')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10">🕒 History</button>
+
+        <button onclick="showTab('overview', this)" 
+            class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 transition">
+            📊 Overview
+        </button>
+
+        <button onclick="showTab('upload', this)" 
+            class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 transition">
+            ⬆ Upload
+        </button>
+
+        <button onclick="showTab('manage', this)" 
+            class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 transition">
+            📂 Manage
+        </button>
+
+        <button onclick="showTab('history', this)" 
+            class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 transition">
+            🕒 History
+        </button>
+
     </div>
 </div>
 
-<!-- 🔥 FLEX FIX (MAIN LAYOUT) -->
+<!-- MAIN -->
 <div class="flex w-full">
 
-    <!-- Sidebar spacing (desktop only) -->
-    <div class="hidden md:block w-64 flex-shrink-0"></div>
+<div class="hidden md:block w-64 flex-shrink-0"></div>
 
-    <!-- MAIN CONTENT -->
-    <div class="flex-1 w-full overflow-x-hidden">
+<div class="flex-1 w-full overflow-x-hidden">
 
-    <div class="max-w-screen-xl mx-auto p-4 md:p-6">
+<div class="max-w-screen-xl mx-auto p-4 md:p-6">
 
-    <!-- TOP BAR -->
-    <div class="flex justify-between items-center mb-6">
+<!-- TOP -->
+<div class="flex justify-between items-center mb-6">
 
-        <button onclick="toggleSidebar()" class="md:hidden px-3 py-2 bg-gray-800 rounded-lg">
-            ☰
-        </button>
+<button onclick="toggleSidebar()" class="md:hidden px-3 py-2 bg-gray-800 rounded-lg">
+☰
+</button>
 
-        <div class="text-sm text-gray-400 text-right">
-            Logged in as 
-            <span class="text-white font-medium capitalize">
-                {{ current_user.username }}
-            </span>
+<div class="text-sm text-gray-400 text-right">
+Logged in as 
+<span class="text-white font-medium capitalize">
+{{ current_user.username }}
+</span>
 
-            <div id="deviceInfo"
-                class="mt-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs inline-block">
-            </div>
-        </div>
+<div id="deviceInfo"
+class="mt-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs inline-block">
+</div>
+</div>
 
-    </div>
+</div>
 
-    <!-- OVERVIEW -->
-    <div id="overview" class="tab-content">
+<!-- OVERVIEW -->
+<div id="overview" class="tab-content transition-all duration-300">
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
 
-    <div class="bg-white/5 p-4 rounded-xl border border-white/10">
-        <p class="text-gray-400 text-sm">Total Notes</p>
-        <h3 class="text-xl font-semibold">{{ notes|length }}</h3>
-    </div>
+<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+<p class="text-gray-400 text-sm">Total Notes</p>
+<h3 class="text-xl font-semibold">{{ notes|length }}</h3>
+</div>
 
-    <div class="bg-white/5 p-4 rounded-xl border border-white/10">
-        <p class="text-gray-400 text-sm">Classes</p>
-        <h3 class="text-xl font-semibold">11</h3>
-    </div>
+<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+<p class="text-gray-400 text-sm">Classes</p>
+<h3 class="text-xl font-semibold">11</h3>
+</div>
 
-    <div class="bg-white/5 p-4 rounded-xl border border-white/10">
-        <p class="text-gray-400 text-sm">With Notes</p>
-        <h3 class="text-xl font-semibold text-green-400">
-            {{ classes_with_notes }}
-        </h3>
-    </div>
+<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+<p class="text-gray-400 text-sm">With Notes</p>
+<h3 class="text-xl font-semibold text-green-400">
+{{ classes_with_notes }}
+</h3>
+</div>
 
-    </div>
+</div>
 
-    </div>
+</div>
 
-    <!-- UPLOAD -->
-    <div id="upload" class="tab-content hidden">
+<!-- UPLOAD -->
+<div id="upload" class="tab-content hidden transition-all duration-300">
 
-    <div class="bg-white/5 p-6 rounded-xl border border-white/10 max-w-md">
+<div class="bg-white/5 p-6 rounded-xl border border-white/10 max-w-md">
 
-    <form method="POST" enctype="multipart/form-data">
+<form method="POST" enctype="multipart/form-data">
 
-    <select name="class_number" class="w-full mb-4 p-3 bg-gray-800 rounded-lg text-sm">
-    {% for i in range(1,12) %}
-    <option value="{{i}}">Class {{i}}</option>
-    {% endfor %}
-    </select>
+<select name="class_number" class="w-full mb-4 p-3 bg-gray-800 rounded-lg text-sm">
+{% for i in range(1,12) %}
+<option value="{{i}}">Class {{i}}</option>
+{% endfor %}
+</select>
 
-    <div id="dropZone"
-         class="p-5 border-2 border-dashed border-gray-600 rounded-lg text-center cursor-pointer text-sm">
+<div id="dropZone"
+class="p-5 border-2 border-dashed border-gray-600 rounded-lg text-center cursor-pointer text-sm hover:border-blue-500 transition">
 
-        Drop PDF or click
-        <input type="file" name="file" id="fileInput" class="hidden">
-    </div>
+Drop PDF or click
+<input type="file" name="file" id="fileInput" class="hidden">
+</div>
 
-    <p id="fileName" class="text-green-400 text-sm mt-2 hidden truncate"></p>
+<p id="fileName" class="text-green-400 text-sm mt-2 hidden truncate"></p>
 
-    <button class="w-full mt-4 bg-green-600 py-2 rounded-lg text-sm hover:bg-green-700">
-    Upload
-    </button>
+<button class="w-full mt-4 bg-green-600 py-2 rounded-lg text-sm hover:bg-green-700 transition">
+Upload
+</button>
 
-    </form>
+</form>
 
-    </div>
+</div>
 
-    </div>
+</div>
 
-    <!-- MANAGE -->
-    <div id="manage" class="tab-content hidden">
+<!-- MANAGE -->
+<div id="manage" class="tab-content hidden transition-all duration-300">
 
-    <input id="searchNotes" placeholder="Search..."
-        class="mb-4 p-2 w-full bg-gray-800 rounded-lg text-sm">
+<input id="searchNotes" placeholder="Search..."
+class="mb-4 p-2 w-full bg-gray-800 rounded-lg text-sm">
 
-    <div class="space-y-3 max-h-[400px] overflow-y-auto">
+<div class="space-y-3 max-h-[400px] overflow-y-auto">
 
-    {% for note in notes %}
-    <div class="flex justify-between items-center bg-white/5 p-3 rounded-lg border note-item">
+{% for note in notes %}
+<div class="flex justify-between items-center bg-white/5 p-3 rounded-lg border note-item hover:bg-white/10 transition">
 
-    <div class="min-w-0">
-        <p class="text-sm">Class {{note.class_number}}</p>
-        <p class="text-xs text-gray-400 truncate max-w-[140px]">
-            {{ note.pdf_url.split('/')[-1] }}
-        </p>
-    </div>
+<div class="min-w-0">
+<p class="text-sm">Class {{note.class_number}}</p>
+<p class="text-xs text-gray-400 truncate max-w-[140px]">
+{{ note.pdf_url.split('/')[-1] }}
+</p>
+</div>
 
-    <div class="flex gap-2 flex-shrink-0">
-    <a href="{{note.pdf_url}}" target="_blank"
-       class="px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs whitespace-nowrap">
-    View
-    </a>
+<div class="flex gap-2 flex-shrink-0">
+<a href="{{note.pdf_url}}" target="_blank"
+class="px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs whitespace-nowrap transition">
+View
+</a>
 
-    <form method="POST" action="/delete-note/{{note.id}}">
-    <button class="px-2 py-1 bg-red-600 hover:bg-red-700 rounded text-xs whitespace-nowrap">
-    Delete
-    </button>
-    </form>
-    </div>
+<form method="POST" action="/delete-note/{{note.id}}">
+<button class="px-2 py-1 bg-red-600 hover:bg-red-700 rounded text-xs whitespace-nowrap transition">
+Delete
+</button>
+</form>
+</div>
 
-    </div>
-    {% endfor %}
+</div>
+{% endfor %}
 
-    </div>
+</div>
 
-    </div>
+</div>
 
-    <!-- HISTORY -->
-    <div id="history" class="tab-content hidden">
+<!-- HISTORY -->
+<div id="history" class="tab-content hidden transition-all duration-300">
 
-    <div class="space-y-3">
+<div class="space-y-3">
 
-    {% for note in notes %}
-    <div class="bg-white/5 p-4 rounded-lg border">
+{% for note in notes %}
+<div class="bg-white/5 p-4 rounded-lg border hover:bg-white/10 transition">
 
-    <p class="text-sm">
-    {{ current_user.username }} → Class {{note.class_number}}
-    </p>
+<p class="text-sm">
+{{ current_user.username }} → Class {{note.class_number}}
+</p>
 
-    <p class="text-xs text-gray-400 truncate">
-    {{ note.pdf_url.split('/')[-1] }}
-    </p>
+<p class="text-xs text-gray-400 truncate">
+{{ note.pdf_url.split('/')[-1] }}
+</p>
 
-    <p class="text-xs text-gray-500 mt-1">
-    ID: {{note.id}}
-    </p>
+<p class="text-xs text-gray-500 mt-1">
+{{ note.created_at.strftime("%d %b %Y, %I:%M %p") }}
+</p>
 
-    </div>
-    {% endfor %}
+</div>
+{% endfor %}
 
-    </div>
+</div>
 
-    </div>
+</div>
 
-    </div>
-    </div>
-
+</div>
+</div>
 </div>
 
 <!-- SCRIPT -->
 <script>
 
-// tab switch
-function showTab(id){
-    document.querySelectorAll(".tab-content").forEach(el=>el.classList.add("hidden"));
-    document.getElementById(id).classList.remove("hidden");
+// TAB + ACTIVE HIGHLIGHT
+function showTab(id, el){
+document.querySelectorAll(".tab-content").forEach(x=>x.classList.add("hidden"));
+document.getElementById(id).classList.remove("hidden");
+
+// active highlight
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+btn.classList.remove("bg-white/10","text-white");
+});
+el.classList.add("bg-white/10","text-white");
 }
 
-// sidebar toggle
+// default active
+document.querySelector(".tab-btn")?.click();
+
+// sidebar
 function toggleSidebar(){
-    document.getElementById("sidebar").classList.toggle("-translate-x-full");
+document.getElementById("sidebar").classList.toggle("-translate-x-full");
 }
 
-// drag & drop
+// drag drop
 const dz = document.getElementById("dropZone");
 const fi = document.getElementById("fileInput");
 const fn = document.getElementById("fileName");
@@ -196,37 +219,37 @@ const fn = document.getElementById("fileName");
 dz.onclick = ()=>fi.click();
 
 fi.onchange = ()=>{
-    if(fi.files.length){
-        fn.innerText = fi.files[0].name;
-        fn.classList.remove("hidden");
-    }
+if(fi.files.length){
+fn.innerText = fi.files[0].name;
+fn.classList.remove("hidden");
+}
 };
 
 // search
 document.getElementById("searchNotes")?.addEventListener("input", e=>{
-    const val = e.target.value.toLowerCase();
-    document.querySelectorAll(".note-item").forEach(item=>{
-        item.style.display = item.innerText.toLowerCase().includes(val) ? "flex" : "none";
-    });
+const val = e.target.value.toLowerCase();
+document.querySelectorAll(".note-item").forEach(item=>{
+item.style.display = item.innerText.toLowerCase().includes(val) ? "flex" : "none";
+});
 });
 
-// device info (kept)
+// device info
 async function getDeviceInfo(){
-    const ua = navigator.userAgent;
+const ua = navigator.userAgent;
 
-    let device = /mobile/i.test(ua) ? "Mobile" : "Desktop";
-    let browser = ua.includes("Edg") ? "Edge" :
-                  ua.includes("Chrome") ? "Chrome" : "Browser";
+let device = /mobile/i.test(ua) ? "Mobile" : "Desktop";
+let browser = ua.includes("Edg") ? "Edge" :
+              ua.includes("Chrome") ? "Chrome" : "Browser";
 
-    let location = "";
-    try{
-        const res = await fetch("https://ipapi.co/json/");
-        const data = await res.json();
-        location = data.city;
-    }catch{}
+let location = "";
+try{
+const res = await fetch("https://ipapi.co/json/");
+const data = await res.json();
+location = data.city;
+}catch{}
 
-    document.getElementById("deviceInfo").innerText =
-        `${device} • ${browser} • ${location}`;
+document.getElementById("deviceInfo").innerText =
+`${device} • ${browser} • ${location}`;
 }
 getDeviceInfo();
 
