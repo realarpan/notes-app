@@ -1,387 +1,235 @@
-{% extends "base.html" %}
-{% block content %}
+from flask import Flask, render_template, redirect, url_for, request, flash
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from werkzeug.security import check_password_hash
+from werkzeug.utils import secure_filename
+from sqlalchemy import text
+from datetime import datetime, timedelta
+import os
+import requests
 
-<div class="flex h-screen overflow-hidden">
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+TEMPLATE_DIR = os.path.join(BASE_DIR, "../templates")
 
-<!-- ================= SIDEBAR ================= -->
-<div id="sidebar"
-class="fixed md:relative z-50 h-full w-64 bg-black/80 backdrop-blur-xl border-r border-white/10 transform -translate-x-full md:translate-x-0 transition duration-300 flex flex-col">
+app = Flask(__name__, template_folder=TEMPLATE_DIR)
 
-<!-- LOGO -->
-<div class="p-5 text-lg font-semibold border-b border-white/10">
-Admin Panel
-</div>
+app.config["SECRET_KEY"] = "supersecretkey"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-<!-- NAV -->
-<div class="flex-1 p-3 space-y-2 text-sm">
+db = SQLAlchemy(app)
 
-<button onclick="showTab('overview', this)" class="tab-btn flex items-center gap-3 w-full px-3 py-2 rounded-lg hover:bg-white/10">
-📊 <span>Overview</span>
-</button>
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
 
-<button onclick="showTab('upload', this)" class="tab-btn flex items-center gap-3 w-full px-3 py-2 rounded-lg hover:bg-white/10">
-⬆ <span>Upload</span>
-</button>
 
-<button onclick="showTab('manage', this)" class="tab-btn flex items-center gap-3 w-full px-3 py-2 rounded-lg hover:bg-white/10">
-📂 <span>Notes</span>
-</button>
+# ================= MODELS =================
 
-<button onclick="showTab('history', this)" class="tab-btn flex items-center gap-3 w-full px-3 py-2 rounded-lg hover:bg-white/10">
-🕒 <span>History</span>
-</button>
+class User(UserMixin, db.Model):
+    __tablename__ = "users"
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100), unique=True)
+    password = db.Column(db.String(200))
+    role = db.Column(db.String(20))
 
-</div>
 
-<!-- COLLAPSE -->
-<div class="p-3 border-t border-white/10">
-<button onclick="toggleSidebar()" class="w-full text-xs bg-gray-800 py-2 rounded">
-Toggle
-</button>
-</div>
+class Note(db.Model):
+    __tablename__ = "notes"
+    id = db.Column(db.Integer, primary_key=True)
+    class_number = db.Column(db.Integer)
+    pdf_url = db.Column(db.String(500))
 
-</div>
 
+# 🔥 OPTIONAL LOG MODEL (SAFE)
+class UploadLog(db.Model):
+    __tablename__ = "upload_logs"
+    id = db.Column(db.Integer, primary_key=True)
+    filename = db.Column(db.String(200))
+    class_number = db.Column(db.Integer)
+    uploaded_by = db.Column(db.String(100))
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-<!-- ================= MAIN ================= -->
-<div class="flex-1 flex flex-col overflow-hidden">
 
-<!-- TOPBAR -->
-<div class="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-black/40">
+# ================= LOGIN =================
 
-<div class="flex items-center gap-3">
-<button onclick="toggleSidebar()" class="md:hidden">☰</button>
+@login_manager.user_loader
+def load_user(user_id):
+    return db.session.get(User, int(user_id))
 
-<input placeholder="Search..."
-class="px-3 py-1 bg-gray-800 rounded text-sm outline-none">
-</div>
 
-<div class="text-sm text-right">
-{{ current_user.username }}
-<div id="deviceInfo" class="text-xs text-gray-400"></div>
-</div>
+@app.route("/")
+def home():
+    return redirect(url_for("login"))
 
-</div>
 
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
 
-<!-- CONTENT -->
-<div class="flex-1 overflow-y-auto p-4 space-y-6">
+        user = User.query.filter_by(username=username).first()
 
-<!-- ================= OVERVIEW ================= -->
-<div id="overview" class="tab-content">
+        if user and check_password_hash(user.password, password):
+            login_user(user)
 
-<!-- STATS CARDS -->
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            if user.role == "admin":
+                return redirect(url_for("admin"))
+            return redirect(url_for("dashboard"))
 
-<div class="bg-white/5 p-4 rounded-xl border border-white/10">
-<p class="text-gray-400 text-xs">TOTAL NOTES</p>
-<h3 class="text-xl font-semibold">{{ notes|length }}</h3>
-</div>
+        flash("Invalid credentials")
 
-<div class="bg-white/5 p-4 rounded-xl border border-white/10">
-<p class="text-gray-400 text-xs">CLASSES ACTIVE</p>
-<h3 class="text-xl font-semibold text-green-400">
-{{ classes_with_notes }}
-</h3>
-</div>
+    return render_template("login.html")
 
-<div class="bg-white/5 p-4 rounded-xl border border-white/10">
-<p class="text-gray-400 text-xs">RECENT UPLOADS</p>
-<h3 class="text-xl font-semibold">
-{{ logs|length }}
-</h3>
-</div>
 
-<div class="bg-white/5 p-4 rounded-xl border border-white/10">
-<p class="text-gray-400 text-xs">SYSTEM STATUS</p>
-<h3 class="text-sm font-semibold text-green-400">
-● ONLINE
-</h3>
-</div>
+# ================= DASHBOARD =================
 
-</div>
+@app.route("/dashboard")
+@login_required
+def dashboard():
+    return render_template("dashboard.html")
 
 
-<!-- GRID -->
-<div class="grid md:grid-cols-2 gap-6 mt-6">
+# ================= CLASS NOTES =================
 
-<!-- LEFT SIDE -->
-<div class="space-y-6">
+@app.route("/class/<int:class_number>")
+@login_required
+def class_notes(class_number):
+    notes = Note.query.filter_by(class_number=class_number).all()
+    return render_template("class_notes.html", notes=notes, class_number=class_number)
 
-<!-- ACTIVITY FEED -->
-<div class="bg-black/40 border border-green-500/20 p-4 rounded-xl">
 
-<p class="text-green-400 text-xs mb-3">RECENT ACTIVITY</p>
+# ================= ADMIN PANEL =================
+
+@app.route("/admin", methods=["GET", "POST"])
+@login_required
+def admin():
+    if current_user.role != "admin":
+        return "Access Denied"
+
+    # ================= UPLOAD =================
+    if request.method == "POST":
+        class_number = request.form["class_number"]
+        file = request.files.get("file")
+
+        if not file:
+            flash("No file selected")
+            return redirect(url_for("admin"))
+
+        if request.content_length and request.content_length > 10 * 1024 * 1024:
+            flash("File too large (Max 10MB)")
+            return redirect(url_for("admin"))
+
+        filename = secure_filename(file.filename)
+        temp_path = f"/tmp/{filename}"
+        file.save(temp_path)
 
-<div class="space-y-2 text-xs font-mono">
+        SUPABASE_URL = os.environ.get("SUPABASE_URL")
+        SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
 
-{% for log in logs %}
-<p class="text-green-300">
-> {{ log.uploaded_by }} uploaded {{ log.filename }}
-</p>
-{% endfor %}
+        upload_url = f"{SUPABASE_URL}/storage/v1/object/notes/{filename}"
 
-</div>
+        headers = {
+            "apikey": SUPABASE_KEY,
+            "Authorization": f"Bearer {SUPABASE_KEY}",
+            "Content-Type": "application/pdf"
+        }
 
-</div>
+        with open(temp_path, "rb") as f:
+            response = requests.post(upload_url, headers=headers, data=f)
 
+        if response.status_code not in [200, 201]:
+            return f"Upload failed: {response.text}"
 
-<!-- QUICK INSIGHTS -->
-<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+        public_url = f"{SUPABASE_URL}/storage/v1/object/public/notes/{filename}"
 
-<p class="text-gray-400 text-xs mb-3">INSIGHTS</p>
+        # ✅ SAVE NOTE
+        note = Note(class_number=class_number, pdf_url=public_url)
+        db.session.add(note)
 
-<div class="text-sm space-y-2">
+        # ✅ SAVE LOG (SAFE TRY)
+        try:
+            log = UploadLog(
+                filename=filename,
+                class_number=class_number,
+                uploaded_by=current_user.username
+            )
+            db.session.add(log)
+        except:
+            pass  # avoids crash if table not created
 
-<p>📌 Most Active Class:
-<span class="text-blue-400">Class {{ notes[0].class_number if notes else '-' }}</span>
-</p>
+        db.session.commit()
 
-<p>📂 Total Stored Files:
-<span class="text-green-400">{{ notes|length }}</span>
-</p>
+        flash("PDF uploaded successfully")
 
-<p>🕒 Last Upload:
-<span class="text-gray-300">
-{{ logs[0].timestamp.strftime("%d %b, %I:%M %p") if logs else '-' }}
-</span>
-</p>
+    # ================= FETCH DATA =================
 
-</div>
+    notes = Note.query.order_by(Note.id.desc()).all()
+    classes_with_notes = db.session.query(Note.class_number).distinct().count()
 
-</div>
+    # 🔥 DB STATUS
+    db_status = "offline"
+    try:
+        db.session.execute(text("SELECT 1"))
+        db_status = "online"
+    except:
+        db_status = "offline"
 
-</div>
+    # 🔥 SAFE LOG FETCH
+    try:
+        logs = UploadLog.query.order_by(UploadLog.timestamp.desc()).limit(10).all()
+    except:
+        logs = []
 
+    # 🔥 LAST UPLOAD
+    last_upload = logs[0].timestamp if logs else None
 
-<!-- RIGHT SIDE -->
-<div class="space-y-6">
+    # 🔥 LAST 24H UPLOAD COUNT
+    try:
+        last_24h = datetime.utcnow() - timedelta(hours=24)
+        recent_uploads = UploadLog.query.filter(
+            UploadLog.timestamp >= last_24h
+        ).count()
+    except:
+        recent_uploads = 0
 
-<!-- FAKE SYSTEM METRICS -->
-<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+    return render_template(
+        "admin.html",
+        notes=notes,
+        classes_with_notes=classes_with_notes,
+        logs=logs,
+        db_status=db_status,
+        last_upload=last_upload,
+        recent_uploads=recent_uploads
+    )
 
-<p class="text-gray-400 text-xs mb-3">SYSTEM METRICS</p>
 
-<div class="space-y-3 text-xs">
+# ================= DELETE NOTE =================
 
-<div>
-<p>CPU Usage</p>
-<div class="w-full bg-gray-800 h-2 rounded">
-<div class="bg-green-500 h-2 rounded w-[35%]"></div>
-</div>
-</div>
+@app.route("/delete-note/<int:id>", methods=["POST"])
+@login_required
+def delete_note(id):
+    if current_user.role != "admin":
+        return "Access Denied"
 
-<div>
-<p>Storage</p>
-<div class="w-full bg-gray-800 h-2 rounded">
-<div class="bg-blue-500 h-2 rounded w-[60%]"></div>
-</div>
-</div>
+    note = Note.query.get(id)
 
-<div>
-<p>Network</p>
-<div class="w-full bg-gray-800 h-2 rounded">
-<div class="bg-purple-500 h-2 rounded w-[20%]"></div>
-</div>
-</div>
+    if note:
+        db.session.delete(note)
+        db.session.commit()
+        flash("Note deleted")
 
-</div>
+    return redirect(url_for("admin"))
 
-</div>
 
+# ================= LOGOUT =================
 
-<!-- TERMINAL BOX -->
-<div class="bg-black border border-green-500/30 p-4 rounded-xl h-[200px] overflow-y-auto">
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("login"))
 
-<p class="text-green-400 text-xs mb-2">SYSTEM LOG</p>
-
-<div class="text-green-300 text-xs font-mono space-y-1">
-
-<p>> Initializing system...</p>
-<p>> Connecting to database...</p>
-<p>> Auth success</p>
-
-{% for log in logs %}
-<p>> {{ log.filename }} uploaded ✔</p>
-{% endfor %}
-
-<p class="animate-pulse">> _</p>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- ================= UPLOAD ================= -->
-<div id="upload" class="tab-content hidden">
-
-<div class="bg-white/5 p-6 rounded-xl max-w-md">
-
-<form method="POST" enctype="multipart/form-data">
-
-<select name="class_number"
-class="w-full mb-4 p-3 bg-gray-800 rounded text-sm">
-{% for i in range(1,12) %}
-<option value="{{i}}">Class {{i}}</option>
-{% endfor %}
-</select>
-
-<div id="dropZone"
-class="p-6 border-2 border-dashed border-gray-600 rounded text-center cursor-pointer">
-
-Upload PDF
-<input type="file" name="file" id="fileInput" class="hidden">
-</div>
-
-<p id="fileName" class="text-green-400 text-sm mt-2 hidden"></p>
-
-<button class="w-full mt-4 bg-green-600 py-2 rounded text-sm">
-Upload
-</button>
-
-</form>
-
-</div>
-
-</div>
-
-
-<!-- ================= MANAGE ================= -->
-<div id="manage" class="tab-content hidden">
-
-<input id="searchNotes"
-class="mb-4 w-full p-2 bg-gray-800 rounded text-sm"
-placeholder="Search notes">
-
-<div class="space-y-3">
-
-{% for note in notes %}
-<div class="flex justify-between items-center bg-white/5 p-3 rounded">
-
-<div>
-<p class="text-sm">Class {{note.class_number}}</p>
-<p class="text-xs text-gray-400 truncate max-w-[150px]">
-{{ note.pdf_url.split('/')[-1] }}
-</p>
-</div>
-
-<div class="flex gap-2">
-<a href="{{note.pdf_url}}" target="_blank"
-class="bg-blue-600 px-2 py-1 text-xs rounded">View</a>
-
-<form method="POST" action="/delete-note/{{note.id}}">
-<button onclick="return confirm('Delete?')"
-class="bg-red-600 px-2 py-1 text-xs rounded">Delete</button>
-</form>
-</div>
-
-</div>
-{% endfor %}
-
-</div>
-
-</div>
-
-
-<!-- ================= HISTORY ================= -->
-<div id="history" class="tab-content hidden">
-
-<div class="space-y-3">
-
-{% for log in logs %}
-<div class="bg-white/5 p-3 rounded">
-
-<p class="text-sm">
-{{ log.uploaded_by }} → Class {{ log.class_number }}
-</p>
-
-<p class="text-xs text-gray-400">
-{{ log.filename }}
-</p>
-
-<p class="text-xs text-gray-500">
-{{ log.timestamp.strftime("%d %b %Y, %I:%M %p") }}
-</p>
-
-</div>
-{% endfor %}
-
-</div>
-
-</div>
-
-</div>
-</div>
-</div>
-
-
-<!-- ================= SCRIPT ================= -->
-<script>
-
-// TAB SWITCH
-function showTab(id, el){
-document.querySelectorAll(".tab-content").forEach(x=>x.classList.add("hidden"));
-document.getElementById(id).classList.remove("hidden");
-
-document.querySelectorAll(".tab-btn").forEach(btn=>btn.classList.remove("bg-white/10"));
-el.classList.add("bg-white/10");
-}
-
-// DEFAULT TAB
-document.querySelector(".tab-btn")?.click();
-
-// SIDEBAR
-function toggleSidebar(){
-document.getElementById("sidebar").classList.toggle("-translate-x-full");
-}
-
-// DRAG DROP
-const dz = document.getElementById("dropZone");
-const fi = document.getElementById("fileInput");
-const fn = document.getElementById("fileName");
-
-dz.onclick = ()=>fi.click();
-
-fi.onchange = ()=>{
-if(fi.files.length){
-fn.innerText = fi.files[0].name;
-fn.classList.remove("hidden");
-}
-};
-
-// SEARCH
-document.getElementById("searchNotes")?.addEventListener("input", e=>{
-const val = e.target.value.toLowerCase();
-document.querySelectorAll(".note-item").forEach(item=>{
-item.style.display = item.innerText.toLowerCase().includes(val) ? "flex" : "none";
-});
-});
-
-// DEVICE INFO
-async function getDeviceInfo(){
-const ua = navigator.userAgent;
-
-let device = /mobile/i.test(ua) ? "Mobile" : "Desktop";
-let browser = ua.includes("Chrome") ? "Chrome" : "Browser";
-
-let location = "";
-try{
-const res = await fetch("https://ipapi.co/json/");
-const data = await res.json();
-location = data.city;
-}catch{}
-
-document.getElementById("deviceInfo").innerText =
-`${device} • ${browser} • ${location}`;
-}
-getDeviceInfo();
-
-</script>
-
-{% endblock %}
+with app.app_context():
+    db.create_all()
