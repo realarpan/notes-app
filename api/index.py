@@ -3,6 +3,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
+from sqlalchemy import text
+from datetime import datetime, timedelta
+import time
 import os
 import requests
 
@@ -96,6 +99,7 @@ def admin():
     if current_user.role != "admin":
         return "Access Denied"
 
+    # ================= UPLOAD =================
     if request.method == "POST":
         class_number = request.form["class_number"]
         file = request.files.get("file")
@@ -131,38 +135,43 @@ def admin():
 
         public_url = f"{SUPABASE_URL}/storage/v1/object/public/notes/{filename}"
 
-        # ✅ SAVE NOTE
         note = Note(class_number=class_number, pdf_url=public_url)
         db.session.add(note)
         db.session.commit()
 
         flash("PDF uploaded successfully")
 
-    # ✅ FETCH DATA
-    # ✅ FETCH DATA
+    # ================= FETCH =================
+
     notes = Note.query.order_by(Note.id.desc()).all()
     classes_with_notes = db.session.query(Note.class_number).distinct().count()
+    total_users = User.query.count()
 
-    # 🔥 DATABASE STATUS (REAL)
+    # 🔥 DB STATUS + LATENCY
     db_status = "offline"
+    db_ping = None
     try:
-        db.session.execute("SELECT 1")
+        start = time.time()
+        db.session.execute(text("SELECT 1"))
+        db_ping = round((time.time() - start) * 1000)
         db_status = "online"
     except:
         db_status = "offline"
 
-    # 🔥 TOTAL USERS
-    total_users = User.query.count()
+    # 🔥 HOST INFO
+    host = request.host
 
-    # 🔥 RECENT NOTES (last 24h approx using latest 10)
-    recent_notes = notes[:10]
+    # 🔥 RECENT NOTES
+    recent_notes = notes[:5]
 
     return render_template(
         "admin.html",
         notes=notes,
         classes_with_notes=classes_with_notes,
-        db_status=db_status,
         total_users=total_users,
+        db_status=db_status,
+        db_ping=db_ping,
+        host=host,
         recent_notes=recent_notes
     )
 
