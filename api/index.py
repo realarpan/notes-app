@@ -32,15 +32,6 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(200))
     role = db.Column(db.String(20))
 
-
-class Note(db.Model):
-    __tablename__ = "notes"
-    id = db.Column(db.Integer, primary_key=True)
-    class_number = db.Column(db.Integer)
-    pdf_url = db.Column(db.String(500))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # ✅ timestamp added
-
-
 class UploadLog(db.Model):
     __tablename__ = "upload_logs"
     id = db.Column(db.Integer, primary_key=True)
@@ -198,8 +189,3 @@ def delete_note(id):
 def logout():
     logout_user()
     return redirect(url_for("login"))
-
-if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-    app.run(debug=True)
