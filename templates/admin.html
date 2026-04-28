@@ -15,155 +15,163 @@
     </div>
 </div>
 
-<!-- MAIN WRAPPER -->
-<div class="ml-0 md:ml-64 w-full">
+<!-- 🔥 FLEX FIX (MAIN LAYOUT) -->
+<div class="flex w-full">
 
-<div class="w-full max-w-screen-xl mx-auto p-4 md:p-6">
+    <!-- Sidebar spacing (desktop only) -->
+    <div class="hidden md:block w-64 flex-shrink-0"></div>
 
-<!-- TOP BAR -->
-<div class="flex justify-between items-center mb-6">
+    <!-- MAIN CONTENT -->
+    <div class="flex-1 w-full overflow-x-hidden">
 
-    <button onclick="toggleSidebar()" class="md:hidden px-3 py-2 bg-gray-800 rounded-lg">
-        ☰
-    </button>
+    <div class="max-w-screen-xl mx-auto p-4 md:p-6">
 
-    <div class="text-sm text-gray-400 text-right">
-        Logged in as 
-        <span class="text-white font-medium capitalize">
-            {{ current_user.username }}
-        </span>
+    <!-- TOP BAR -->
+    <div class="flex justify-between items-center mb-6">
 
-        <div id="deviceInfo"
-            class="mt-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs inline-block">
+        <button onclick="toggleSidebar()" class="md:hidden px-3 py-2 bg-gray-800 rounded-lg">
+            ☰
+        </button>
+
+        <div class="text-sm text-gray-400 text-right">
+            Logged in as 
+            <span class="text-white font-medium capitalize">
+                {{ current_user.username }}
+            </span>
+
+            <div id="deviceInfo"
+                class="mt-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs inline-block">
+            </div>
         </div>
+
     </div>
 
-</div>
+    <!-- OVERVIEW -->
+    <div id="overview" class="tab-content">
 
-<!-- OVERVIEW -->
-<div id="overview" class="tab-content">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
 
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+    <div class="bg-white/5 p-4 rounded-xl border border-white/10">
+        <p class="text-gray-400 text-sm">Total Notes</p>
+        <h3 class="text-xl font-semibold">{{ notes|length }}</h3>
+    </div>
 
-<div class="bg-white/5 p-4 rounded-xl border border-white/10">
-    <p class="text-gray-400 text-sm">Total Notes</p>
-    <h3 class="text-xl font-semibold">{{ notes|length }}</h3>
-</div>
+    <div class="bg-white/5 p-4 rounded-xl border border-white/10">
+        <p class="text-gray-400 text-sm">Classes</p>
+        <h3 class="text-xl font-semibold">11</h3>
+    </div>
 
-<div class="bg-white/5 p-4 rounded-xl border border-white/10">
-    <p class="text-gray-400 text-sm">Classes</p>
-    <h3 class="text-xl font-semibold">11</h3>
-</div>
+    <div class="bg-white/5 p-4 rounded-xl border border-white/10">
+        <p class="text-gray-400 text-sm">With Notes</p>
+        <h3 class="text-xl font-semibold text-green-400">
+            {{ classes_with_notes }}
+        </h3>
+    </div>
 
-<div class="bg-white/5 p-4 rounded-xl border border-white/10">
-    <p class="text-gray-400 text-sm">With Notes</p>
-    <h3 class="text-xl font-semibold text-green-400">
-        {{ classes_with_notes }}
-    </h3>
-</div>
+    </div>
 
-</div>
+    </div>
 
-</div>
+    <!-- UPLOAD -->
+    <div id="upload" class="tab-content hidden">
 
-<!-- UPLOAD -->
-<div id="upload" class="tab-content hidden">
+    <div class="bg-white/5 p-6 rounded-xl border border-white/10 max-w-md">
 
-<div class="bg-white/5 p-6 rounded-xl border border-white/10 max-w-md">
+    <form method="POST" enctype="multipart/form-data">
 
-<form method="POST" enctype="multipart/form-data">
+    <select name="class_number" class="w-full mb-4 p-3 bg-gray-800 rounded-lg text-sm">
+    {% for i in range(1,12) %}
+    <option value="{{i}}">Class {{i}}</option>
+    {% endfor %}
+    </select>
 
-<select name="class_number" class="w-full mb-4 p-3 bg-gray-800 rounded-lg text-sm">
-{% for i in range(1,12) %}
-<option value="{{i}}">Class {{i}}</option>
-{% endfor %}
-</select>
+    <div id="dropZone"
+         class="p-5 border-2 border-dashed border-gray-600 rounded-lg text-center cursor-pointer text-sm">
 
-<div id="dropZone"
-     class="p-5 border-2 border-dashed border-gray-600 rounded-lg text-center cursor-pointer text-sm">
+        Drop PDF or click
+        <input type="file" name="file" id="fileInput" class="hidden">
+    </div>
 
-    Drop PDF or click
-    <input type="file" name="file" id="fileInput" class="hidden">
-</div>
+    <p id="fileName" class="text-green-400 text-sm mt-2 hidden truncate"></p>
 
-<p id="fileName" class="text-green-400 text-sm mt-2 hidden truncate"></p>
+    <button class="w-full mt-4 bg-green-600 py-2 rounded-lg text-sm hover:bg-green-700">
+    Upload
+    </button>
 
-<button class="w-full mt-4 bg-green-600 py-2 rounded-lg text-sm hover:bg-green-700">
-Upload
-</button>
+    </form>
 
-</form>
+    </div>
 
-</div>
+    </div>
 
-</div>
+    <!-- MANAGE -->
+    <div id="manage" class="tab-content hidden">
 
-<!-- MANAGE -->
-<div id="manage" class="tab-content hidden">
+    <input id="searchNotes" placeholder="Search..."
+        class="mb-4 p-2 w-full bg-gray-800 rounded-lg text-sm">
 
-<input id="searchNotes" placeholder="Search..."
-    class="mb-4 p-2 w-full bg-gray-800 rounded-lg text-sm">
+    <div class="space-y-3 max-h-[400px] overflow-y-auto">
 
-<div class="space-y-3 max-h-[400px] overflow-y-auto">
+    {% for note in notes %}
+    <div class="flex justify-between items-center bg-white/5 p-3 rounded-lg border note-item">
 
-{% for note in notes %}
-<div class="flex justify-between items-center bg-white/5 p-3 rounded-lg border note-item">
+    <div class="min-w-0">
+        <p class="text-sm">Class {{note.class_number}}</p>
+        <p class="text-xs text-gray-400 truncate max-w-[140px]">
+            {{ note.pdf_url.split('/')[-1] }}
+        </p>
+    </div>
 
-<div class="min-w-0">
-    <p class="text-sm">Class {{note.class_number}}</p>
-    <p class="text-xs text-gray-400 truncate max-w-[140px]">
-        {{ note.pdf_url.split('/')[-1] }}
+    <div class="flex gap-2 flex-shrink-0">
+    <a href="{{note.pdf_url}}" target="_blank"
+       class="px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs whitespace-nowrap">
+    View
+    </a>
+
+    <form method="POST" action="/delete-note/{{note.id}}">
+    <button class="px-2 py-1 bg-red-600 hover:bg-red-700 rounded text-xs whitespace-nowrap">
+    Delete
+    </button>
+    </form>
+    </div>
+
+    </div>
+    {% endfor %}
+
+    </div>
+
+    </div>
+
+    <!-- HISTORY -->
+    <div id="history" class="tab-content hidden">
+
+    <div class="space-y-3">
+
+    {% for note in notes %}
+    <div class="bg-white/5 p-4 rounded-lg border">
+
+    <p class="text-sm">
+    {{ current_user.username }} → Class {{note.class_number}}
     </p>
-</div>
 
-<div class="flex gap-2 flex-shrink-0">
-<a href="{{note.pdf_url}}" target="_blank"
-   class="px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs whitespace-nowrap">
-View
-</a>
+    <p class="text-xs text-gray-400 truncate">
+    {{ note.pdf_url.split('/')[-1] }}
+    </p>
 
-<form method="POST" action="/delete-note/{{note.id}}">
-<button class="px-2 py-1 bg-red-600 hover:bg-red-700 rounded text-xs whitespace-nowrap">
-Delete
-</button>
-</form>
-</div>
+    <p class="text-xs text-gray-500 mt-1">
+    ID: {{note.id}}
+    </p>
 
-</div>
-{% endfor %}
+    </div>
+    {% endfor %}
 
-</div>
+    </div>
 
-</div>
+    </div>
 
-<!-- HISTORY -->
-<div id="history" class="tab-content hidden">
+    </div>
+    </div>
 
-<div class="space-y-3">
-
-{% for note in notes %}
-<div class="bg-white/5 p-4 rounded-lg border">
-
-<p class="text-sm">
-{{ current_user.username }} → Class {{note.class_number}}
-</p>
-
-<p class="text-xs text-gray-400 truncate">
-{{ note.pdf_url.split('/')[-1] }}
-</p>
-
-<p class="text-xs text-gray-500 mt-1">
-ID: {{note.id}}
-</p>
-
-</div>
-{% endfor %}
-
-</div>
-
-</div>
-
-</div>
 </div>
 
 <!-- SCRIPT -->
