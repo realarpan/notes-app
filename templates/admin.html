@@ -1,67 +1,88 @@
 {% extends "base.html" %}
 {% block content %}
 
-<!-- SIDEBAR -->
+<div class="flex h-screen overflow-hidden">
+
+<!-- ================= SIDEBAR ================= -->
 <div id="sidebar"
-     class="fixed top-0 left-0 h-full w-64 bg-gray-900/80 backdrop-blur-xl border-r border-white/10 p-5 transform -translate-x-full md:translate-x-0 transition duration-300 z-50">
+class="fixed md:relative z-50 h-full w-64 bg-black/80 backdrop-blur-xl border-r border-white/10 transform -translate-x-full md:translate-x-0 transition duration-300 flex flex-col">
 
-    <h2 class="text-xl font-semibold mb-8">Admin</h2>
-
-    <div class="space-y-2 text-sm">
-        <button onclick="showTab('overview', this)" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 transition">📊 Overview</button>
-        <button onclick="showTab('upload', this)" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 transition">⬆ Upload</button>
-        <button onclick="showTab('manage', this)" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 transition">📂 Manage</button>
-        <button onclick="showTab('history', this)" class="tab-btn w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 transition">🕒 History</button>
-    </div>
+<!-- LOGO -->
+<div class="p-5 text-lg font-semibold border-b border-white/10">
+Dashboard
 </div>
 
-<!-- MAIN -->
-<div class="flex w-full">
+<!-- NAV -->
+<div class="flex-1 p-3 space-y-2 text-sm">
 
-<!-- sidebar spacing -->
-<div class="hidden md:block w-64 flex-shrink-0"></div>
-
-<!-- content -->
-<div class="flex-1 w-full overflow-x-hidden">
-
-<div class="max-w-screen-xl mx-auto p-4 md:p-6">
-
-<!-- TOP -->
-<div class="flex justify-between items-center mb-6">
-
-<button onclick="toggleSidebar()" class="md:hidden px-3 py-2 bg-gray-800 rounded-lg">
-☰
+<button onclick="showTab('overview', this)" class="tab-btn flex items-center gap-3 w-full px-3 py-2 rounded-lg hover:bg-white/10">
+📊 <span>Overview</span>
 </button>
 
-<div class="text-sm text-gray-400 text-right">
-Logged in as 
-<span class="text-white font-medium capitalize">
+<button onclick="showTab('upload', this)" class="tab-btn flex items-center gap-3 w-full px-3 py-2 rounded-lg hover:bg-white/10">
+⬆ <span>Upload</span>
+</button>
+
+<button onclick="showTab('manage', this)" class="tab-btn flex items-center gap-3 w-full px-3 py-2 rounded-lg hover:bg-white/10">
+📂 <span>Notes</span>
+</button>
+
+<button onclick="showTab('history', this)" class="tab-btn flex items-center gap-3 w-full px-3 py-2 rounded-lg hover:bg-white/10">
+🕒 <span>History</span>
+</button>
+
+</div>
+
+<!-- COLLAPSE -->
+<div class="p-3 border-t border-white/10">
+<button onclick="toggleSidebar()" class="w-full text-xs bg-gray-800 py-2 rounded">
+Toggle
+</button>
+</div>
+
+</div>
+
+
+<!-- ================= MAIN ================= -->
+<div class="flex-1 flex flex-col overflow-hidden">
+
+<!-- TOPBAR -->
+<div class="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-black/40">
+
+<div class="flex items-center gap-3">
+<button onclick="toggleSidebar()" class="md:hidden">☰</button>
+
+<input placeholder="Search..."
+class="px-3 py-1 bg-gray-800 rounded text-sm outline-none">
+</div>
+
+<div class="text-sm text-right">
 {{ current_user.username }}
-</span>
-
-<div id="deviceInfo"
-class="mt-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs inline-block">
-</div>
+<div id="deviceInfo" class="text-xs text-gray-400"></div>
 </div>
 
 </div>
 
-<!-- OVERVIEW -->
+
+<!-- CONTENT -->
+<div class="flex-1 overflow-y-auto p-4 space-y-6">
+
+<!-- ================= OVERVIEW ================= -->
 <div id="overview" class="tab-content">
 
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
 
-<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+<div class="bg-white/5 p-4 rounded-xl">
 <p class="text-gray-400 text-sm">Total Notes</p>
 <h3 class="text-xl font-semibold">{{ notes|length }}</h3>
 </div>
 
-<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+<div class="bg-white/5 p-4 rounded-xl">
 <p class="text-gray-400 text-sm">Classes</p>
 <h3 class="text-xl font-semibold">11</h3>
 </div>
 
-<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+<div class="bg-white/5 p-4 rounded-xl">
 <p class="text-gray-400 text-sm">With Notes</p>
 <h3 class="text-xl font-semibold text-green-400">
 {{ classes_with_notes }}
@@ -72,28 +93,31 @@ class="mt-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs inl
 
 </div>
 
-<!-- UPLOAD -->
+
+<!-- ================= UPLOAD ================= -->
 <div id="upload" class="tab-content hidden">
 
-<div class="bg-white/5 p-6 rounded-xl border border-white/10 max-w-md">
+<div class="bg-white/5 p-6 rounded-xl max-w-md">
 
 <form method="POST" enctype="multipart/form-data">
 
-<select name="class_number" class="w-full mb-4 p-3 bg-gray-800 rounded-lg text-sm">
+<select name="class_number"
+class="w-full mb-4 p-3 bg-gray-800 rounded text-sm">
 {% for i in range(1,12) %}
 <option value="{{i}}">Class {{i}}</option>
 {% endfor %}
 </select>
 
 <div id="dropZone"
-class="p-5 border-2 border-dashed border-gray-600 rounded-lg text-center cursor-pointer text-sm hover:border-blue-500 transition">
-Drop PDF or click
+class="p-6 border-2 border-dashed border-gray-600 rounded text-center cursor-pointer">
+
+Upload PDF
 <input type="file" name="file" id="fileInput" class="hidden">
 </div>
 
-<p id="fileName" class="text-green-400 text-sm mt-2 hidden truncate"></p>
+<p id="fileName" class="text-green-400 text-sm mt-2 hidden"></p>
 
-<button class="w-full mt-4 bg-green-600 py-2 rounded-lg text-sm hover:bg-green-700 transition">
+<button class="w-full mt-4 bg-green-600 py-2 rounded text-sm">
 Upload
 </button>
 
@@ -103,34 +127,33 @@ Upload
 
 </div>
 
-<!-- MANAGE -->
+
+<!-- ================= MANAGE ================= -->
 <div id="manage" class="tab-content hidden">
 
-<input id="searchNotes" placeholder="Search..."
-class="mb-4 p-2 w-full bg-gray-800 rounded-lg text-sm">
+<input id="searchNotes"
+class="mb-4 w-full p-2 bg-gray-800 rounded text-sm"
+placeholder="Search notes">
 
-<div class="space-y-3 max-h-[400px] overflow-y-auto">
+<div class="space-y-3">
 
 {% for note in notes %}
-<div class="flex justify-between items-center bg-white/5 p-3 rounded-lg border note-item hover:bg-white/10 transition">
+<div class="flex justify-between items-center bg-white/5 p-3 rounded">
 
-<div class="min-w-0">
+<div>
 <p class="text-sm">Class {{note.class_number}}</p>
-<p class="text-xs text-gray-400 truncate max-w-[140px]">
+<p class="text-xs text-gray-400 truncate max-w-[150px]">
 {{ note.pdf_url.split('/')[-1] }}
 </p>
 </div>
 
-<div class="flex gap-2 flex-shrink-0">
+<div class="flex gap-2">
 <a href="{{note.pdf_url}}" target="_blank"
-class="px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs whitespace-nowrap">
-View
-</a>
+class="bg-blue-600 px-2 py-1 text-xs rounded">View</a>
 
 <form method="POST" action="/delete-note/{{note.id}}">
-<button class="px-2 py-1 bg-red-600 hover:bg-red-700 rounded text-xs whitespace-nowrap">
-Delete
-</button>
+<button onclick="return confirm('Delete?')"
+class="bg-red-600 px-2 py-1 text-xs rounded">Delete</button>
 </form>
 </div>
 
@@ -141,24 +164,25 @@ Delete
 
 </div>
 
-<!-- HISTORY (SAFE VERSION) -->
+
+<!-- ================= HISTORY ================= -->
 <div id="history" class="tab-content hidden">
 
 <div class="space-y-3">
 
-{% for note in notes %}
-<div class="bg-white/5 p-4 rounded-lg border hover:bg-white/10 transition">
+{% for log in logs %}
+<div class="bg-white/5 p-3 rounded">
 
 <p class="text-sm">
-{{ current_user.username }} → Class {{note.class_number}}
+{{ log.uploaded_by }} → Class {{ log.class_number }}
 </p>
 
-<p class="text-xs text-gray-400 truncate">
-{{ note.pdf_url.split('/')[-1] }}
+<p class="text-xs text-gray-400">
+{{ log.filename }}
 </p>
 
-<p class="text-xs text-gray-500 mt-1">
-ID: {{note.id}}
+<p class="text-xs text-gray-500">
+{{ log.timestamp.strftime("%d %b %Y, %I:%M %p") }}
 </p>
 
 </div>
@@ -172,29 +196,28 @@ ID: {{note.id}}
 </div>
 </div>
 
-<!-- SCRIPT -->
+
+<!-- ================= SCRIPT ================= -->
 <script>
 
-// tab switch + active highlight
+// TAB SWITCH
 function showTab(id, el){
 document.querySelectorAll(".tab-content").forEach(x=>x.classList.add("hidden"));
 document.getElementById(id).classList.remove("hidden");
 
-document.querySelectorAll(".tab-btn").forEach(btn=>{
-btn.classList.remove("bg-white/10","text-white");
-});
-el.classList.add("bg-white/10","text-white");
+document.querySelectorAll(".tab-btn").forEach(btn=>btn.classList.remove("bg-white/10"));
+el.classList.add("bg-white/10");
 }
 
-// default tab
+// DEFAULT TAB
 document.querySelector(".tab-btn")?.click();
 
-// sidebar
+// SIDEBAR
 function toggleSidebar(){
 document.getElementById("sidebar").classList.toggle("-translate-x-full");
 }
 
-// drag drop
+// DRAG DROP
 const dz = document.getElementById("dropZone");
 const fi = document.getElementById("fileInput");
 const fn = document.getElementById("fileName");
@@ -208,7 +231,7 @@ fn.classList.remove("hidden");
 }
 };
 
-// search
+// SEARCH
 document.getElementById("searchNotes")?.addEventListener("input", e=>{
 const val = e.target.value.toLowerCase();
 document.querySelectorAll(".note-item").forEach(item=>{
@@ -216,13 +239,12 @@ item.style.display = item.innerText.toLowerCase().includes(val) ? "flex" : "none
 });
 });
 
-// device info
+// DEVICE INFO
 async function getDeviceInfo(){
 const ua = navigator.userAgent;
 
 let device = /mobile/i.test(ua) ? "Mobile" : "Desktop";
-let browser = ua.includes("Edg") ? "Edge" :
-              ua.includes("Chrome") ? "Chrome" : "Browser";
+let browser = ua.includes("Chrome") ? "Chrome" : "Browser";
 
 let location = "";
 try{
