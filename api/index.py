@@ -38,9 +38,9 @@ class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     class_number = db.Column(db.Integer)
     pdf_url = db.Column(db.String(500))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # ✅ timestamp added
 
 
-# 🔥 NEW: UPLOAD LOG MODEL
 class UploadLog(db.Model):
     __tablename__ = "upload_logs"
     id = db.Column(db.Integer, primary_key=True)
@@ -146,7 +146,7 @@ def admin():
         note = Note(class_number=class_number, pdf_url=public_url)
         db.session.add(note)
 
-        # 🔥 SAVE LOG
+        # ✅ SAVE LOG
         log = UploadLog(
             filename=filename,
             class_number=class_number,
@@ -158,9 +158,10 @@ def admin():
 
         flash("PDF uploaded successfully")
 
-    # ✅ GET DATA
-    notes = Note.query.order_by(Note.id.desc()).all()
-    logs = UploadLog.query.order_by(UploadLog.timestamp.desc()).limit(10).all()
+    # ================= FETCH DATA =================
+
+    notes = Note.query.order_by(Note.created_at.desc()).all()
+    logs = UploadLog.query.order_by(UploadLog.timestamp.desc()).limit(20).all()
 
     classes_with_notes = db.session.query(Note.class_number).distinct().count()
 
