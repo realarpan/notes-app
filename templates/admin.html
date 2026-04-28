@@ -7,12 +7,10 @@
 <div id="sidebar"
 class="fixed md:relative z-50 h-full w-64 bg-black/80 backdrop-blur-xl border-r border-white/10 transform -translate-x-full md:translate-x-0 transition duration-300 flex flex-col">
 
-<!-- LOGO -->
 <div class="p-5 text-lg font-semibold border-b border-white/10">
 Dashboard
 </div>
 
-<!-- NAV -->
 <div class="flex-1 p-3 space-y-2 text-sm">
 
 <button onclick="showTab('overview', this)" class="tab-btn flex items-center gap-3 w-full px-3 py-2 rounded-lg hover:bg-white/10">
@@ -33,7 +31,6 @@ Dashboard
 
 </div>
 
-<!-- COLLAPSE -->
 <div class="p-3 border-t border-white/10">
 <button onclick="toggleSidebar()" class="w-full text-xs bg-gray-800 py-2 rounded">
 Toggle
@@ -64,31 +61,36 @@ class="px-3 py-1 bg-gray-800 rounded text-sm outline-none">
 </div>
 
 
-<!-- CONTENT -->
+<!-- ================= CONTENT ================= -->
 <div class="flex-1 overflow-y-auto p-4 space-y-6">
 
 <!-- ================= OVERVIEW ================= -->
 <div id="overview" class="tab-content">
 
-<!-- TOP CARDS -->
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+<!-- ===== TOP CARDS ===== -->
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
 
-<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+<div class="bg-gradient-to-br from-gray-900 to-black p-4 rounded-xl border border-white/10">
 <p class="text-xs text-gray-400">Total Notes</p>
-<h3 class="text-xl font-semibold">{{ notes|length }}</h3>
+<h3 class="text-2xl font-semibold">{{ notes|length }}</h3>
 </div>
 
-<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+<div class="bg-gradient-to-br from-gray-900 to-black p-4 rounded-xl border border-white/10">
 <p class="text-xs text-gray-400">Active Classes</p>
-<h3 class="text-xl font-semibold">{{ classes_with_notes }}</h3>
+<h3 class="text-2xl font-semibold">{{ classes_with_notes }}</h3>
 </div>
 
-<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+<div class="bg-gradient-to-br from-gray-900 to-black p-4 rounded-xl border border-white/10">
 <p class="text-xs text-gray-400">Users</p>
-<h3 class="text-xl font-semibold">{{ total_users }}</h3>
+<h3 class="text-2xl font-semibold">{{ total_users }}</h3>
 </div>
 
-<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+<div class="bg-gradient-to-br from-gray-900 to-black p-4 rounded-xl border border-white/10">
+<p class="text-xs text-gray-400">Uploads (24h)</p>
+<h3 class="text-2xl font-semibold">{{ recent_uploads }}</h3>
+</div>
+
+<div class="bg-gradient-to-br from-gray-900 to-black p-4 rounded-xl border border-white/10">
 <p class="text-xs text-gray-400">Database</p>
 
 {% if db_status == "online" %}
@@ -103,58 +105,18 @@ class="px-3 py-1 bg-gray-800 rounded text-sm outline-none">
 </div>
 
 
-<!-- SECOND ROW -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+<!-- ===== SECOND ROW ===== -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
 
-<!-- RECENT -->
-<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+<!-- RECENT UPLOADS -->
+<div class="bg-white/5 p-4 rounded-xl border border-white/10 col-span-2">
 <h3 class="text-sm text-gray-300 mb-3">Recent Uploads</h3>
 
 <div class="space-y-2 text-xs">
 {% for note in recent_notes %}
-<div class="flex justify-between">
-<span class="truncate text-gray-400">
-{{ note.pdf_url.split('/')[-1] }}
-</span>
-<span class="text-gray-500">Class {{ note.class_number }}</span>
-</div>
-{% endfor %}
-</div>
-</div>
+<div class="flex justify-between border-b border-white/5 pb-1">
 
-
-<!-- SYSTEM -->
-<div class="bg-white/5 p-4 rounded-xl border border-white/10">
-<h3 class="text-sm text-gray-300 mb-3">System</h3>
-
-<div class="space-y-2 text-xs text-gray-400">
-<div>Host: {{ host }}</div>
-<div>Backend: Flask</div>
-<div>Storage: Supabase</div>
-<div>Status: Running</div>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- SECOND ROW -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-
-<!-- RECENT ACTIVITY -->
-<div class="bg-white/5 p-4 rounded-xl border border-white/10">
-
-<h3 class="text-sm text-gray-300 mb-3">Recent Uploads</h3>
-
-<div class="space-y-2 text-xs">
-
-{% for note in recent_notes %}
-<div class="flex justify-between">
-
-<span class="text-gray-400 truncate">
+<span class="truncate text-gray-300">
 {{ note.pdf_url.split('/')[-1] }}
 </span>
 
@@ -164,25 +126,62 @@ Class {{ note.class_number }}
 
 </div>
 {% endfor %}
-
 </div>
 
 </div>
 
 
-<!-- SYSTEM INFO -->
+<!-- SYSTEM STATUS -->
 <div class="bg-white/5 p-4 rounded-xl border border-white/10">
-
-<h3 class="text-sm text-gray-300 mb-3">System Info</h3>
+<h3 class="text-sm text-gray-300 mb-3">System Status</h3>
 
 <div class="space-y-2 text-xs text-gray-400">
 
-<div>App: Flask</div>
-<div>Storage: Supabase</div>
-<div>Environment: Production</div>
-<div>Status: Running</div>
+<div class="flex justify-between">
+<span>Host</span>
+<span class="text-white">{{ host }}</span>
+</div>
+
+<div class="flex justify-between">
+<span>Backend</span>
+<span class="text-white">Flask</span>
+</div>
+
+<div class="flex justify-between">
+<span>Storage</span>
+<span class="text-white">Supabase</span>
+</div>
+
+<div class="flex justify-between">
+<span>Server</span>
+<span class="text-green-400">● Running</span>
+</div>
 
 </div>
+
+</div>
+
+</div>
+
+
+<!-- ===== USERS PANEL ===== -->
+<div class="bg-white/5 p-4 rounded-xl border border-white/10 mt-6">
+
+<h3 class="text-sm text-gray-300 mb-3">Users</h3>
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+
+{% for user in users %}
+<div class="bg-black/40 p-3 rounded-lg border border-white/10">
+
+<p class="text-white">{{ user.username }}</p>
+
+<p class="text-gray-400">
+{{ user.role }}
+</p>
+
+</div>
+{% endfor %}
 
 </div>
 
@@ -207,7 +206,6 @@ class="w-full mb-4 p-3 bg-gray-800 rounded text-sm">
 
 <div id="dropZone"
 class="p-6 border-2 border-dashed border-gray-600 rounded text-center cursor-pointer">
-
 Upload PDF
 <input type="file" name="file" id="fileInput" class="hidden">
 </div>
@@ -235,7 +233,7 @@ placeholder="Search notes">
 <div class="space-y-3">
 
 {% for note in notes %}
-<div class="flex justify-between items-center bg-white/5 p-3 rounded">
+<div class="flex justify-between items-center bg-white/5 p-3 rounded note-item">
 
 <div>
 <p class="text-sm">Class {{note.class_number}}</p>
@@ -314,7 +312,7 @@ function toggleSidebar(){
 document.getElementById("sidebar").classList.toggle("-translate-x-full");
 }
 
-// DRAG DROP
+// FILE PICKER
 const dz = document.getElementById("dropZone");
 const fi = document.getElementById("fileInput");
 const fn = document.getElementById("fileName");
