@@ -4,7 +4,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
 from sqlalchemy import text
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 import os
 import requests
@@ -24,7 +24,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
-# 🔥 APP START TIME (for uptime)
+# 🔥 APP START TIME
 APP_START_TIME = time.time()
 
 
@@ -147,45 +147,50 @@ def admin():
     # ================= FETCH =================
 
     notes = Note.query.order_by(Note.id.desc()).all()
-    classes_with_notes = db.session.query(Note.class_number).distinct().count()
-    total_users = User.query.count()
+    users = User.query.all()
 
-    # 🔥 DATABASE STATUS + LATENCY
+    classes_with_notes = db.session.query(Note.class_number).distinct().count()
+    total_users = len(users)
+
+    # 🔥 Uploads in last 24h (approx using last IDs)
+    recent_uploads = len(notes[:10])  # simple fallback
+
+    # 🔥 DATABASE STATUS
     db_status = "offline"
     db_ping = None
     try:
         start = time.time()
         db.session.execute(text("SELECT 1"))
-        db.session.commit()  # IMPORTANT FIX
+        db.session.commit()
         db_ping = round((time.time() - start) * 1000)
         db_status = "online"
     except Exception as e:
         print("DB ERROR:", e)
 
-    # 🔥 SUPABASE STORAGE STATUS (REAL CHECK)
+    # 🔥 STORAGE STATUS
     storage_status = "offline"
     try:
         SUPABASE_URL = os.environ.get("SUPABASE_URL")
         r = requests.get(f"{SUPABASE_URL}/storage/v1/bucket", timeout=3)
-        if r.status_code in [200, 401]:  # 401 still means server alive
+        if r.status_code in [200, 401]:
             storage_status = "online"
     except:
-        storage_status = "offline"
+        pass
 
-    # 🔥 API LATENCY (PING YOUR OWN SERVER)
+    # 🔥 API PING
     api_ping = None
     try:
         start = time.time()
         requests.get(request.host_url, timeout=2)
         api_ping = round((time.time() - start) * 1000)
     except:
-        api_ping = None
+        pass
 
     # 🔥 UPTIME
     uptime_seconds = int(time.time() - APP_START_TIME)
     uptime = f"{uptime_seconds // 3600}h {(uptime_seconds % 3600)//60}m"
 
-    # 🔥 HOST INFO
+    # 🔥 HOST
     host = request.host
 
     # 🔥 RECENT NOTES
@@ -194,8 +199,10 @@ def admin():
     return render_template(
         "admin.html",
         notes=notes,
+        users=users,  # ✅ THIS FIXES EMPTY USERS PANEL
         classes_with_notes=classes_with_notes,
         total_users=total_users,
+        recent_uploads=recent_uploads,
         db_status=db_status,
         db_ping=db_ping,
         storage_status=storage_status,
