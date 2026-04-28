@@ -68,35 +68,73 @@ class="px-3 py-1 bg-gray-800 rounded text-sm outline-none">
 <div class="flex-1 overflow-y-auto p-4 space-y-6">
 
 <!-- ================= OVERVIEW ================= -->
-<!-- ================= OVERVIEW ================= -->
 <div id="overview" class="tab-content">
 
-<!-- TOP STATS -->
+<!-- TOP CARDS -->
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
 
 <div class="bg-white/5 p-4 rounded-xl border border-white/10">
-<p class="text-gray-400 text-xs">Total Notes</p>
+<p class="text-xs text-gray-400">Total Notes</p>
 <h3 class="text-xl font-semibold">{{ notes|length }}</h3>
 </div>
 
 <div class="bg-white/5 p-4 rounded-xl border border-white/10">
-<p class="text-gray-400 text-xs">Active Classes</p>
+<p class="text-xs text-gray-400">Active Classes</p>
 <h3 class="text-xl font-semibold">{{ classes_with_notes }}</h3>
 </div>
 
 <div class="bg-white/5 p-4 rounded-xl border border-white/10">
-<p class="text-gray-400 text-xs">Users</p>
+<p class="text-xs text-gray-400">Users</p>
 <h3 class="text-xl font-semibold">{{ total_users }}</h3>
 </div>
 
 <div class="bg-white/5 p-4 rounded-xl border border-white/10">
-<p class="text-gray-400 text-xs">Database</p>
+<p class="text-xs text-gray-400">Database</p>
 
 {% if db_status == "online" %}
 <h3 class="text-green-400 font-semibold">● Online</h3>
+<p class="text-xs text-gray-400 mt-1">{{ db_ping }} ms</p>
 {% else %}
 <h3 class="text-red-400 font-semibold">● Offline</h3>
 {% endif %}
+
+</div>
+
+</div>
+
+
+<!-- SECOND ROW -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+
+<!-- RECENT -->
+<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+<h3 class="text-sm text-gray-300 mb-3">Recent Uploads</h3>
+
+<div class="space-y-2 text-xs">
+{% for note in recent_notes %}
+<div class="flex justify-between">
+<span class="truncate text-gray-400">
+{{ note.pdf_url.split('/')[-1] }}
+</span>
+<span class="text-gray-500">Class {{ note.class_number }}</span>
+</div>
+{% endfor %}
+</div>
+</div>
+
+
+<!-- SYSTEM -->
+<div class="bg-white/5 p-4 rounded-xl border border-white/10">
+<h3 class="text-sm text-gray-300 mb-3">System</h3>
+
+<div class="space-y-2 text-xs text-gray-400">
+<div>Host: {{ host }}</div>
+<div>Backend: Flask</div>
+<div>Storage: Supabase</div>
+<div>Status: Running</div>
+</div>
+
+</div>
 
 </div>
 
