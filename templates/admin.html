@@ -284,12 +284,65 @@ margin-top:10px;
 
 <!-- ================= SCRIPT ================= -->
 <script>
+
+// TAB SWITCH (FIXED)
+function showTab(id, el){
+document.querySelectorAll(".tab-content").forEach(x=>x.classList.add("hidden"));
+document.getElementById(id).classList.remove("hidden");
+
+// active highlight
+document.querySelectorAll(".tab-btn").forEach(btn=>btn.classList.remove("bg-white/10"));
+el.classList.add("bg-white/10");
+}
+
+// ✅ IMPORTANT: default tab load
+window.onload = () => {
+const firstTab = document.querySelector(".tab-btn");
+if(firstTab){
+firstTab.click();
+}
+};
+
+// SIDEBAR FIX
+function toggleSidebar(){
+const sb = document.getElementById("sidebar");
+sb.classList.toggle("hidden");
+}
+
+// FILE UPLOAD
+const dz = document.getElementById("dropZone");
+const fi = document.getElementById("fileInput");
+const fn = document.getElementById("fileName");
+
+if(dz){
+dz.onclick = ()=>fi.click();
+}
+
+if(fi){
+fi.onchange = ()=>{
+if(fi.files.length){
+fn.innerText = fi.files[0].name;
+fn.classList.remove("hidden");
+}
+};
+}
+
+// SEARCH
+const search = document.getElementById("searchNotes");
+if(search){
+search.addEventListener("input", e=>{
+const val = e.target.value.toLowerCase();
+document.querySelectorAll(".note-item").forEach(item=>{
+item.style.display = item.innerText.toLowerCase().includes(val) ? "flex" : "none";
+});
+});
+}
+
+// DEVICE INFO (REAL)
 async function getDeviceInfo(){
 const ua = navigator.userAgent;
 
-let device = "Desktop";
-if(/mobile/i.test(ua)) device = "Mobile";
-if(/tablet/i.test(ua)) device = "Tablet";
+let device = /mobile/i.test(ua) ? "Mobile" : "Desktop";
 
 let browser = "Unknown";
 if(ua.includes("Chrome") && !ua.includes("Edg")) browser = "Chrome";
@@ -305,10 +358,11 @@ location = data.city || "";
 }catch{}
 
 document.getElementById("deviceInfo").innerText =
-`${device} • ${browser} • ${location}`;
+`${device} • ${browser}${location ? " • " + location : ""}`;
 }
 
 getDeviceInfo();
+
 </script>
 
 {% endblock %}
