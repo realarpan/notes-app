@@ -44,7 +44,7 @@ Toggle
 <div class="flex-1 flex flex-col overflow-hidden">
 
 <!-- TOPBAR -->
-<div class="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-black/40">
+<div class="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-gradient-to-r from-black to-gray-900">
 
 <div class="flex items-center gap-3">
 <button onclick="toggleSidebar()" class="md:hidden">☰</button>
@@ -70,32 +70,36 @@ class="px-3 py-1 bg-gray-800 rounded text-sm outline-none">
 <!-- ===== TOP CARDS ===== -->
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
 
-<div class="bg-gradient-to-br from-gray-900 to-black p-4 rounded-xl border border-white/10">
+<div class="bg-gradient-to-br from-gray-900 to-black p-4 rounded-xl border border-white/10 hover:bg-white/10 transition">
 <p class="text-xs text-gray-400">Total Notes</p>
 <h3 class="text-2xl font-semibold">{{ notes|length }}</h3>
 </div>
 
-<div class="bg-gradient-to-br from-gray-900 to-black p-4 rounded-xl border border-white/10">
+<div class="bg-gradient-to-br from-gray-900 to-black p-4 rounded-xl border border-white/10 hover:bg-white/10 transition">
 <p class="text-xs text-gray-400">Active Classes</p>
 <h3 class="text-2xl font-semibold">{{ classes_with_notes }}</h3>
 </div>
 
-<div class="bg-gradient-to-br from-gray-900 to-black p-4 rounded-xl border border-white/10">
-<p class="text-xs text-gray-400">Users</p>
-<h3 class="text-2xl font-semibold">{{ total_users }}</h3>
-</div>
-
-<div class="bg-gradient-to-br from-gray-900 to-black p-4 rounded-xl border border-white/10">
+<div class="bg-gradient-to-br from-gray-900 to-black p-4 rounded-xl border border-white/10 hover:bg-white/10 transition">
 <p class="text-xs text-gray-400">Uploads (24h)</p>
 <h3 class="text-2xl font-semibold">{{ recent_uploads }}</h3>
 </div>
 
-<div class="bg-gradient-to-br from-gray-900 to-black p-4 rounded-xl border border-white/10">
+<div class="bg-gradient-to-br from-gray-900 to-black p-4 rounded-xl border border-white/10 hover:bg-white/10 transition">
+<p class="text-xs text-gray-400">Users</p>
+<h3 class="text-2xl font-semibold">{{ total_users }}</h3>
+</div>
+
+<div class="bg-gradient-to-br from-gray-900 to-black p-4 rounded-xl border border-white/10 hover:bg-white/10 transition">
 <p class="text-xs text-gray-400">Database</p>
 
 {% if db_status == "online" %}
-<h3 class="text-green-400 font-semibold">● Online</h3>
-<p class="text-xs text-gray-400 mt-1">{{ db_ping }} ms</p>
+<h3 class="font-semibold
+{% if db_ping < 150 %}text-green-400
+{% elif db_ping < 400 %}text-yellow-400
+{% else %}text-red-400{% endif %}">
+● {{ db_ping }} ms
+</h3>
 {% else %}
 <h3 class="text-red-400 font-semibold">● Offline</h3>
 {% endif %}
@@ -127,13 +131,12 @@ Class {{ note.class_number }}
 </div>
 {% endfor %}
 </div>
-
 </div>
 
 
 <!-- SYSTEM STATUS -->
 <div class="bg-white/5 p-4 rounded-xl border border-white/10">
-<h3 class="text-sm text-gray-300 mb-3">System Status</h3>
+<h3 class="text-sm text-gray-300 mb-3">System Health</h3>
 
 <div class="space-y-2 text-xs text-gray-400">
 
@@ -153,8 +156,21 @@ Class {{ note.class_number }}
 </div>
 
 <div class="flex justify-between">
-<span>Server</span>
-<span class="text-green-400">● Running</span>
+<span>DB Latency</span>
+<span class="text-white">{{ db_ping }} ms</span>
+</div>
+
+<div class="flex justify-between">
+<span>Status</span>
+
+{% if db_ping < 150 %}
+<span class="text-green-400">● Healthy</span>
+{% elif db_ping < 400 %}
+<span class="text-yellow-400">● Moderate</span>
+{% else %}
+<span class="text-red-400">● Slow</span>
+{% endif %}
+
 </div>
 
 </div>
@@ -172,7 +188,7 @@ Class {{ note.class_number }}
 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
 
 {% for user in users %}
-<div class="bg-black/40 p-3 rounded-lg border border-white/10">
+<div class="bg-black/40 p-3 rounded-lg border border-white/10 hover:bg-white/10 transition">
 
 <p class="text-white">{{ user.username }}</p>
 
@@ -183,6 +199,21 @@ Class {{ note.class_number }}
 </div>
 {% endfor %}
 
+</div>
+
+</div>
+
+
+<!-- ===== ACTIVITY ===== -->
+<div class="bg-white/5 p-4 rounded-xl border border-white/10 mt-6">
+
+<h3 class="text-sm text-gray-300 mb-3">Activity</h3>
+
+<div class="text-xs text-gray-400 space-y-2">
+<div>Uploads today: {{ recent_uploads }}</div>
+<div>Total users: {{ total_users }}</div>
+<div>System latency: {{ db_ping }} ms</div>
+<div>Server uptime: 99.9%</div>
 </div>
 
 </div>
@@ -295,7 +326,6 @@ class="bg-red-600 px-2 py-1 text-xs rounded">Delete</button>
 <!-- ================= SCRIPT ================= -->
 <script>
 
-// TAB SWITCH
 function showTab(id, el){
 document.querySelectorAll(".tab-content").forEach(x=>x.classList.add("hidden"));
 document.getElementById(id).classList.remove("hidden");
@@ -304,15 +334,12 @@ document.querySelectorAll(".tab-btn").forEach(btn=>btn.classList.remove("bg-whit
 el.classList.add("bg-white/10");
 }
 
-// DEFAULT TAB
 document.querySelector(".tab-btn")?.click();
 
-// SIDEBAR
 function toggleSidebar(){
 document.getElementById("sidebar").classList.toggle("-translate-x-full");
 }
 
-// FILE PICKER
 const dz = document.getElementById("dropZone");
 const fi = document.getElementById("fileInput");
 const fn = document.getElementById("fileName");
@@ -326,7 +353,6 @@ fn.classList.remove("hidden");
 }
 };
 
-// SEARCH
 document.getElementById("searchNotes")?.addEventListener("input", e=>{
 const val = e.target.value.toLowerCase();
 document.querySelectorAll(".note-item").forEach(item=>{
@@ -334,7 +360,6 @@ item.style.display = item.innerText.toLowerCase().includes(val) ? "flex" : "none
 });
 });
 
-// DEVICE INFO
 async function getDeviceInfo(){
 const ua = navigator.userAgent;
 
