@@ -24,7 +24,6 @@ class="fixed md:relative z-50 h-full w-64 bg-black/90 backdrop-blur-xl border-r 
 <button onclick="showTab('usersTab', this)" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-white/10">👤 Users</button>
 
 </div>
-
 </div>
 
 
@@ -73,27 +72,52 @@ class="fixed md:relative z-50 h-full w-64 bg-black/90 backdrop-blur-xl border-r 
 </div>
 
 
-<!-- ===== UPLOAD ===== -->
+<!-- ===== UPLOAD (ADVANCED) ===== -->
 <div id="upload" class="tab-content hidden">
-<div class="card max-w-md">
 
-<form method="POST" enctype="multipart/form-data">
+<div class="max-w-lg mx-auto">
 
-<select name="class_number" class="w-full p-2 bg-gray-800 rounded mb-3">
+<form method="POST" enctype="multipart/form-data" class="space-y-4">
+
+<div class="card">
+<label class="text-xs text-gray-400 mb-1 block">Select Class</label>
+<select name="class_number"
+class="w-full p-3 bg-gray-900 rounded-lg border border-white/10 focus:outline-none focus:ring-2 focus:ring-green-500">
 {% for i in range(1,12) %}
 <option value="{{i}}">Class {{i}}</option>
 {% endfor %}
 </select>
+</div>
 
-<div id="dropZone" class="border-2 border-dashed p-6 text-center cursor-pointer hover:bg-white/5 transition">
-Upload PDF
+<div id="dropZone"
+class="border-2 border-dashed border-gray-600 rounded-xl p-8 text-center cursor-pointer hover:border-green-400 hover:bg-green-500/5 transition">
+
+<div class="text-4xl mb-3">📄</div>
+<p class="text-sm text-gray-300">Drag & Drop PDF here</p>
+<p class="text-xs text-gray-500">or click to browse</p>
+
 <input type="file" name="file" id="fileInput" class="hidden">
 </div>
 
-<p id="fileName" class="text-green-400 mt-2 hidden"></p>
+<div id="filePreview" class="hidden card flex justify-between items-center">
+<div>
+<p id="fileName" class="text-sm font-medium"></p>
+<p class="text-xs text-gray-400">Ready to upload</p>
+</div>
 
-<button class="w-full mt-4 bg-green-600 py-2 rounded hover:bg-green-500 transition">
-Upload
+<button type="button" id="removeFile" class="text-red-400 text-xs">Remove</button>
+</div>
+
+<div id="progressContainer" class="hidden">
+<div class="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+<div id="progressBar" class="h-full bg-green-500 w-0"></div>
+</div>
+<p class="text-xs text-gray-400 mt-1">Uploading...</p>
+</div>
+
+<button id="uploadBtn"
+class="w-full py-3 rounded-xl font-medium bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 transition">
+🚀 Upload Notes
 </button>
 
 </form>
@@ -121,9 +145,8 @@ Upload
 
 <div class="flex gap-2">
 
-<a href="{{note.pdf_url}}" target="_blank" class="btn-blue">
-View
-</a>
+<a href="{{note.pdf_url}}" target="_blank"
+class="btn-blue">View</a>
 
 <form method="POST" action="/delete-note/{{note.id}}">
 <button class="btn-red">Delete</button>
@@ -135,7 +158,6 @@ View
 {% endfor %}
 
 </div>
-
 </div>
 
 
@@ -175,17 +197,16 @@ View
 bg-red-500/20 text-red-400
 {% else %}
 bg-blue-500/20 text-blue-400
-{% endif %}
-">
+{% endif %}">
 {{ user.role }}
 </span>
 
 </div>
 
 <div class="text-xs text-gray-400 space-y-1">
-<p>User ID: {{ user.id }}</p>
+<p>ID: {{ user.id }}</p>
 <p>Status: Active</p>
-<p>Joined: --</p>
+<p>Access: {{ user.role }}</p>
 </div>
 
 </div>
@@ -208,22 +229,16 @@ background: rgba(255,255,255,0.05);
 padding:14px;
 border-radius:12px;
 border:1px solid rgba(255,255,255,0.1);
-backdrop-filter: blur(10px);
 }
 
-.btn-blue{
-background:#2563eb;
+.btn-blue, .btn-red{
 padding:5px 10px;
 border-radius:6px;
 font-size:12px;
 }
 
-.btn-red{
-background:#dc2626;
-padding:5px 10px;
-border-radius:6px;
-font-size:12px;
-}
+.btn-blue{background:#2563eb;}
+.btn-red{background:#dc2626;}
 </style>
 
 
@@ -232,7 +247,6 @@ font-size:12px;
 
 document.addEventListener("DOMContentLoaded", () => {
 
-/* TAB SWITCH */
 function showTab(id, el){
 document.querySelectorAll(".tab-content").forEach(x=>x.classList.add("hidden"));
 document.getElementById(id).classList.remove("hidden");
@@ -240,32 +254,36 @@ document.getElementById(id).classList.remove("hidden");
 document.querySelectorAll(".tab-btn").forEach(btn=>btn.classList.remove("bg-white/10"));
 el.classList.add("bg-white/10");
 
-/* MOBILE AUTO CLOSE */
 if(window.innerWidth < 768){
 document.getElementById("sidebar").classList.add("-translate-x-full");
 }
 }
 
 window.showTab = showTab;
-
-/* DEFAULT TAB */
 document.querySelector(".tab-btn")?.click();
 
-/* SIDEBAR */
 window.toggleSidebar = function(){
 document.getElementById("sidebar").classList.toggle("-translate-x-full");
 };
 
-/* FILE PICK */
+/* UPLOAD LOGIC */
 const dz = document.getElementById("dropZone");
 const fi = document.getElementById("fileInput");
 const fn = document.getElementById("fileName");
+const preview = document.getElementById("filePreview");
+const remove = document.getElementById("removeFile");
 
 if(dz){
 dz.onclick = ()=>fi.click();
+
 fi.onchange = ()=>{
 fn.innerText = fi.files[0].name;
-fn.classList.remove("hidden");
+preview.classList.remove("hidden");
+};
+
+remove.onclick = ()=>{
+fi.value = "";
+preview.classList.add("hidden");
 };
 }
 
@@ -280,16 +298,13 @@ item.style.display = item.innerText.toLowerCase().includes(val) ? "flex" : "none
 });
 }
 
-/* DEVICE INFO (REAL FIX) */
+/* DEVICE */
 const ua = navigator.userAgent;
-
 let device = /Mobi|Android/i.test(ua) ? "Mobile" : "Desktop";
-
 let browser =
 ua.includes("Chrome") ? "Chrome" :
 ua.includes("Firefox") ? "Firefox" :
-ua.includes("Safari") ? "Safari" :
-"Browser";
+ua.includes("Safari") ? "Safari" : "Browser";
 
 document.getElementById("deviceInfo").innerText =
 device + " • " + browser;
