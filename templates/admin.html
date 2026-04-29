@@ -8,33 +8,43 @@
 class="fixed md:relative z-50 h-full w-64 bg-black/90 backdrop-blur-xl border-r border-white/10 transform -translate-x-full md:translate-x-0 transition duration-300 flex flex-col">
 
 <div class="p-5 text-lg font-semibold border-b border-white/10">
-Admin Panel
+⚡ Admin Panel
 </div>
 
 <div class="flex-1 p-3 space-y-2 text-sm">
-<button onclick="showTab('overview', this)" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-white/10">Overview</button>
-<button onclick="showTab('upload', this)" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-white/10">Upload</button>
-<button onclick="showTab('manage', this)" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-white/10">Notes</button>
-<button onclick="showTab('history', this)" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-white/10">History</button>
-<button onclick="showTab('usersTab', this)" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-white/10">Users</button>
-</div>
+
+<button onclick="showTab('overview', this)" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-white/10">📊 Overview</button>
+
+<button onclick="showTab('upload', this)" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-white/10">⬆ Upload</button>
+
+<button onclick="showTab('manage', this)" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-white/10">📂 Notes</button>
+
+<button onclick="showTab('history', this)" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-white/10">🕒 History</button>
+
+<button onclick="showTab('usersTab', this)" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-white/10">👤 Users</button>
 
 </div>
+</div>
+
 
 <!-- ================= MAIN ================= -->
 <div class="flex-1 flex flex-col overflow-hidden">
 
 <!-- TOPBAR -->
 <div class="flex justify-between items-center px-4 py-3 border-b border-white/10 bg-black/70 backdrop-blur">
+
 <div class="flex items-center gap-3">
 <button onclick="toggleSidebar()" class="md:hidden text-lg">☰</button>
+<input placeholder="Search..." class="px-3 py-1 bg-gray-800 rounded text-sm outline-none">
 </div>
 
 <div class="text-sm text-right">
 {{ current_user.username }}
 <div id="deviceInfo" class="text-xs text-gray-400"></div>
 </div>
+
 </div>
+
 
 <!-- ================= CONTENT ================= -->
 <div class="flex-1 overflow-y-auto p-4 space-y-6">
@@ -42,67 +52,73 @@ Admin Panel
 <!-- ===== OVERVIEW ===== -->
 <div id="overview" class="tab-content">
 
-<!-- STATS -->
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-<div class="card"><p class="label">Total Notes</p><h2 class="value">{{ notes|length }}</h2></div>
-<div class="card"><p class="label">Classes</p><h2 class="value">{{ classes_with_notes }}</h2></div>
-<div class="card"><p class="label">Uploads (24h)</p><h2 class="value">{{ recent_uploads }}</h2></div>
+
+<div class="card">📄 Notes<br><b>{{ notes|length }}</b></div>
+<div class="card">🏫 Classes<br><b>{{ classes_with_notes }}</b></div>
+<div class="card">⚡ Uploads<br><b>{{ recent_uploads }}</b></div>
+
 <div class="card">
-<p class="label">Database</p>
-{% if db_status == "online" %}
-<span class="status-green">{{ db_ping }} ms</span>
+🧠 DB<br>
+{% if db_status=="online" %}
+<span class="text-green-400">{{ db_ping }} ms</span>
 {% else %}
-<span class="status-red">Offline</span>
+<span class="text-red-400">Offline</span>
 {% endif %}
 </div>
-</div>
-
-<!-- CHART + ACTIVITY -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-
-<!-- CHART -->
-<div class="card col-span-2">
-<h3 class="section-title mb-3">Uploads Trend</h3>
-<canvas id="uploadChart" height="100"></canvas>
-</div>
-
-<!-- LIVE ACTIVITY -->
-<div class="card">
-<h3 class="section-title mb-3">Live Activity</h3>
-
-<div id="activityFeed" class="space-y-2 text-xs text-gray-300 max-h-64 overflow-y-auto">
-{% for note in recent_notes %}
-<div>New upload: {{ note.pdf_url.split('/')[-1] }}</div>
-{% endfor %}
-</div>
-
-</div>
 
 </div>
 
 </div>
 
 
-<!-- ===== UPLOAD ===== -->
+<!-- ===== UPLOAD (ADVANCED) ===== -->
 <div id="upload" class="tab-content hidden">
-<div class="card max-w-lg mx-auto">
 
-<form method="POST" enctype="multipart/form-data">
+<div class="max-w-lg mx-auto">
 
-<select name="class_number" class="w-full p-3 bg-gray-900 rounded mb-3">
+<form method="POST" enctype="multipart/form-data" class="space-y-4">
+
+<div class="card">
+<label class="text-xs text-gray-400 mb-1 block">Select Class</label>
+<select name="class_number"
+class="w-full p-3 bg-gray-900 rounded-lg border border-white/10 focus:outline-none focus:ring-2 focus:ring-green-500">
 {% for i in range(1,12) %}
 <option value="{{i}}">Class {{i}}</option>
 {% endfor %}
 </select>
+</div>
 
-<div id="dropZone" class="border-2 border-dashed p-8 text-center cursor-pointer hover:bg-white/5">
-Upload PDF
+<div id="dropZone"
+class="border-2 border-dashed border-gray-600 rounded-xl p-8 text-center cursor-pointer hover:border-green-400 hover:bg-green-500/5 transition">
+
+<div class="text-4xl mb-3">📄</div>
+<p class="text-sm text-gray-300">Drag & Drop PDF here</p>
+<p class="text-xs text-gray-500">or click to browse</p>
+
 <input type="file" name="file" id="fileInput" class="hidden">
 </div>
 
-<p id="fileName" class="text-green-400 mt-2 hidden"></p>
+<div id="filePreview" class="hidden card flex justify-between items-center">
+<div>
+<p id="fileName" class="text-sm font-medium"></p>
+<p class="text-xs text-gray-400">Ready to upload</p>
+</div>
 
-<button class="w-full mt-4 bg-green-600 py-2 rounded">Upload</button>
+<button type="button" id="removeFile" class="text-red-400 text-xs">Remove</button>
+</div>
+
+<div id="progressContainer" class="hidden">
+<div class="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+<div id="progressBar" class="h-full bg-green-500 w-0"></div>
+</div>
+<p class="text-xs text-gray-400 mt-1">Uploading...</p>
+</div>
+
+<button id="uploadBtn"
+class="w-full py-3 rounded-xl font-medium bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 transition">
+🚀 Upload Notes
+</button>
 
 </form>
 
@@ -112,42 +128,94 @@ Upload PDF
 
 <!-- ===== NOTES ===== -->
 <div id="manage" class="tab-content hidden">
-<input id="searchNotes" class="w-full mb-3 p-2 bg-gray-800 rounded" placeholder="Search...">
+
+<input id="searchNotes" class="w-full mb-3 p-2 bg-gray-800 rounded" placeholder="Search notes...">
+
+<div class="space-y-3">
 
 {% for note in notes %}
-<div class="note-item card flex justify-between mb-2">
+<div class="note-item card flex justify-between items-center hover:bg-white/10 transition">
+
 <div>
-Class {{note.class_number}}<br>
-<span class="text-xs text-gray-400">{{ note.pdf_url.split('/')[-1] }}</span>
+<p class="font-medium">Class {{note.class_number}}</p>
+<p class="text-xs text-gray-400 truncate max-w-[180px]">
+{{ note.pdf_url.split('/')[-1] }}
+</p>
 </div>
 
 <div class="flex gap-2">
-<a href="{{note.pdf_url}}" target="_blank" class="btn">View</a>
+
+<a href="{{note.pdf_url}}" target="_blank"
+class="btn-blue">View</a>
+
 <form method="POST" action="/delete-note/{{note.id}}">
 <button class="btn-red">Delete</button>
 </form>
+
 </div>
+
 </div>
 {% endfor %}
+
+</div>
+</div>
+
+
+<!-- ===== HISTORY ===== -->
+<div id="history" class="tab-content hidden">
+
+{% if logs is defined and logs %}
+{% for log in logs %}
+<div class="card">
+<p>{{ log.uploaded_by }} → Class {{ log.class_number }}</p>
+<p class="text-xs text-gray-400">{{ log.filename }}</p>
+<p class="text-xs text-gray-500">
+{{ log.timestamp.strftime("%d %b %Y, %I:%M %p") }}
+</p>
+</div>
+{% endfor %}
+{% else %}
+<div class="text-gray-400">No history available</div>
+{% endif %}
+
 </div>
 
 
 <!-- ===== USERS ===== -->
 <div id="usersTab" class="tab-content hidden">
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
 
 {% for user in users %}
-<div class="card">
-<div class="flex justify-between">
-<b>{{ user.username }}</b>
-<span class="text-xs">{{ user.role }}</span>
+<div class="card hover:bg-white/10 transition">
+
+<div class="flex justify-between items-center mb-2">
+<p class="font-semibold">{{ user.username }}</p>
+
+<span class="text-xs px-2 py-1 rounded
+{% if user.role=='admin' %}
+bg-red-500/20 text-red-400
+{% else %}
+bg-blue-500/20 text-blue-400
+{% endif %}">
+{{ user.role }}
+</span>
+
 </div>
-<p class="text-xs text-gray-400 mt-2">ID: {{ user.id }}</p>
+
+<div class="text-xs text-gray-400 space-y-1">
+<p>ID: {{ user.id }}</p>
+<p>Status: Active</p>
+<p>Access: {{ user.role }}</p>
+</div>
+
 </div>
 {% endfor %}
 
 </div>
+
 </div>
+
 
 </div>
 </div>
@@ -156,53 +224,49 @@ Class {{note.class_number}}<br>
 
 <!-- ================= STYLE ================= -->
 <style>
-.card{background:rgba(255,255,255,0.05);padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);}
-.label{font-size:11px;color:#9ca3af;}
-.value{font-size:22px;font-weight:600;}
-.section-title{font-size:13px;color:#d1d5db;}
-.status-green{color:#4ade80;}
-.status-red{color:#f87171;}
-.btn{background:#2563eb;padding:4px 8px;border-radius:5px;font-size:12px;}
-.btn-red{background:#dc2626;padding:4px 8px;border-radius:5px;font-size:12px;}
+.card{
+background: rgba(255,255,255,0.05);
+padding:14px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.1);
+}
+
+.btn-blue, .btn-red{
+padding:5px 10px;
+border-radius:6px;
+font-size:12px;
+}
+
+.btn-blue{background:#2563eb;}
+.btn-red{background:#dc2626;}
 </style>
 
 
 <!-- ================= SCRIPT ================= -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
+
 document.addEventListener("DOMContentLoaded", () => {
 
-let activeTab = "overview";
-
-/* TAB SWITCH */
-window.showTab = function(id, el){
-activeTab = id;
-
+function showTab(id, el){
 document.querySelectorAll(".tab-content").forEach(x=>x.classList.add("hidden"));
 document.getElementById(id).classList.remove("hidden");
 
 document.querySelectorAll(".tab-btn").forEach(btn=>btn.classList.remove("bg-white/10"));
 el.classList.add("bg-white/10");
 
-/* MOBILE AUTO CLOSE */
 if(window.innerWidth < 768){
 document.getElementById("sidebar").classList.add("-translate-x-full");
 }
-};
-
-/* ✅ DEFAULT LOAD (ONLY ONCE, NO OVERRIDE BUG) */
-const firstBtn = document.querySelector(".tab-btn");
-if(firstBtn){
-showTab("overview", firstBtn);
 }
 
-/* SIDEBAR TOGGLE */
+window.showTab = showTab;
+document.querySelector(".tab-btn")?.click();
+
 window.toggleSidebar = function(){
 document.getElementById("sidebar").classList.toggle("-translate-x-full");
 };
 
-/* FILE PICK */
+/* UPLOAD LOGIC */
 const dz = document.getElementById("dropZone");
 const fi = document.getElementById("fileInput");
 const fn = document.getElementById("fileName");
@@ -234,7 +298,7 @@ item.style.display = item.innerText.toLowerCase().includes(val) ? "flex" : "none
 });
 }
 
-/* DEVICE INFO */
+/* DEVICE */
 const ua = navigator.userAgent;
 let device = /Mobi|Android/i.test(ua) ? "Mobile" : "Desktop";
 let browser =
@@ -245,22 +309,8 @@ ua.includes("Safari") ? "Safari" : "Browser";
 document.getElementById("deviceInfo").innerText =
 device + " • " + browser;
 
-
-/* ================= REAL-TIME AUTO REFRESH ================= */
-async function refreshStats(){
-try{
-const res = await fetch("/admin-stats");
-const data = await res.json();
-
-/* Example: update counters dynamically if you add IDs later */
-console.log("Live Stats:", data);
-
-}catch{}
-}
-
-setInterval(refreshStats, 5000);
-
 });
+
 </script>
 
 {% endblock %}
