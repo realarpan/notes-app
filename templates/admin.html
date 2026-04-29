@@ -52,19 +52,118 @@ class="fixed md:relative z-50 h-full w-64 bg-black/90 backdrop-blur-xl border-r 
 <!-- ===== OVERVIEW ===== -->
 <div id="overview" class="tab-content">
 
+<!-- ===== STATS CARDS ===== -->
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
 
-<div class="card">📄 Notes<br><b>{{ notes|length }}</b></div>
-<div class="card">🏫 Classes<br><b>{{ classes_with_notes }}</b></div>
-<div class="card">⚡ Uploads<br><b>{{ recent_uploads }}</b></div>
+<div class="card">
+<p class="label">Total Notes</p>
+<h2 class="value">{{ notes|length }}</h2>
+</div>
 
 <div class="card">
-🧠 DB<br>
-{% if db_status=="online" %}
-<span class="text-green-400">{{ db_ping }} ms</span>
+<p class="label">Active Classes</p>
+<h2 class="value">{{ classes_with_notes }}</h2>
+</div>
+
+<div class="card">
+<p class="label">Uploads (24h)</p>
+<h2 class="value">{{ recent_uploads }}</h2>
+</div>
+
+<div class="card">
+<p class="label">Database</p>
+
+{% if db_status == "online" %}
+<span class="status-green">{{ db_ping }} ms</span>
 {% else %}
-<span class="text-red-400">Offline</span>
+<span class="status-red">Offline</span>
 {% endif %}
+
+</div>
+
+</div>
+
+
+<!-- ===== SECOND ROW ===== -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+
+<!-- RECENT UPLOADS -->
+<div class="card col-span-2">
+
+<div class="flex justify-between items-center mb-3">
+<h3 class="section-title">Recent Uploads</h3>
+<span class="text-xs text-gray-500">{{ recent_notes|length }} items</span>
+</div>
+
+<div class="space-y-2">
+
+{% for note in recent_notes %}
+<div class="flex justify-between items-center bg-black/40 px-3 py-2 rounded-lg hover:bg-white/5 transition">
+
+<div class="truncate text-sm text-gray-300">
+{{ note.pdf_url.split('/')[-1] }}
+</div>
+
+<div class="text-xs text-gray-500">
+Class {{ note.class_number }}
+</div>
+
+</div>
+{% endfor %}
+
+{% if not recent_notes %}
+<p class="text-xs text-gray-500">No uploads yet</p>
+{% endif %}
+
+</div>
+
+</div>
+
+
+<!-- SYSTEM HEALTH -->
+<div class="card">
+
+<h3 class="section-title mb-3">System Health</h3>
+
+<div class="space-y-3 text-xs">
+
+<div class="flex justify-between">
+<span class="text-gray-400">Database</span>
+{% if db_ping < 150 %}
+<span class="status-green">Healthy</span>
+{% elif db_ping < 400 %}
+<span class="status-yellow">Moderate</span>
+{% else %}
+<span class="status-red">Slow</span>
+{% endif %}
+</div>
+
+<div class="flex justify-between">
+<span class="text-gray-400">Latency</span>
+<span class="text-white">{{ db_ping }} ms</span>
+</div>
+
+<div class="flex justify-between">
+<span class="text-gray-400">Storage</span>
+<span class="{% if storage_status=='online' %}status-green{% else %}status-red{% endif %}">
+{{ storage_status }}
+</span>
+</div>
+
+<div class="flex justify-between">
+<span class="text-gray-400">API</span>
+<span class="text-white">
+{% if api_ping %}{{ api_ping }} ms{% else %}--{% endif %}
+</span>
+</div>
+
+<div class="flex justify-between">
+<span class="text-gray-400">Uptime</span>
+<span class="text-white">{{ uptime }}</span>
+</div>
+
+</div>
+
 </div>
 
 </div>
@@ -224,6 +323,37 @@ bg-blue-500/20 text-blue-400
 
 <!-- ================= STYLE ================= -->
 <style>
+.label{
+font-size:11px;
+color:#9ca3af;
+margin-bottom:4px;
+}
+
+.value{
+font-size:22px;
+font-weight:600;
+}
+
+.section-title{
+font-size:13px;
+color:#d1d5db;
+}
+
+.status-green{
+color:#4ade80;
+font-weight:500;
+}
+
+.status-yellow{
+color:#facc15;
+font-weight:500;
+}
+
+.status-red{
+color:#f87171;
+font-weight:500;
+}
+
 .card{
 background: rgba(255,255,255,0.05);
 padding:14px;
