@@ -171,25 +171,57 @@ Class {{note.class_number}}<br>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-
 document.addEventListener("DOMContentLoaded", () => {
 
-/* TAB */
-function showTab(id, el){
+let activeTab = "overview";
+
+/* TAB SWITCH */
+window.showTab = function(id, el){
+activeTab = id;
+
 document.querySelectorAll(".tab-content").forEach(x=>x.classList.add("hidden"));
 document.getElementById(id).classList.remove("hidden");
 
+document.querySelectorAll(".tab-btn").forEach(btn=>btn.classList.remove("bg-white/10"));
+el.classList.add("bg-white/10");
+
+/* MOBILE AUTO CLOSE */
 if(window.innerWidth < 768){
 document.getElementById("sidebar").classList.add("-translate-x-full");
 }
-}
-window.showTab = showTab;
-document.querySelector(".tab-btn")?.click();
+};
 
-/* SIDEBAR */
-window.toggleSidebar = () => {
+/* ✅ DEFAULT LOAD (ONLY ONCE, NO OVERRIDE BUG) */
+const firstBtn = document.querySelector(".tab-btn");
+if(firstBtn){
+showTab("overview", firstBtn);
+}
+
+/* SIDEBAR TOGGLE */
+window.toggleSidebar = function(){
 document.getElementById("sidebar").classList.toggle("-translate-x-full");
 };
+
+/* FILE PICK */
+const dz = document.getElementById("dropZone");
+const fi = document.getElementById("fileInput");
+const fn = document.getElementById("fileName");
+const preview = document.getElementById("filePreview");
+const remove = document.getElementById("removeFile");
+
+if(dz){
+dz.onclick = ()=>fi.click();
+
+fi.onchange = ()=>{
+fn.innerText = fi.files[0].name;
+preview.classList.remove("hidden");
+};
+
+remove.onclick = ()=>{
+fi.value = "";
+preview.classList.add("hidden");
+};
+}
 
 /* SEARCH */
 const search = document.getElementById("searchNotes");
@@ -202,52 +234,33 @@ item.style.display = item.innerText.toLowerCase().includes(val) ? "flex" : "none
 });
 }
 
-/* FILE */
-const dz = document.getElementById("dropZone");
-const fi = document.getElementById("fileInput");
-const fn = document.getElementById("fileName");
-
-if(dz){
-dz.onclick = ()=>fi.click();
-fi.onchange = ()=>{
-fn.innerText = fi.files[0].name;
-fn.classList.remove("hidden");
-};
-}
-
-/* DEVICE */
+/* DEVICE INFO */
 const ua = navigator.userAgent;
+let device = /Mobi|Android/i.test(ua) ? "Mobile" : "Desktop";
+let browser =
+ua.includes("Chrome") ? "Chrome" :
+ua.includes("Firefox") ? "Firefox" :
+ua.includes("Safari") ? "Safari" : "Browser";
+
 document.getElementById("deviceInfo").innerText =
-(/Mobi|Android/i.test(ua) ? "Mobile" : "Desktop");
+device + " • " + browser;
 
-/* ===== CHART ===== */
-const ctx = document.getElementById("uploadChart");
 
-if(ctx){
-new Chart(ctx, {
-type: "line",
-data: {
-labels: {{ chart_labels|safe }},
-datasets: [{
-label: "Uploads",
-data: {{ chart_values|safe }},
-borderWidth: 2
-}]
-}
-});
+/* ================= REAL-TIME AUTO REFRESH ================= */
+async function refreshStats(){
+try{
+const res = await fetch("/admin-stats");
+const data = await res.json();
+
+/* Example: update counters dynamically if you add IDs later */
+console.log("Live Stats:", data);
+
+}catch{}
 }
 
-/* ===== AUTO REFRESH (REAL-TIME FEEL) ===== */
-setInterval(()=>{
-fetch("/admin-data")
-.then(res=>res.json())
-.then(data=>{
-location.reload(); // simple but effective
-});
-}, 15000);
+setInterval(refreshStats, 5000);
 
 });
-
 </script>
 
 {% endblock %}
