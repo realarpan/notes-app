@@ -8,20 +8,20 @@
 class="fixed md:relative z-50 h-full w-64 bg-black/90 backdrop-blur-xl border-r border-white/10 transform -translate-x-full md:translate-x-0 transition duration-300 flex flex-col">
 
 <div class="p-5 text-lg font-semibold border-b border-white/10">
-Admin Panel
+⚡ Admin Panel
 </div>
 
 <div class="flex-1 p-3 space-y-2 text-sm">
 
 <button onclick="showTab('overview', this)" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-white/10">📊 Overview</button>
 
-<button onclick="showTab('upload', this)" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-white/10">⬆ Upload Notes</button>
+<button onclick="showTab('upload', this)" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-white/10">⬆ Upload</button>
 
-<button onclick="showTab('manage', this)" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-white/10">📂 All Notes</button>
+<button onclick="showTab('manage', this)" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-white/10">📂 Notes</button>
 
-<button onclick="showTab('history', this)" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-white/10">🕒 Notes History</button>
+<button onclick="showTab('history', this)" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-white/10">🕒 History</button>
 
-<button onclick="showTab('usersTab', this)" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-white/10">👤 Registered Users</button>
+<button onclick="showTab('usersTab', this)" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-white/10">👤 Users</button>
 
 </div>
 </div>
@@ -52,133 +52,19 @@ Admin Panel
 <!-- ===== OVERVIEW ===== -->
 <div id="overview" class="tab-content">
 
-<div id="overview" class="tab-content space-y-6">
-
-<!-- ===== TOP METRICS ===== -->
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
 
-<div class="card">
-<p class="label">Total Notes</p>
-<h2 class="value">{{ notes|length }}</h2>
-<p class="sub">All time stored files</p>
-</div>
+<div class="card">📄 Notes<br><b>{{ notes|length }}</b></div>
+<div class="card">🏫 Classes<br><b>{{ classes_with_notes }}</b></div>
+<div class="card">⚡ Uploads<br><b>{{ recent_uploads }}</b></div>
 
 <div class="card">
-<p class="label">Active Classes</p>
-<h2 class="value">{{ classes_with_notes }}</h2>
-<p class="sub">Classes with content</p>
-</div>
-
-<div class="card">
-<p class="label">Uploads (24h)</p>
-<h2 class="value">{{ recent_uploads }}</h2>
-<p class="sub">Recent activity</p>
-</div>
-
-<div class="card">
-<p class="label">Database</p>
+🧠 DB<br>
 {% if db_status=="online" %}
-<h2 class="value text-green-400">{{ db_ping }} ms</h2>
-<p class="sub text-green-400">Connected</p>
+<span class="text-green-400">{{ db_ping }} ms</span>
 {% else %}
-<h2 class="value text-red-400">Offline</h2>
-<p class="sub text-red-400">Check connection</p>
+<span class="text-red-400">Offline</span>
 {% endif %}
-</div>
-
-</div>
-
-
-<!-- ===== CHART + ACTIVITY ===== -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-<!-- CHART -->
-<div class="card col-span-2">
-<div class="flex justify-between items-center mb-3">
-<h3 class="section-title">Uploads Trend</h3>
-<span class="text-xs text-gray-500">last 7 days</span>
-</div>
-
-<canvas id="uploadChart" height="120"></canvas>
-</div>
-
-<!-- LIVE ACTIVITY -->
-<div class="card">
-<h3 class="section-title mb-3">Live Activity</h3>
-
-<div id="activityFeed" class="space-y-2 text-xs text-gray-400 max-h-[200px] overflow-y-auto">
-<div class="text-gray-500">Loading activity...</div>
-</div>
-
-</div>
-
-</div>
-
-
-<!-- ===== SYSTEM INSIGHTS ===== -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-<div class="card">
-<h3 class="section-title mb-3">System</h3>
-
-<div class="space-y-2 text-xs">
-<div class="flex justify-between">
-<span class="text-gray-400">Host</span>
-<span>{{ host }}</span>
-</div>
-
-<div class="flex justify-between">
-<span class="text-gray-400">API</span>
-<span>{% if api_ping %}{{ api_ping }} ms{% else %}--{% endif %}</span>
-</div>
-
-<div class="flex justify-between">
-<span class="text-gray-400">Uptime</span>
-<span>{{ uptime }}</span>
-</div>
-</div>
-</div>
-
-
-<div class="card">
-<h3 class="section-title mb-3">Storage</h3>
-
-<div class="space-y-2 text-xs">
-<div class="flex justify-between">
-<span class="text-gray-400">Status</span>
-<span class="{% if storage_status=='online' %}text-green-400{% else %}text-red-400{% endif %}">
-{{ storage_status }}
-</span>
-</div>
-
-<div class="flex justify-between">
-<span class="text-gray-400">Provider</span>
-<span>Supabase</span>
-</div>
-</div>
-</div>
-
-
-<div class="card">
-<h3 class="section-title mb-3">Performance</h3>
-
-<div class="space-y-2 text-xs">
-<div class="flex justify-between">
-<span class="text-gray-400">Latency</span>
-<span>{{ db_ping }} ms</span>
-</div>
-
-<div class="flex justify-between">
-<span class="text-gray-400">Status</span>
-{% if db_ping < 150 %}
-<span class="text-green-400">Healthy</span>
-{% elif db_ping < 400 %}
-<span class="text-yellow-400">Moderate</span>
-{% else %}
-<span class="text-red-400">Slow</span>
-{% endif %}
-</div>
-</div>
 </div>
 
 </div>
@@ -425,7 +311,6 @@ device + " • " + browser;
 
 });
 
-  
 </script>
 
 {% endblock %}
