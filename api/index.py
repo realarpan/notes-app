@@ -1,9 +1,9 @@
-from flask import Flask, render_template, redirect, url_for, request, flash
+from flask import Flask, render_template, redirect, url_for, request, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
-from sqlalchemy import text
+from sqlalchemy import text, func
 from datetime import datetime, timedelta
 import time
 import os
@@ -24,9 +24,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
-# 🔥 APP START TIME
 APP_START_TIME = time.time()
-
 
 # ================= MODELS =================
 
@@ -43,6 +41,7 @@ class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     class_number = db.Column(db.Integer)
     pdf_url = db.Column(db.String(500))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # ✅ NEW
 
 
 # ================= LOGIN =================
@@ -60,17 +59,11 @@ def home():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
+        user = User.query.filter_by(username=request.form["username"]).first()
 
-        user = User.query.filter_by(username=username).first()
-
-        if user and check_password_hash(user.password, password):
+        if user and check_password_hash(user.password, request.form["password"]):
             login_user(user)
-
-            if user.role == "admin":
-                return redirect(url_for("admin"))
-            return redirect(url_for("dashboard"))
+            return redirect(url_for("admin") if user.role == "admin" else url_for("dashboard"))
 
         flash("Invalid credentials")
 
@@ -102,17 +95,17 @@ def admin():
     if current_user.role != "admin":
         return "Access Denied"
 
-    # ================= UPLOAD =================
+    # ===== UPLOAD =====
     if request.method == "POST":
-        class_number = request.form["class_number"]
         file = request.files.get("file")
+        class_number = request.form["class_number"]
 
         if not file:
             flash("No file selected")
             return redirect(url_for("admin"))
 
         if request.content_length and request.content_length > 10 * 1024 * 1024:
-            flash("File too large (Max 10MB)")
+            flash("File too large")
             return redirect(url_for("admin"))
 
         filename = secure_filename(file.filename)
@@ -131,31 +124,59 @@ def admin():
         }
 
         with open(temp_path, "rb") as f:
-            response = requests.post(upload_url, headers=headers, data=f)
+            res = requests.post(upload_url, headers=headers, data=f)
 
-        if response.status_code not in [200, 201]:
-            return f"Upload failed: {response.text}"
+        if res.status_code not in [200, 201]:
+            return f"Upload failed: {res.text}"
 
         public_url = f"{SUPABASE_URL}/storage/v1/object/public/notes/{filename}"
 
-        note = Note(class_number=class_number, pdf_url=public_url)
+        note = Note(
+            class_number=class_number,
+            pdf_url=public_url,
+            created_at=datetime.utcnow()
+        )
+
         db.session.add(note)
         db.session.commit()
 
-        flash("PDF uploaded successfully")
+        flash("Uploaded successfully")
 
-    # ================= FETCH =================
-
-    notes = Note.query.order_by(Note.id.desc()).all()
+    # ===== FETCH =====
+    notes = Note.query.order_by(Note.created_at.desc()).all()
     users = User.query.all()
 
-    classes_with_notes = db.session.query(Note.class_number).distinct().count()
     total_users = len(users)
+    classes_with_notes = db.session.query(Note.class_number).distinct().count()
 
-    # 🔥 Uploads in last 24h (approx using last IDs)
-    recent_uploads = len(notes[:10])  # simple fallback
+    # ===== UPLOADS LAST 24H =====
+    last_24h = datetime.utcnow() - timedelta(hours=24)
+    recent_uploads = Note.query.filter(Note.created_at >= last_24h).count()
 
-    # 🔥 DATABASE STATUS
+    # ===== CHART DATA (LAST 7 DAYS) =====
+    uploads_data = []
+    for i in range(6, -1, -1):
+        day = datetime.utcnow() - timedelta(days=i)
+        count = Note.query.filter(
+            func.date(Note.created_at) == day.date()
+        ).count()
+        uploads_data.append(count)
+
+    # ===== RECENT NOTES =====
+    recent_notes = notes[:5]
+
+    # ===== ACTIVITY FEED =====
+    activity = [
+        {
+            "user": "Admin",
+            "action": "uploaded",
+            "file": n.pdf_url.split("/")[-1],
+            "time": n.created_at.strftime("%H:%M")
+        }
+        for n in recent_notes
+    ]
+
+    # ===== DB STATUS =====
     db_status = "offline"
     db_ping = None
     try:
@@ -164,10 +185,10 @@ def admin():
         db.session.commit()
         db_ping = round((time.time() - start) * 1000)
         db_status = "online"
-    except Exception as e:
-        print("DB ERROR:", e)
+    except:
+        pass
 
-    # 🔥 STORAGE STATUS
+    # ===== STORAGE STATUS =====
     storage_status = "offline"
     try:
         SUPABASE_URL = os.environ.get("SUPABASE_URL")
@@ -177,7 +198,7 @@ def admin():
     except:
         pass
 
-    # 🔥 API PING
+    # ===== API PING =====
     api_ping = None
     try:
         start = time.time()
@@ -186,34 +207,46 @@ def admin():
     except:
         pass
 
-    # 🔥 UPTIME
-    uptime_seconds = int(time.time() - APP_START_TIME)
-    uptime = f"{uptime_seconds // 3600}h {(uptime_seconds % 3600)//60}m"
-
-    # 🔥 HOST
-    host = request.host
-
-    # 🔥 RECENT NOTES
-    recent_notes = notes[:5]
+    # ===== UPTIME =====
+    uptime_sec = int(time.time() - APP_START_TIME)
+    uptime = f"{uptime_sec//3600}h {(uptime_sec%3600)//60}m"
 
     return render_template(
         "admin.html",
         notes=notes,
-        users=users,  # ✅ THIS FIXES EMPTY USERS PANEL
-        classes_with_notes=classes_with_notes,
+        users=users,
         total_users=total_users,
+        classes_with_notes=classes_with_notes,
         recent_uploads=recent_uploads,
+        recent_notes=recent_notes,
+        uploads_data=uploads_data,   # ✅ for chart
+        activity=activity,           # ✅ live feed
         db_status=db_status,
         db_ping=db_ping,
         storage_status=storage_status,
         api_ping=api_ping,
-        uptime=uptime,
-        host=host,
-        recent_notes=recent_notes
+        uptime=uptime
     )
 
 
-# ================= DELETE NOTE =================
+# ================= REAL-TIME API =================
+
+@app.route("/admin-stats")
+@login_required
+def admin_stats():
+    notes_count = Note.query.count()
+    users_count = User.query.count()
+
+    last_note = Note.query.order_by(Note.created_at.desc()).first()
+
+    return jsonify({
+        "notes": notes_count,
+        "users": users_count,
+        "last_upload": last_note.created_at.strftime("%H:%M") if last_note else "--"
+    })
+
+
+# ================= DELETE =================
 
 @app.route("/delete-note/<int:id>", methods=["POST"])
 @login_required
@@ -222,11 +255,9 @@ def delete_note(id):
         return "Access Denied"
 
     note = Note.query.get(id)
-
     if note:
         db.session.delete(note)
         db.session.commit()
-        flash("Note deleted")
 
     return redirect(url_for("admin"))
 
