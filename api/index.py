@@ -234,16 +234,25 @@ def admin():
 @app.route("/admin-stats")
 @login_required
 def admin_stats():
-    notes_count = Note.query.count()
-    users_count = User.query.count()
+    notes = Note.query.all()
 
-    last_note = Note.query.order_by(Note.created_at.desc()).first()
+    today = datetime.utcnow().date()
+    uploads_data = []
+    uploads_labels = []
 
-    return jsonify({
-        "notes": notes_count,
-        "users": users_count,
-        "last_upload": last_note.created_at.strftime("%H:%M") if last_note else "--"
-    })
+    for i in range(6, -1, -1):
+        day = today - timedelta(days=i)
+        count = 0
+        uploads_data.append(count)
+        uploads_labels.append(day.strftime("%d %b"))
+
+    activity = [{"user":"Admin","class":n.class_number} for n in notes[:5]]
+
+    return {
+        "uploads_data": uploads_data,
+        "uploads_labels": uploads_labels,
+        "activity": activity
+    }
 
 
 # ================= DELETE =================
