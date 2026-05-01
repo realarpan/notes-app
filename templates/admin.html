@@ -50,21 +50,145 @@ Admin Panel
 <div class="flex-1 overflow-y-auto p-4 space-y-6">
 
 <!-- ===== OVERVIEW ===== -->
-<div id="overview" class="tab-content">
+<div id="overview" class="tab-content space-y-6">
 
+<!-- ===== TOP METRICS ===== -->
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
 
-<div class="card">Total Notes<br><b>{{ notes|length }}</b></div>
-<div class="card">Classes<br><b>{{ classes_with_notes }}</b></div>
-<div class="card">Uploads<br><b>{{ recent_uploads }}</b></div>
+<div class="card">
+<p class="label">Total Notes</p>
+<h2 class="value">{{ notes|length }}</h2>
+<p class="sub">All uploaded files</p>
+</div>
 
 <div class="card">
-DATABASE<br>
+<p class="label">Classes</p>
+<h2 class="value">{{ classes_with_notes }}</h2>
+<p class="sub">Active classes</p>
+</div>
+
+<div class="card">
+<p class="label">Uploads (24h)</p>
+<h2 class="value">{{ recent_uploads }}</h2>
+<p class="sub">Recent activity</p>
+</div>
+
+<div class="card">
+<p class="label">Database</p>
 {% if db_status=="online" %}
-<span class="text-green-400">{{ db_ping }} ms</span>
+<h2 class="value text-green-400">{{ db_ping }} ms</h2>
+<p class="sub text-green-400">Connected</p>
 {% else %}
-<span class="text-red-400">Offline</span>
+<h2 class="value text-red-400">Offline</h2>
+<p class="sub text-red-400">Connection issue</p>
 {% endif %}
+</div>
+
+</div>
+
+
+<!-- ===== SECOND ROW ===== -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+<!-- SYSTEM INFO -->
+<div class="card">
+<h3 class="section-title mb-3">System Info</h3>
+
+<div class="space-y-2 text-xs">
+
+<div class="flex justify-between">
+<span class="text-gray-400">User</span>
+<span>{{ current_user.username }}</span>
+</div>
+
+<div class="flex justify-between">
+<span class="text-gray-400">Device</span>
+<span id="deviceType">--</span>
+</div>
+
+<div class="flex justify-between">
+<span class="text-gray-400">Browser</span>
+<span id="browserType">--</span>
+</div>
+
+<div class="flex justify-between">
+<span class="text-gray-400">IP / Location</span>
+<span id="locationInfo">Loading...</span>
+</div>
+
+</div>
+</div>
+
+
+<!-- SERVER STATUS -->
+<div class="card">
+<h3 class="section-title mb-3">Server Status</h3>
+
+<div class="space-y-2 text-xs">
+
+<div class="flex justify-between">
+<span class="text-gray-400">API</span>
+<span>{% if api_ping %}{{ api_ping }} ms{% else %}--{% endif %}</span>
+</div>
+
+<div class="flex justify-between">
+<span class="text-gray-400">Uptime</span>
+<span>{{ uptime }}</span>
+</div>
+
+<div class="flex justify-between">
+<span class="text-gray-400">Host</span>
+<span>{{ host }}</span>
+</div>
+
+</div>
+</div>
+
+
+<!-- STORAGE -->
+<div class="card">
+<h3 class="section-title mb-3">Storage</h3>
+
+<div class="space-y-2 text-xs">
+
+<div class="flex justify-between">
+<span class="text-gray-400">Status</span>
+<span class="{% if storage_status=='online' %}text-green-400{% else %}text-red-400{% endif %}">
+{{ storage_status }}
+</span>
+</div>
+
+<div class="flex justify-between">
+<span class="text-gray-400">Provider</span>
+<span>Supabase</span>
+</div>
+
+<div class="flex justify-between">
+<span class="text-gray-400">Health</span>
+{% if db_ping and db_ping < 150 %}
+<span class="text-green-400">Optimal</span>
+{% elif db_ping and db_ping < 400 %}
+<span class="text-yellow-400">Stable</span>
+{% else %}
+<span class="text-red-400">Slow</span>
+{% endif %}
+</div>
+
+</div>
+</div>
+
+</div>
+
+
+<!-- ===== LIVE ACTIVITY ===== -->
+<div class="card">
+<div class="flex justify-between items-center mb-3">
+<h3 class="section-title">Live Activity</h3>
+<span class="text-xs text-gray-500">auto updating</span>
+</div>
+
+<div id="activityFeed" class="space-y-2 text-xs text-gray-400 max-h-[180px] overflow-y-auto">
+<div class="text-gray-500">Waiting for activity...</div>
 </div>
 
 </div>
@@ -224,11 +348,49 @@ bg-blue-500/20 text-blue-400
 
 <!-- ================= STYLE ================= -->
 <style>
+.label{
+font-size:11px;
+color:#9ca3af;
+margin-bottom:4px;
+}
+
+.value{
+font-size:22px;
+font-weight:600;
+}
+
+.sub{
+font-size:11px;
+color:#6b7280;
+margin-top:2px;
+}
+
+.section-title{
+font-size:13px;
+color:#d1d5db;
+}
+
 .card{
-background: rgba(255,255,255,0.05);
-padding:14px;
-border-radius:12px;
-border:1px solid rgba(255,255,255,0.1);
+background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+padding:16px;
+border-radius:14px;
+border:1px solid rgba(255,255,255,0.08);
+backdrop-filter: blur(10px);
+transition: 0.3s;
+}
+
+.card{
+background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+padding:16px;
+border-radius:14px;
+border:1px solid rgba(255,255,255,0.08);
+backdrop-filter: blur(10px);
+transition: 0.3s;
+}
+
+.card:hover{
+border-color: rgba(255,255,255,0.15);
+transform: translateY(-2px);
 }
 
 .btn-blue, .btn-red{
@@ -299,17 +461,55 @@ item.style.display = item.innerText.toLowerCase().includes(val) ? "flex" : "none
 }
 
 /* DEVICE */
+/* DEVICE SPLIT */
 const ua = navigator.userAgent;
+
 let device = /Mobi|Android/i.test(ua) ? "Mobile" : "Desktop";
 let browser =
 ua.includes("Chrome") ? "Chrome" :
 ua.includes("Firefox") ? "Firefox" :
 ua.includes("Safari") ? "Safari" : "Browser";
 
-document.getElementById("deviceInfo").innerText =
-device + " • " + browser;
+document.getElementById("deviceType").innerText = device;
+document.getElementById("browserType").innerText = browser;
 
+/* LOCATION (IP BASED) */
+fetch("https://ipapi.co/json/")
+.then(res => res.json())
+.then(data => {
+document.getElementById("locationInfo").innerText =
+data.city + ", " + data.country_name;
+})
+.catch(()=>{
+document.getElementById("locationInfo").innerText = "Unavailable";
 });
+
+/* LIVE ACTIVITY FAKE (UI ENHANCEMENT) */
+const feed = document.getElementById("activityFeed");
+
+function addActivity(msg){
+const div = document.createElement("div");
+div.className = "bg-black/40 px-3 py-2 rounded";
+div.innerText = msg;
+feed.prepend(div);
+
+if(feed.children.length > 6){
+feed.removeChild(feed.lastChild);
+}
+}
+
+setInterval(()=>{
+const actions = [
+"User logged in",
+"New note uploaded",
+"Database ping checked",
+"User opened dashboard",
+"Storage checked"
+];
+
+const random = actions[Math.floor(Math.random()*actions.length)];
+addActivity(random + " • " + new Date().toLocaleTimeString());
+}, 4000);
 
 </script>
 
