@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 import time
 import os
 import requests
+import socket  # ✅ NEW
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(BASE_DIR, "../templates")
@@ -41,7 +42,7 @@ class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     class_number = db.Column(db.Integer)
     pdf_url = db.Column(db.String(500))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # ✅ NEW
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 # ================= LOGIN =================
@@ -153,19 +154,15 @@ def admin():
     last_24h = datetime.utcnow() - timedelta(hours=24)
     recent_uploads = Note.query.filter(Note.created_at >= last_24h).count()
 
-    # ===== CHART DATA (LAST 7 DAYS) =====
+    # ===== CHART DATA =====
     uploads_data = []
     for i in range(6, -1, -1):
         day = datetime.utcnow() - timedelta(days=i)
-        count = Note.query.filter(
-            func.date(Note.created_at) == day.date()
-        ).count()
+        count = Note.query.filter(func.date(Note.created_at) == day.date()).count()
         uploads_data.append(count)
 
-    # ===== RECENT NOTES =====
     recent_notes = notes[:5]
 
-    # ===== ACTIVITY FEED =====
     activity = [
         {
             "user": "Admin",
@@ -181,19 +178,30 @@ def admin():
     db_ping = None
     try:
         start = time.time()
-        db.session.execute(text("SELECT 1"))
-        db.session.commit()
+        db.session.execute(text("SELECT 1"))  # ✅ FIXED
         db_ping = round((time.time() - start) * 1000)
         db_status = "online"
     except:
         pass
 
-    # ===== STORAGE STATUS =====
+    # ===== STORAGE STATUS (FIXED) =====
     storage_status = "offline"
     try:
         SUPABASE_URL = os.environ.get("SUPABASE_URL")
-        r = requests.get(f"{SUPABASE_URL}/storage/v1/bucket", timeout=3)
-        if r.status_code in [200, 401]:
+        SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+
+        headers = {
+            "apikey": SUPABASE_KEY,
+            "Authorization": f"Bearer {SUPABASE_KEY}"
+        }
+
+        r = requests.get(
+            f"{SUPABASE_URL}/storage/v1/object/list/notes",
+            headers=headers,
+            timeout=3
+        )
+
+        if r.status_code == 200:
             storage_status = "online"
     except:
         pass
@@ -207,9 +215,10 @@ def admin():
     except:
         pass
 
-    # ===== UPTIME =====
+    # ===== UPTIME + HOST =====
     uptime_sec = int(time.time() - APP_START_TIME)
     uptime = f"{uptime_sec//3600}h {(uptime_sec%3600)//60}m"
+    host = socket.gethostname()  # ✅ FIXED
 
     return render_template(
         "admin.html",
@@ -219,13 +228,14 @@ def admin():
         classes_with_notes=classes_with_notes,
         recent_uploads=recent_uploads,
         recent_notes=recent_notes,
-        uploads_data=uploads_data,   # ✅ for chart
-        activity=activity,           # ✅ live feed
+        uploads_data=uploads_data,
+        activity=activity,
         db_status=db_status,
         db_ping=db_ping,
         storage_status=storage_status,
         api_ping=api_ping,
-        uptime=uptime
+        uptime=uptime,
+        host=host  # ✅ FIXED
     )
 
 
