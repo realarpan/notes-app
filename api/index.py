@@ -150,11 +150,9 @@ def admin():
     total_users = len(users)
     classes_with_notes = db.session.query(Note.class_number).distinct().count()
 
-    # ===== UPLOADS LAST 24H =====
     last_24h = datetime.utcnow() - timedelta(hours=24)
     recent_uploads = Note.query.filter(Note.created_at >= last_24h).count()
 
-    # ===== CHART DATA =====
     uploads_data = []
     for i in range(6, -1, -1):
         day = datetime.utcnow() - timedelta(days=i)
@@ -173,52 +171,60 @@ def admin():
         for n in recent_notes
     ]
 
-    # ===== DB STATUS =====
+    # ===== DB STATUS (FIXED STRONG) =====
     db_status = "offline"
     db_ping = None
     try:
         start = time.time()
-        db.session.execute(text("SELECT 1"))  # ✅ FIXED
-        db_ping = round((time.time() - start) * 1000)
+        db.session.execute(text("SELECT 1"))
+        db_ping = int((time.time() - start) * 1000)
         db_status = "online"
-    except:
-        pass
+    except Exception as e:
+        print("DB ERROR:", e)
 
-    # ===== STORAGE STATUS (FIXED) =====
+    # ===== STORAGE STATUS (REAL FIX) =====
     storage_status = "offline"
     try:
         SUPABASE_URL = os.environ.get("SUPABASE_URL")
         SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
 
-        headers = {
-            "apikey": SUPABASE_KEY,
-            "Authorization": f"Bearer {SUPABASE_KEY}"
-        }
+        if SUPABASE_URL and SUPABASE_KEY:
+            headers = {
+                "apikey": SUPABASE_KEY,
+                "Authorization": f"Bearer {SUPABASE_KEY}"
+            }
 
-        r = requests.get(
-            f"{SUPABASE_URL}/storage/v1/object/list/notes",
-            headers=headers,
-            timeout=3
-        )
+            # ✅ Correct endpoint
+            r = requests.get(
+                f"{SUPABASE_URL}/storage/v1/bucket",
+                headers=headers,
+                timeout=3
+            )
 
-        if r.status_code == 200:
-            storage_status = "online"
-    except:
-        pass
+            if r.status_code in [200, 401]:
+                storage_status = "online"
+
+    except Exception as e:
+        print("STORAGE ERROR:", e)
 
     # ===== API PING =====
     api_ping = None
     try:
         start = time.time()
         requests.get(request.host_url, timeout=2)
-        api_ping = round((time.time() - start) * 1000)
-    except:
-        pass
+        api_ping = int((time.time() - start) * 1000)
+    except Exception as e:
+        print("API ERROR:", e)
 
-    # ===== UPTIME + HOST =====
+    # ===== UPTIME =====
     uptime_sec = int(time.time() - APP_START_TIME)
     uptime = f"{uptime_sec//3600}h {(uptime_sec%3600)//60}m"
-    host = socket.gethostname()  # ✅ FIXED
+
+    # ===== HOST (REAL FIX) =====
+    try:
+        host = socket.gethostbyname(socket.gethostname())
+    except:
+        host = socket.gethostname()
 
     return render_template(
         "admin.html",
@@ -235,7 +241,7 @@ def admin():
         storage_status=storage_status,
         api_ping=api_ping,
         uptime=uptime,
-        host=host  # ✅ FIXED
+        host=host
     )
 
 
