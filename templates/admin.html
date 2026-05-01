@@ -406,7 +406,6 @@ font-size:12px;
 
 <!-- ================= SCRIPT ================= -->
 <script>
-
 document.addEventListener("DOMContentLoaded", () => {
 
 function showTab(id, el){
@@ -428,7 +427,7 @@ window.toggleSidebar = function(){
 document.getElementById("sidebar").classList.toggle("-translate-x-full");
 };
 
-/* UPLOAD LOGIC */
+/* UPLOAD */
 const dz = document.getElementById("dropZone");
 const fi = document.getElementById("fileInput");
 const fn = document.getElementById("fileName");
@@ -439,8 +438,10 @@ if(dz){
 dz.onclick = ()=>fi.click();
 
 fi.onchange = ()=>{
+if(fi.files[0]){
 fn.innerText = fi.files[0].name;
 preview.classList.remove("hidden");
+}
 };
 
 remove.onclick = ()=>{
@@ -461,7 +462,6 @@ item.style.display = item.innerText.toLowerCase().includes(val) ? "flex" : "none
 }
 
 /* DEVICE */
-/* DEVICE SPLIT */
 const ua = navigator.userAgent;
 
 let device = /Mobi|Android/i.test(ua) ? "Mobile" : "Desktop";
@@ -470,24 +470,32 @@ ua.includes("Chrome") ? "Chrome" :
 ua.includes("Firefox") ? "Firefox" :
 ua.includes("Safari") ? "Safari" : "Browser";
 
-document.getElementById("deviceType").innerText = device;
-document.getElementById("browserType").innerText = browser;
+const dEl = document.getElementById("deviceType");
+const bEl = document.getElementById("browserType");
 
-/* LOCATION (IP BASED) */
+if(dEl) dEl.innerText = device;
+if(bEl) bEl.innerText = browser;
+
+/* LOCATION */
+const locEl = document.getElementById("locationInfo");
+
+if(locEl){
 fetch("https://ipapi.co/json/")
 .then(res => res.json())
 .then(data => {
-document.getElementById("locationInfo").innerText =
-data.city + ", " + data.country_name;
+locEl.innerText = data.city + ", " + data.country_name;
 })
 .catch(()=>{
-document.getElementById("locationInfo").innerText = "Unavailable";
+locEl.innerText = "Unavailable";
 });
+}
 
-/* LIVE ACTIVITY FAKE (UI ENHANCEMENT) */
+/* ACTIVITY */
 const feed = document.getElementById("activityFeed");
 
 function addActivity(msg){
+if(!feed) return;
+
 const div = document.createElement("div");
 div.className = "bg-black/40 px-3 py-2 rounded";
 div.innerText = msg;
@@ -511,6 +519,7 @@ const random = actions[Math.floor(Math.random()*actions.length)];
 addActivity(random + " • " + new Date().toLocaleTimeString());
 }, 4000);
 
+});
 </script>
 
 {% endblock %}
