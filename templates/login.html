@@ -1,47 +1,47 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div id="appRoot" class="min-h-screen flex bg-[#0c0d10] text-white">
+<div id="appRoot" class="min-h-screen flex flex-col md:flex-row overflow-x-hidden bg-[#0c0d10] text-white">
 
 <!-- BACKGROUND -->
-<div class="fixed inset-0 -z-10">
+<div class="fixed inset-0 -z-10 overflow-hidden">
     <div class="bg-gradient"></div>
     <div class="grid-overlay"></div>
 </div>
 
-<!-- LEFT -->
-<div class="hidden md:flex w-[55%] items-center px-20">
+<!-- LEFT PANEL -->
+<div class="hidden md:flex w-1/2 items-center px-10 lg:px-20">
     <div>
-        <h1 class="text-6xl font-semibold mb-6 tracking-tight">
+        <h1 class="text-4xl lg:text-6xl font-semibold mb-6 tracking-tight">
             Welcome back.
         </h1>
-
-        <p class="text-gray-400 text-base max-w-md leading-relaxed">
+        <p class="text-gray-400 text-sm lg:text-base max-w-md leading-relaxed">
             Fast, minimal and secure platform to manage your academic workflow with clarity.
         </p>
     </div>
 </div>
 
-<!-- RIGHT -->
-<div class="flex-1 flex items-center justify-center px-6">
+<!-- RIGHT PANEL -->
+<div class="flex-1 flex items-center justify-center px-4 sm:px-6">
 
 <div id="loginCard"
-class="w-full max-w-md p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl">
+class="w-full max-w-md p-6 sm:p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl">
 
 <!-- HEADER -->
-<div class="flex justify-between items-center mb-8">
+<div class="flex justify-between items-center mb-6">
     <div>
-        <h2 class="text-2xl font-semibold">Sign in</h2>
-        <p class="text-sm text-gray-400">Access your dashboard</p>
+        <h2 class="text-xl sm:text-2xl font-semibold">Sign in</h2>
+        <p class="text-xs sm:text-sm text-gray-400">Access your dashboard</p>
     </div>
 
     <button onclick="toggleTheme()"
-    class="text-xs px-3 py-1.5 rounded-md border border-white/10 hover:bg-white/10">
+    class="text-xs px-2.5 py-1.5 rounded-md border border-white/10 hover:bg-white/10">
     Theme
     </button>
 </div>
 
-<form method="POST" id="loginForm" class="space-y-5">
+<!-- FORM -->
+<form method="POST" id="loginForm" class="space-y-4">
 
     <div class="input-group">
         <input name="username" required placeholder=" " class="input">
@@ -54,7 +54,7 @@ class="w-full max-w-md p-8 rounded-2xl bg-white/5 border border-white/10 backdro
         <label>Password</label>
 
         <button type="button" onclick="togglePassword()"
-        class="absolute right-3 top-3 text-gray-400 hover:text-white">
+        class="absolute right-3 top-3 text-gray-400 hover:text-white text-xs">
         View
         </button>
     </div>
@@ -74,14 +74,13 @@ class="w-full max-w-md p-8 rounded-2xl bg-white/5 border border-white/10 backdro
 
 </form>
 
-<!-- 🔥 INLINE STATUS BAR -->
-<!-- STATUS BAR (UNDER LOGIN BUTTON) -->
-<div class="mt-6">
+<!-- STATUS BAR -->
+<div class="mt-5">
 
-    <div class="status-bar-clean">
+    <div class="status-bar-clean flex-col sm:flex-row">
 
         <!-- Combined pill -->
-        <div class="pill-combined">
+        <div class="pill-combined flex-wrap justify-center sm:justify-start">
             <span id="deviceType"></span>
             <span class="dot-sep"></span>
             <span id="browserType"></span>
@@ -90,7 +89,7 @@ class="w-full max-w-md p-8 rounded-2xl bg-white/5 border border-white/10 backdro
         </div>
 
         <!-- Ping -->
-        <div class="flex items-center gap-2 text-xs text-gray-400">
+        <div class="flex items-center justify-center sm:justify-end gap-2 text-xs text-gray-400 mt-2 sm:mt-0">
             <span class="live-dot"></span>
             <span id="pingText">-- ms</span>
         </div>
@@ -101,18 +100,22 @@ class="w-full max-w-md p-8 rounded-2xl bg-white/5 border border-white/10 backdro
 
 </div>
 </div>
+
 </div>
 
 <!-- STYLE -->
 <style>
 
-/* Background */
-/* ================= BACKGROUND ================= */
+/* Prevent scroll */
+html, body{
+overflow-x:hidden;
+}
 
+/* BACKGROUND */
 .bg-gradient{
 position:absolute;
-width:200%;
-height:200%;
+width:150%;
+height:150%;
 background:
 radial-gradient(circle at 20% 30%, rgba(99,102,241,0.15), transparent 40%),
 radial-gradient(circle at 80% 70%, rgba(168,85,247,0.12), transparent 40%);
@@ -134,22 +137,17 @@ background-size: 40px 40px;
 100%{ transform: translate(0,0); }
 }
 
-
-/* ================= INPUTS ================= */
-
-.input-group{
-position:relative;
-}
+/* INPUTS */
+.input-group{ position:relative; }
 
 .input{
 width:100%;
-padding:14px;
+padding:12px;
 background:#111216;
 border:1px solid rgba(255,255,255,0.08);
-border-radius:12px;
+border-radius:10px;
 color:white;
 outline:none;
-transition:0.25s;
 }
 
 .input:focus{
@@ -158,60 +156,51 @@ box-shadow:0 0 0 2px rgba(99,102,241,0.2);
 background:#16181d;
 }
 
-/* Floating labels */
 .input-group label{
 position:absolute;
-left:14px;
-top:14px;
+left:12px;
+top:12px;
 color:#6b7280;
-font-size:13px;
+font-size:12px;
 transition:0.2s;
-pointer-events:none;
 }
 
 .input:focus + label,
 .input:not(:placeholder-shown) + label{
-top:-8px;
+top:-7px;
 font-size:10px;
 color:#a5b4fc;
 }
 
-
-/* ================= BUTTON ================= */
-
+/* BUTTON */
 .btn-primary{
 width:100%;
-padding:14px;
-border-radius:12px;
+padding:12px;
+border-radius:10px;
 background:linear-gradient(135deg,#6366f1,#8b5cf6);
 font-weight:500;
 display:flex;
 justify-content:center;
 align-items:center;
 gap:8px;
-transition:0.3s;
 }
 
 .btn-primary:hover{
-transform:translateY(-1px);
-box-shadow:0 10px 30px rgba(99,102,241,0.3);
+box-shadow:0 10px 25px rgba(99,102,241,0.3);
 }
 
-
-/* ================= STATUS BAR (PREMIUM INLINE) ================= */
-
+/* STATUS BAR */
 .status-bar-clean{
 display:flex;
 justify-content:space-between;
 align-items:center;
-gap:12px;
+gap:10px;
 
-padding:10px 14px;
+padding:10px;
 border-radius:12px;
 
 background:rgba(255,255,255,0.04);
 border:1px solid rgba(255,255,255,0.08);
-
 backdrop-filter: blur(12px);
 }
 
@@ -219,54 +208,42 @@ backdrop-filter: blur(12px);
 .pill-combined{
 display:flex;
 align-items:center;
-gap:10px;
+gap:8px;
+flex-wrap:wrap;
 
-padding:6px 14px;
+padding:6px 12px;
 border-radius:999px;
 
 background:rgba(99,102,241,0.12);
 border:1px solid rgba(99,102,241,0.25);
 
-font-size:12px;
-color:#e5e7eb;
-font-weight:500;
-transition:0.3s;
+font-size:11px;
 }
 
-/* subtle premium hover */
-.pill-combined:hover{
-box-shadow:0 0 20px rgba(99,102,241,0.25);
-}
-
-/* Dot separator */
+/* Dot */
 .dot-sep{
 width:4px;
 height:4px;
 border-radius:50%;
 background:#6b7280;
-opacity:0.6;
 }
 
-
-/* ================= LIVE PING DOT ================= */
-
+/* Live dot */
 .live-dot{
-width:8px;
-height:8px;
+width:7px;
+height:7px;
 border-radius:50%;
 background:#22c55e;
 animation:pulse 1.5s infinite;
 }
 
 @keyframes pulse{
-0%{opacity:1; transform:scale(1);}
-50%{opacity:0.5; transform:scale(1.6);}
-100%{opacity:1; transform:scale(1);}
+0%{opacity:1;}
+50%{opacity:0.4;}
+100%{opacity:1;}
 }
 
-
-/* ================= LIGHT MODE ================= */
-
+/* LIGHT MODE */
 .light{
 background:#f9fafb !important;
 color:#111 !important;
@@ -275,7 +252,6 @@ color:#111 !important;
 .light #loginCard{
 background:white !important;
 color:black !important;
-border:1px solid #e5e7eb;
 }
 
 </style>
@@ -285,13 +261,12 @@ border:1px solid #e5e7eb;
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    // THEME
     window.toggleTheme = function(){
         document.getElementById("appRoot").classList.toggle("light");
     };
 
-    // DEVICE + BROWSER
     const ua = navigator.userAgent;
+
     document.getElementById("deviceType").innerText =
         /Mobi|Android/i.test(ua) ? "Mobile" : "Desktop";
 
@@ -300,7 +275,6 @@ document.addEventListener("DOMContentLoaded", () => {
         ua.includes("Firefox") ? "Firefox" :
         ua.includes("Safari") ? "Safari" : "Browser";
 
-    // LOCATION
     fetch("https://ipapi.co/json/")
     .then(res => res.json())
     .then(data => {
@@ -311,7 +285,6 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("locationText").innerText = "Unknown";
     });
 
-    // PING
     async function ping(){
         const start = performance.now();
         try{
@@ -326,19 +299,16 @@ document.addEventListener("DOMContentLoaded", () => {
     ping();
     setInterval(ping, 5000);
 
-    // PASSWORD
     window.togglePassword = function(){
         const p = document.getElementById("password");
         p.type = p.type === "password" ? "text" : "password";
     };
 
-    // CAPS
     window.checkCaps = function(e){
         document.getElementById("capsWarning")
         .classList.toggle("hidden", !e.getModifierState("CapsLock"));
     };
 
-    // LOADING
     document.getElementById("loginForm").addEventListener("submit", ()=>{
         document.getElementById("btnText").innerText = "Signing in...";
         document.getElementById("spinner").classList.remove("hidden");
