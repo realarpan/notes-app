@@ -1,64 +1,86 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="min-h-screen flex bg-black text-white">
+<div class="min-h-screen flex bg-[#0b0b0f] text-white">
 
-<!-- LEFT SIDE (BRANDING) -->
-<div class="hidden md:flex w-1/2 relative items-center justify-center bg-gradient-to-br from-blue-700 to-purple-700">
+<!-- LEFT SIDE -->
+<div class="hidden md:flex w-[55%] relative overflow-hidden">
 
-    <div class="absolute inset-0 bg-black/30"></div>
+    <!-- Gradient Mesh -->
+    <div class="absolute inset-0">
+        <div class="absolute w-[600px] h-[600px] bg-blue-600/30 blur-[140px] top-[-150px] left-[-100px]"></div>
+        <div class="absolute w-[500px] h-[500px] bg-purple-600/30 blur-[140px] bottom-[-150px] right-[-100px]"></div>
+    </div>
 
-    <div class="relative z-10 max-w-md px-10 text-white">
+    <!-- Content -->
+    <div class="relative z-10 p-16 flex flex-col justify-between">
 
-        <h1 class="text-4xl font-bold mb-4 leading-tight">
-            Manage your notes<br>like a pro.
-        </h1>
+        <div>
+            <h1 class="text-5xl font-semibold leading-tight tracking-tight mb-6">
+                Your workspace,<br>reimagined.
+            </h1>
 
-        <p class="text-white/80 text-sm mb-8">
-            Secure cloud storage, instant access, and seamless experience across devices.
-        </p>
+            <p class="text-gray-300 text-sm max-w-md">
+                A fast, secure and minimal platform to manage academic content with precision and control.
+            </p>
+        </div>
 
-        <div class="space-y-3 text-sm text-white/80">
-            <p>✔ Secure authentication</p>
-            <p>✔ Fast uploads</p>
-            <p>✔ Real-time dashboard</p>
+        <div class="space-y-3 text-sm text-gray-400">
+            <p>• Secure authentication & session control</p>
+            <p>• High-speed file delivery</p>
+            <p>• Clean admin experience</p>
         </div>
 
     </div>
+
 </div>
 
 
-<!-- RIGHT SIDE (LOGIN) -->
-<div class="flex w-full md:w-1/2 items-center justify-center px-6">
+<!-- RIGHT SIDE -->
+<div class="flex-1 flex items-center justify-center px-6">
 
-<div id="loginCard" class="w-full max-w-sm">
+<div id="loginCard"
+class="w-full max-w-md p-8 rounded-2xl bg-white/[0.03] border border-white/10 shadow-[0_0_60px_rgba(0,0,0,0.6)] transition">
 
-    <h2 class="text-2xl font-semibold mb-2">
-        Sign in to your account
-    </h2>
+    <!-- Logo / Title -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-semibold tracking-tight">Sign in</h2>
+        <p class="text-sm text-gray-400 mt-1">Continue to your dashboard</p>
+    </div>
 
-    <p class="text-sm text-gray-400 mb-6">
-        Enter your credentials to continue
-    </p>
-
-    <form method="POST" id="loginForm" class="space-y-4">
+    <form method="POST" id="loginForm" class="space-y-5">
 
         <!-- Username -->
-        <div>
-            <label class="text-xs text-gray-400">Username</label>
+        <div class="relative">
             <input name="username" required
-            class="w-full mt-1 p-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 transition">
+            class="peer w-full p-3 bg-[#121218] border border-white/10 rounded-lg outline-none focus:border-white/30 transition placeholder-transparent"
+            placeholder="Username">
+
+            <label class="absolute left-3 top-3 text-gray-500 text-sm transition-all
+            peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-500
+            peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-300
+            peer-valid:-top-2 peer-valid:text-xs">
+            Username
+            </label>
         </div>
 
         <!-- Password -->
         <div class="relative">
-            <label class="text-xs text-gray-400">Password</label>
             <input type="password" name="password" id="password" required
-            class="w-full mt-1 p-3 pr-10 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 transition"
+            class="peer w-full p-3 pr-10 bg-[#121218] border border-white/10 rounded-lg outline-none focus:border-white/30 transition placeholder-transparent"
+            placeholder="Password"
             onkeyup="checkCaps(event)">
 
+            <label class="absolute left-3 top-3 text-gray-500 text-sm transition-all
+            peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-500
+            peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-300
+            peer-valid:-top-2 peer-valid:text-xs">
+            Password
+            </label>
+
+            <!-- Eye -->
             <button type="button" onclick="togglePassword()"
-            class="absolute right-3 top-9 text-gray-400 hover:text-white">
+            class="absolute right-3 top-3 text-gray-500 hover:text-white transition">
             👁️
             </button>
         </div>
@@ -68,11 +90,11 @@
             Caps Lock is ON
         </p>
 
-        <!-- Login Button -->
+        <!-- Submit -->
         <button id="loginBtn"
-        class="w-full py-3 rounded-lg font-medium bg-white text-black hover:opacity-90 transition flex justify-center items-center gap-2">
+        class="w-full py-3 rounded-lg font-medium bg-white text-black hover:bg-gray-200 transition flex justify-center items-center gap-2">
 
-            <span id="btnText">Sign In</span>
+            <span id="btnText">Sign in</span>
 
             <svg id="spinner" class="hidden w-4 h-4 animate-spin" viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="10" stroke="black" stroke-width="3" fill="none" opacity="0.3"/>
@@ -83,23 +105,38 @@
     </form>
 
     <!-- Divider -->
-    <div class="my-6 flex items-center gap-3">
-        <div class="flex-1 h-px bg-gray-700"></div>
-        <span class="text-xs text-gray-500">secure login</span>
-        <div class="flex-1 h-px bg-gray-700"></div>
-    </div>
+    <div class="my-6 h-px bg-white/10"></div>
 
     <!-- Footer -->
-    <p class="text-xs text-gray-500 text-center">
-        Protected by encrypted backend and role-based access control.
-    </p>
+    <div class="text-xs text-gray-500 flex justify-between items-center">
+        <span>Secure session</span>
+        <span id="timeNow"></span>
+    </div>
 
 </div>
 </div>
 </div>
 
 
-<!-- JS -->
+<!-- 🔥 MICRO INTERACTIONS -->
+<style>
+#loginCard:hover{
+transform: translateY(-2px);
+border-color: rgba(255,255,255,0.2);
+}
+
+@keyframes shake {
+0% { transform: translateX(0); }
+25% { transform: translateX(-6px); }
+50% { transform: translateX(6px); }
+75% { transform: translateX(-6px); }
+100% { transform: translateX(0); }
+}
+.shake { animation: shake 0.3s; }
+</style>
+
+
+<!-- ⚡ JS -->
 <script>
 
 // Toggle password
@@ -110,22 +147,29 @@ p.type = p.type === "password" ? "text" : "password";
 
 // Caps lock
 function checkCaps(e){
-const w = document.getElementById("capsWarning");
-w.classList.toggle("hidden", !e.getModifierState("CapsLock"));
+document.getElementById("capsWarning")
+.classList.toggle("hidden", !e.getModifierState("CapsLock"));
 }
 
-// Loading state
+// Loading
 document.getElementById("loginForm").addEventListener("submit", ()=>{
 document.getElementById("btnText").innerText = "Signing in...";
 document.getElementById("spinner").classList.remove("hidden");
 document.getElementById("loginBtn").disabled = true;
 });
 
-// Error animation
+// Live time (premium feel)
+setInterval(()=>{
+const now = new Date();
+document.getElementById("timeNow").innerText =
+now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+}, 1000);
+
+// Error shake
 window.onload = function(){
 const hasError = {{ 'true' if get_flashed_messages() else 'false' }};
 if(hasError){
-document.getElementById("loginCard").classList.add("animate-pulse");
+document.getElementById("loginCard").classList.add("shake");
 }
 };
 
