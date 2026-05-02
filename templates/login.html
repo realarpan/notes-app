@@ -1,151 +1,188 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="min-h-screen flex bg-[#0b0b0f] text-white">
+<div id="appRoot" class="min-h-screen flex bg-[#0b0b0f] text-white transition">
 
-<!-- LEFT SIDE -->
-<div class="hidden md:flex w-[55%] relative overflow-hidden">
+<!-- 🌊 Animated Gradient Background -->
+<div class="fixed inset-0 -z-10 overflow-hidden">
+    <div class="wave"></div>
+    <div class="wave2"></div>
+</div>
 
-    <!-- Gradient Mesh -->
-    <div class="absolute inset-0">
-        <div class="absolute w-[600px] h-[600px] bg-blue-600/30 blur-[140px] top-[-150px] left-[-100px]"></div>
-        <div class="absolute w-[500px] h-[500px] bg-purple-600/30 blur-[140px] bottom-[-150px] right-[-100px]"></div>
-    </div>
+<!-- LEFT -->
+<div class="hidden md:flex w-[55%] relative items-center px-16">
 
-    <!-- Content -->
-    <div class="relative z-10 p-16 flex flex-col justify-between">
+    <div>
+        <h1 class="text-5xl font-semibold mb-6">
+            Welcome<br>Back
+        </h1>
 
-        <div>
-            <h1 class="text-5xl font-semibold leading-tight tracking-tight mb-6">
-                Your workspace,<br>reimagined.
-            </h1>
+        <p class="text-gray-400 text-sm max-w-md">
+            Secure, fast and minimal platform designed for precision and control.
+        </p>
 
-            <p class="text-gray-300 text-sm max-w-md">
-                A fast, secure and minimal platform to manage academic content with precision and control.
-            </p>
-        </div>
-
-        <div class="space-y-3 text-sm text-gray-400">
-            <p>• Secure authentication & session control</p>
-            <p>• High-speed file delivery</p>
-            <p>• Clean admin experience</p>
+        <!-- Device + IP -->
+        <div class="mt-10 text-xs text-gray-500 space-y-1">
+            <p>Device: <span id="deviceType"></span></p>
+            <p>Browser: <span id="browserType"></span></p>
+            <p>IP: {{ client_ip }}</p>
         </div>
 
     </div>
 
 </div>
 
-
-<!-- RIGHT SIDE -->
+<!-- RIGHT -->
 <div class="flex-1 flex items-center justify-center px-6">
 
 <div id="loginCard"
-class="w-full max-w-md p-8 rounded-2xl bg-white/[0.03] border border-white/10 shadow-[0_0_60px_rgba(0,0,0,0.6)] transition">
+class="w-full max-w-md p-8 rounded-2xl bg-white/[0.04] border border-white/10 backdrop-blur-xl shadow-xl transition">
 
-    <!-- Logo / Title -->
-    <div class="mb-8">
-        <h2 class="text-2xl font-semibold tracking-tight">Sign in</h2>
-        <p class="text-sm text-gray-400 mt-1">Continue to your dashboard</p>
+<!-- Header -->
+<div class="flex justify-between items-center mb-6">
+    <div>
+        <h2 class="text-xl font-semibold">Sign in</h2>
+        <p class="text-xs text-gray-400">Access your dashboard</p>
     </div>
 
-    <form method="POST" id="loginForm" class="space-y-5">
+    <!-- 🌗 Toggle -->
+    <button onclick="toggleTheme()"
+    class="text-xs px-3 py-1 border border-white/10 rounded hover:bg-white/10 transition">
+    Toggle
+    </button>
+</div>
 
-        <!-- Username -->
-        <div class="relative">
-            <input name="username" required
-            class="peer w-full p-3 bg-[#121218] border border-white/10 rounded-lg outline-none focus:border-white/30 transition placeholder-transparent"
-            placeholder="Username">
+<form method="POST" id="loginForm" class="space-y-5">
 
-            <label class="absolute left-3 top-3 text-gray-500 text-sm transition-all
-            peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-500
-            peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-300
-            peer-valid:-top-2 peer-valid:text-xs">
-            Username
-            </label>
-        </div>
+    <!-- Username -->
+    <div class="relative">
+        <input name="username" required
+        class="peer w-full p-3 bg-[#121218] border border-white/10 rounded-lg outline-none focus:border-white/30 transition placeholder-transparent"
+        placeholder="Username">
 
-        <!-- Password -->
-        <div class="relative">
-            <input type="password" name="password" id="password" required
-            class="peer w-full p-3 pr-10 bg-[#121218] border border-white/10 rounded-lg outline-none focus:border-white/30 transition placeholder-transparent"
-            placeholder="Password"
-            onkeyup="checkCaps(event)">
+        <label class="absolute left-3 top-3 text-gray-500 text-sm transition-all
+        peer-placeholder-shown:top-3
+        peer-focus:-top-2 peer-focus:text-xs
+        peer-valid:-top-2 peer-valid:text-xs">
+        Username
+        </label>
+    </div>
 
-            <label class="absolute left-3 top-3 text-gray-500 text-sm transition-all
-            peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-500
-            peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-300
-            peer-valid:-top-2 peer-valid:text-xs">
-            Password
-            </label>
+    <!-- Password -->
+    <div class="relative">
+        <input type="password" name="password" id="password" required
+        class="peer w-full p-3 pr-10 bg-[#121218] border border-white/10 rounded-lg outline-none focus:border-white/30 transition placeholder-transparent"
+        placeholder="Password"
+        onkeyup="checkCaps(event)">
 
-            <!-- Eye -->
-            <button type="button" onclick="togglePassword()"
-            class="absolute right-3 top-3 text-gray-500 hover:text-white transition">
-            👁️
-            </button>
-        </div>
+        <label class="absolute left-3 top-3 text-gray-500 text-sm transition-all
+        peer-placeholder-shown:top-3
+        peer-focus:-top-2 peer-focus:text-xs
+        peer-valid:-top-2 peer-valid:text-xs">
+        Password
+        </label>
 
-        <!-- Caps -->
-        <p id="capsWarning" class="text-xs text-yellow-400 hidden">
-            Caps Lock is ON
-        </p>
-
-        <!-- Submit -->
-        <button id="loginBtn"
-        class="w-full py-3 rounded-lg font-medium bg-white text-black hover:bg-gray-200 transition flex justify-center items-center gap-2">
-
-            <span id="btnText">Sign in</span>
-
-            <svg id="spinner" class="hidden w-4 h-4 animate-spin" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" stroke="black" stroke-width="3" fill="none" opacity="0.3"/>
-                <path d="M22 12a10 10 0 0 1-10 10" stroke="black" stroke-width="3"/>
-            </svg>
+        <button type="button" onclick="togglePassword()"
+        class="absolute right-3 top-3 text-gray-500 hover:text-white">
+        👁️
         </button>
-
-    </form>
-
-    <!-- Divider -->
-    <div class="my-6 h-px bg-white/10"></div>
-
-    <!-- Footer -->
-    <div class="text-xs text-gray-500 flex justify-between items-center">
-        <span>Secure session</span>
-        <span id="timeNow"></span>
     </div>
 
+    <p id="capsWarning" class="text-xs text-yellow-400 hidden">
+        Caps Lock is ON
+    </p>
+
+    <!-- Submit -->
+    <button id="loginBtn"
+    class="w-full py-3 rounded-lg font-medium bg-white text-black hover:bg-gray-200 transition flex justify-center items-center gap-2">
+
+        <span id="btnText">Sign in</span>
+
+        <svg id="spinner" class="hidden w-4 h-4 animate-spin" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" stroke="black" stroke-width="3" fill="none" opacity="0.3"/>
+            <path d="M22 12a10 10 0 0 1-10 10" stroke="black" stroke-width="3"/>
+        </svg>
+    </button>
+
+</form>
+
+<div class="mt-6 text-xs text-gray-500 flex justify-between">
+<span>Secure session</span>
+<span id="timeNow"></span>
+</div>
+
 </div>
 </div>
 </div>
 
-
-<!-- 🔥 MICRO INTERACTIONS -->
+<!-- 🌊 WAVE STYLE -->
 <style>
-#loginCard:hover{
-transform: translateY(-2px);
-border-color: rgba(255,255,255,0.2);
+.wave, .wave2{
+position:absolute;
+width:200%;
+height:200%;
+background: radial-gradient(circle at 30% 30%, rgba(59,130,246,0.2), transparent 40%),
+radial-gradient(circle at 70% 70%, rgba(168,85,247,0.2), transparent 40%);
+animation: move 20s linear infinite;
 }
 
-@keyframes shake {
-0% { transform: translateX(0); }
-25% { transform: translateX(-6px); }
-50% { transform: translateX(6px); }
-75% { transform: translateX(-6px); }
-100% { transform: translateX(0); }
+.wave2{
+animation-duration: 30s;
+opacity:0.6;
 }
-.shake { animation: shake 0.3s; }
+
+@keyframes move{
+0%{ transform: translate(0,0); }
+50%{ transform: translate(-10%, -10%); }
+100%{ transform: translate(0,0); }
+}
+
+.light{
+background:#f9fafb !important;
+color:black !important;
+}
 </style>
-
 
 <!-- ⚡ JS -->
 <script>
 
-// Toggle password
+// Theme toggle
+function toggleTheme(){
+const root = document.getElementById("appRoot");
+root.classList.toggle("light");
+localStorage.setItem("theme", root.classList.contains("light") ? "light" : "dark");
+}
+
+// Load theme
+window.onload = function(){
+if(localStorage.getItem("theme")==="light"){
+document.getElementById("appRoot").classList.add("light");
+}
+
+// Device detect
+const ua = navigator.userAgent;
+document.getElementById("deviceType").innerText =
+/Mobi|Android/i.test(ua) ? "Mobile" : "Desktop";
+
+document.getElementById("browserType").innerText =
+ua.includes("Chrome") ? "Chrome" :
+ua.includes("Firefox") ? "Firefox" :
+ua.includes("Safari") ? "Safari" : "Browser";
+
+// Error shake
+const hasError = {{ 'true' if get_flashed_messages() else 'false' }};
+if(hasError){
+document.getElementById("loginCard").classList.add("shake");
+}
+};
+
+// Password toggle
 function togglePassword(){
 const p = document.getElementById("password");
 p.type = p.type === "password" ? "text" : "password";
 }
 
-// Caps lock
+// Caps
 function checkCaps(e){
 document.getElementById("capsWarning")
 .classList.toggle("hidden", !e.getModifierState("CapsLock"));
@@ -155,23 +192,14 @@ document.getElementById("capsWarning")
 document.getElementById("loginForm").addEventListener("submit", ()=>{
 document.getElementById("btnText").innerText = "Signing in...";
 document.getElementById("spinner").classList.remove("hidden");
-document.getElementById("loginBtn").disabled = true;
 });
 
-// Live time (premium feel)
+// Clock
 setInterval(()=>{
 const now = new Date();
 document.getElementById("timeNow").innerText =
 now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
 }, 1000);
-
-// Error shake
-window.onload = function(){
-const hasError = {{ 'true' if get_flashed_messages() else 'false' }};
-if(hasError){
-document.getElementById("loginCard").classList.add("shake");
-}
-};
 
 </script>
 
