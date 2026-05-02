@@ -3,7 +3,7 @@
 
 <div id="appRoot" class="min-h-screen flex bg-[#0c0d10] text-white">
 
-<!-- 🌌 BACKGROUND -->
+<!-- BACKGROUND -->
 <div class="fixed inset-0 -z-10">
     <div class="bg-gradient"></div>
     <div class="grid-overlay"></div>
@@ -11,22 +11,15 @@
 
 <!-- LEFT -->
 <div class="hidden md:flex w-[55%] items-center px-20">
-
     <div>
         <h1 class="text-6xl font-semibold mb-6 tracking-tight">
             Welcome back.
         </h1>
 
         <p class="text-gray-400 text-base max-w-md leading-relaxed">
-            A fast, minimal and secure platform to manage your academic workflow with clarity and precision.
+            Fast, minimal and secure platform to manage your academic workflow with clarity.
         </p>
-
-        <div class="mt-12 text-sm text-gray-400 space-y-2">
-            <p>💻 Device: <span id="deviceType" class="text-white"></span></p>
-            <p>🌐 Browser: <span id="browserType" class="text-white"></span></p>
-        </div>
     </div>
-
 </div>
 
 <!-- RIGHT -->
@@ -52,21 +45,19 @@ class="w-full max-w-md p-8 rounded-2xl bg-white/5 border border-white/10 backdro
 
     <!-- Username -->
     <div class="input-group">
-        <input name="username" required placeholder=" "
-        class="input">
+        <input name="username" required placeholder=" " class="input">
         <label>Username</label>
     </div>
 
     <!-- Password -->
     <div class="input-group">
         <input type="password" name="password" id="password" required placeholder=" "
-        class="input pr-10"
-        onkeyup="checkCaps(event)">
+        class="input pr-10" onkeyup="checkCaps(event)">
         <label>Password</label>
 
         <button type="button" onclick="togglePassword()"
         class="absolute right-3 top-3 text-gray-400 hover:text-white">
-        👁️
+        View
         </button>
     </div>
 
@@ -86,17 +77,42 @@ class="w-full max-w-md p-8 rounded-2xl bg-white/5 border border-white/10 backdro
 
 </form>
 
-<!-- FOOTER -->
-<div class="mt-6 flex justify-between text-xs text-gray-500">
-<span>Secure login</span>
-<span id="timeNow"></span>
+<!-- STATUS BAR -->
+<div class="mt-6 pt-4 border-t border-white/10 flex justify-between items-center text-xs flex-wrap gap-3">
+
+    <!-- LEFT -->
+    <div class="flex items-center gap-5 text-gray-300 flex-wrap">
+
+        <div>
+            <span class="text-green-400">●</span> Secure
+        </div>
+
+        <div>
+            Device: <span id="deviceType" class="text-white"></span>
+        </div>
+
+        <div>
+            Browser: <span id="browserType" class="text-white"></span>
+        </div>
+
+        <div>
+            Location: <span id="locationText" class="text-white">Loading...</span>
+        </div>
+
+    </div>
+
+    <!-- RIGHT -->
+    <div class="text-gray-200 font-medium tracking-wide">
+        <span id="timeNow"></span>
+    </div>
+
 </div>
 
 </div>
 </div>
 </div>
 
-<!-- 🎨 STYLE -->
+<!-- STYLE -->
 <style>
 
 /* Background */
@@ -147,7 +163,7 @@ box-shadow:0 0 0 2px rgba(99,102,241,0.2);
 background:#16181d;
 }
 
-/* Floating label FIXED */
+/* Floating labels */
 .input-group label{
 position:absolute;
 left:14px;
@@ -184,7 +200,7 @@ transform:translateY(-1px);
 box-shadow:0 10px 30px rgba(99,102,241,0.3);
 }
 
-/* Light Mode */
+/* Light mode */
 .light{
 background:#f9fafb !important;
 color:#111 !important;
@@ -198,7 +214,7 @@ border:1px solid #e5e7eb;
 
 </style>
 
-<!-- ⚡ JS -->
+<!-- JS -->
 <script>
 
 // Theme
@@ -215,8 +231,9 @@ if(localStorage.getItem("theme")==="light"){
 document.getElementById("appRoot").classList.add("light");
 }
 
-// Device detect
+// Device + Browser
 const ua = navigator.userAgent;
+
 document.getElementById("deviceType").innerText =
 /Mobi|Android/i.test(ua) ? "Mobile" : "Desktop";
 
@@ -225,14 +242,25 @@ ua.includes("Chrome") ? "Chrome" :
 ua.includes("Firefox") ? "Firefox" :
 ua.includes("Safari") ? "Safari" : "Browser";
 
-// Error shake
+// Location
+fetch("https://ipapi.co/json/")
+.then(res => res.json())
+.then(data => {
+document.getElementById("locationText").innerText =
+data.city + ", " + data.country_name;
+})
+.catch(()=>{
+document.getElementById("locationText").innerText = "Unknown";
+});
+
+// Error animation
 const hasError = {{ 'true' if get_flashed_messages() else 'false' }};
 if(hasError){
 document.getElementById("loginCard").classList.add("shake");
 }
 };
 
-// Toggle password
+// Password toggle
 function togglePassword(){
 const p = document.getElementById("password");
 p.type = p.type === "password" ? "text" : "password";
