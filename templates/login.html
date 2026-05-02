@@ -77,34 +77,31 @@ class="w-full max-w-md p-8 rounded-2xl bg-white/5 border border-white/10 backdro
 
 </form>
 
-<!-- STATUS BAR -->
-<div class="mt-6 pt-4 border-t border-white/10 flex justify-between items-center text-xs flex-wrap gap-3">
+<!-- PREMIUM FOOTER -->
+<div class="mt-6 border-t border-white/10 pt-4 text-xs text-gray-400">
 
-    <!-- LEFT -->
-    <div class="flex items-center gap-5 text-gray-300 flex-wrap">
+    <!-- Row 1 -->
+    <div class="flex justify-between items-center">
 
-        <div>
-            <span class="text-green-400">●</span> Secure
+        <div class="flex items-center gap-4">
+            <span class="flex items-center gap-1 text-green-400">
+                <span class="w-1.5 h-1.5 bg-green-400 rounded-full"></span>
+                Secure
+            </span>
+
+            <span>Device: <span id="deviceType" class="text-gray-300"></span></span>
+            <span>Browser: <span id="browserType" class="text-gray-300"></span></span>
         </div>
 
-        <div>
-            Device: <span id="deviceType" class="text-white"></span>
-        </div>
-
-        <div>
-            Browser: <span id="browserType" class="text-white"></span>
-        </div>
-
-        <div>
-            Location: <span id="locationText" class="text-white">Loading...</span>
-        </div>
-
+        <div class="text-gray-500" id="timeNow"></div>
     </div>
 
-    <!-- RIGHT -->
-    <div class="text-gray-200 font-medium tracking-wide">
-        <span id="timeNow"></span>
+    <!-- Row 2 -->
+    <div class="mt-2 text-gray-500">
+        Location: <span id="locationText" class="text-gray-400">Detecting...</span>
     </div>
+
+</div>
 
 </div>
 
@@ -232,6 +229,7 @@ document.getElementById("appRoot").classList.add("light");
 }
 
 // Device + Browser
+// Device + Browser detection
 const ua = navigator.userAgent;
 
 document.getElementById("deviceType").innerText =
@@ -242,48 +240,23 @@ ua.includes("Chrome") ? "Chrome" :
 ua.includes("Firefox") ? "Firefox" :
 ua.includes("Safari") ? "Safari" : "Browser";
 
-// Location
+// Location (clean + fallback safe)
 fetch("https://ipapi.co/json/")
 .then(res => res.json())
 .then(data => {
-document.getElementById("locationText").innerText =
-data.city + ", " + data.country_name;
+    document.getElementById("locationText").innerText =
+    `${data.city}, ${data.country_name}`;
 })
-.catch(()=>{
-document.getElementById("locationText").innerText = "Unknown";
+.catch(() => {
+    document.getElementById("locationText").innerText = "Unknown";
 });
 
-// Error animation
-const hasError = {{ 'true' if get_flashed_messages() else 'false' }};
-if(hasError){
-document.getElementById("loginCard").classList.add("shake");
-}
-};
-
-// Password toggle
-function togglePassword(){
-const p = document.getElementById("password");
-p.type = p.type === "password" ? "text" : "password";
-}
-
-// Caps
-function checkCaps(e){
-document.getElementById("capsWarning")
-.classList.toggle("hidden", !e.getModifierState("CapsLock"));
-}
-
-// Loading
-document.getElementById("loginForm").addEventListener("submit", ()=>{
-document.getElementById("btnText").innerText = "Signing in...";
-document.getElementById("spinner").classList.remove("hidden");
-});
-
-// Time
-setInterval(()=>{
-const now = new Date();
-document.getElementById("timeNow").innerText =
-now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-},1000);
+// Time (clean format)
+setInterval(() => {
+    const now = new Date();
+    document.getElementById("timeNow").innerText =
+    now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}, 1000);
 
 </script>
 
