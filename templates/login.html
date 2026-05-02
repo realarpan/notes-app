@@ -43,13 +43,11 @@ class="w-full max-w-md p-8 rounded-2xl bg-white/5 border border-white/10 backdro
 
 <form method="POST" id="loginForm" class="space-y-5">
 
-    <!-- Username -->
     <div class="input-group">
         <input name="username" required placeholder=" " class="input">
         <label>Username</label>
     </div>
 
-    <!-- Password -->
     <div class="input-group">
         <input type="password" name="password" id="password" required placeholder=" "
         class="input pr-10" onkeyup="checkCaps(event)">
@@ -65,7 +63,6 @@ class="w-full max-w-md p-8 rounded-2xl bg-white/5 border border-white/10 backdro
         Caps Lock is ON
     </p>
 
-    <!-- BUTTON -->
     <button id="loginBtn" class="btn-primary">
         <span id="btnText">Sign in</span>
 
@@ -77,40 +74,26 @@ class="w-full max-w-md p-8 rounded-2xl bg-white/5 border border-white/10 backdro
 
 </form>
 
-<!-- PREMIUM FOOTER CLEAN -->
-<!-- ULTRA CLEAN FOOTER -->
-<div class="mt-6 border-t border-white/10 pt-4">
+</div>
+</div>
+</div>
 
-    <div class="flex justify-between items-center text-sm">
+<!-- 🔥 FLOATING STATUS BAR -->
+<div class="status-bar">
 
-        <!-- LEFT INFO -->
-        <div class="flex items-center gap-6 text-gray-400 font-medium">
+    <div class="flex items-center gap-3 flex-wrap">
 
-            <span id="deviceType" class="tracking-wide"></span>
-
-            <span id="browserType" class="tracking-wide"></span>
-
-            <span id="locationText" class="tracking-wide text-gray-300">
-                Detecting...
-            </span>
-
-        </div>
-
-        <!-- TIME -->
-        <div id="timeNow" class="text-gray-200 font-semibold tracking-wide"></div>
+        <div class="pill" id="deviceType"></div>
+        <div class="pill" id="browserType"></div>
+        <div class="pill highlight" id="locationText">Detecting...</div>
 
     </div>
 
-</div>
+    <div class="flex items-center gap-2 text-xs text-gray-400">
+        <span class="live-dot"></span>
+        <span id="pingText">-- ms</span>
+    </div>
 
-</div>
-
-</div>
-
-</div>
-
-</div>
-</div>
 </div>
 
 <!-- STYLE -->
@@ -143,9 +126,7 @@ background-size: 40px 40px;
 }
 
 /* Inputs */
-.input-group{
-position:relative;
-}
+.input-group{ position:relative; }
 
 .input{
 width:100%;
@@ -164,7 +145,6 @@ box-shadow:0 0 0 2px rgba(99,102,241,0.2);
 background:#16181d;
 }
 
-/* Floating labels */
 .input-group label{
 position:absolute;
 left:14px;
@@ -201,16 +181,58 @@ transform:translateY(-1px);
 box-shadow:0 10px 30px rgba(99,102,241,0.3);
 }
 
-/* Light mode */
-.light{
-background:#f9fafb !important;
-color:#111 !important;
+/* FLOATING BAR */
+.status-bar{
+position:fixed;
+bottom:20px;
+left:50%;
+transform:translateX(-50%);
+width:90%;
+max-width:650px;
+
+display:flex;
+justify-content:space-between;
+align-items:center;
+
+padding:10px 16px;
+border-radius:999px;
+
+background:rgba(20,20,25,0.6);
+backdrop-filter: blur(16px);
+border:1px solid rgba(255,255,255,0.08);
+
+box-shadow:0 10px 40px rgba(0,0,0,0.4);
 }
 
-.light #loginCard{
-background:white !important;
-color:black !important;
-border:1px solid #e5e7eb;
+/* Pills */
+.pill{
+padding:6px 12px;
+border-radius:999px;
+background:rgba(255,255,255,0.05);
+border:1px solid rgba(255,255,255,0.08);
+font-size:12px;
+color:#9ca3af;
+}
+
+.pill.highlight{
+color:#e5e7eb;
+background:rgba(99,102,241,0.15);
+border-color:rgba(99,102,241,0.3);
+}
+
+/* Live dot */
+.live-dot{
+width:8px;
+height:8px;
+border-radius:50%;
+background:#22c55e;
+animation:pulse 1.5s infinite;
+}
+
+@keyframes pulse{
+0%{opacity:1; transform:scale(1);}
+50%{opacity:0.5; transform:scale(1.6);}
+100%{opacity:1; transform:scale(1);}
 }
 
 </style>
@@ -220,96 +242,65 @@ border:1px solid #e5e7eb;
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    // ===== THEME =====
-    function toggleTheme(){
+    // THEME
+    window.toggleTheme = function(){
         const root = document.getElementById("appRoot");
         root.classList.toggle("light");
-        localStorage.setItem("theme", root.classList.contains("light") ? "light":"dark");
-    }
-    window.toggleTheme = toggleTheme;
+    };
 
-    if(localStorage.getItem("theme")==="light"){
-        document.getElementById("appRoot").classList.add("light");
-    }
-
-    // ===== DEVICE + BROWSER =====
+    // DEVICE + BROWSER
     const ua = navigator.userAgent;
+    document.getElementById("deviceType").innerText =
+        /Mobi|Android/i.test(ua) ? "Mobile" : "Desktop";
 
-    const deviceEl = document.getElementById("deviceType");
-    const browserEl = document.getElementById("browserType");
-    const locationEl = document.getElementById("locationText");
-    const timeEl = document.getElementById("timeNow");
+    document.getElementById("browserType").innerText =
+        ua.includes("Chrome") ? "Chrome" :
+        ua.includes("Firefox") ? "Firefox" :
+        ua.includes("Safari") ? "Safari" : "Browser";
 
-    if(deviceEl){
-        deviceEl.innerText = /Mobi|Android/i.test(ua) ? "Mobile" : "Desktop";
+    // LOCATION
+    fetch("https://ipapi.co/json/")
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("locationText").innerText =
+            `${data.city}, ${data.country_name}`;
+    })
+    .catch(()=>{
+        document.getElementById("locationText").innerText = "Unknown";
+    });
+
+    // PING
+    async function ping(){
+        const start = performance.now();
+        try{
+            await fetch("/", {method:"HEAD"});
+            const ms = Math.round(performance.now() - start);
+            document.getElementById("pingText").innerText = ms + " ms";
+        }catch{
+            document.getElementById("pingText").innerText = "offline";
+        }
     }
 
-    if(browserEl){
-        browserEl.innerText =
-            ua.includes("Chrome") ? "Chrome" :
-            ua.includes("Firefox") ? "Firefox" :
-            ua.includes("Safari") ? "Safari" : "Browser";
-    }
+    ping();
+    setInterval(ping, 5000);
 
-    // ===== LOCATION =====
-    if(locationEl){
-        fetch("https://ipapi.co/json/")
-        .then(res => res.json())
-        .then(data => {
-            locationEl.innerText = `${data.city}, ${data.country_name}`;
-        })
-        .catch(() => {
-            locationEl.innerText = "Unavailable";
-        });
-    }
-
-    // ===== TIME =====
-    function updateTime(){
-        const now = new Date();
-
-        const time = now.toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-
-        const date = now.toLocaleDateString([], {
-            day: '2-digit',
-            month: 'short'
-        });
-
-        document.getElementById("timeNow").innerText = `${time} • ${date}`;
-    }
-
-    updateTime();
-    setInterval(updateTime, 1000);
-
-    // ===== PASSWORD TOGGLE =====
+    // PASSWORD
     window.togglePassword = function(){
         const p = document.getElementById("password");
-        if(p){
-            p.type = p.type === "password" ? "text" : "password";
-        }
+        p.type = p.type === "password" ? "text" : "password";
     };
 
-    // ===== CAPS LOCK =====
+    // CAPS
     window.checkCaps = function(e){
-        const warn = document.getElementById("capsWarning");
-        if(warn){
-            warn.classList.toggle("hidden", !e.getModifierState("CapsLock"));
-        }
+        document.getElementById("capsWarning")
+        .classList.toggle("hidden", !e.getModifierState("CapsLock"));
     };
 
-    // ===== LOADING STATE =====
-    const form = document.getElementById("loginForm");
-    if(form){
-        form.addEventListener("submit", () => {
-            const btnText = document.getElementById("btnText");
-            const spinner = document.getElementById("spinner");
-
-            if(btnText) btnText.innerText = "Signing in...";
-            if(spinner) spinner.classList.remove("hidden");
-        });
-    }
+    // LOADING
+    document.getElementById("loginForm").addEventListener("submit", ()=>{
+        document.getElementById("btnText").innerText = "Signing in...";
+        document.getElementById("spinner").classList.remove("hidden");
+    });
 
 });
 
