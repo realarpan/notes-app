@@ -74,26 +74,34 @@ class="w-full max-w-md p-8 rounded-2xl bg-white/5 border border-white/10 backdro
 
 </form>
 
-</div>
-</div>
-</div>
+<!-- 🔥 INLINE STATUS BAR -->
+<div class="mt-6 pt-5 border-t border-white/10">
 
-<!-- 🔥 FLOATING STATUS BAR -->
-<div class="status-bar">
+    <div class="flex justify-between items-center">
 
-    <div class="flex items-center gap-3 flex-wrap">
+        <!-- LEFT -->
+        <div class="flex items-center gap-2 flex-wrap">
 
-        <div class="pill" id="deviceType"></div>
-        <div class="pill" id="browserType"></div>
-        <div class="pill highlight" id="locationText">Detecting...</div>
+            <div class="pill" id="deviceType"></div>
+            <div class="pill" id="browserType"></div>
+            <div class="pill highlight" id="locationText">Detecting...</div>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="flex items-center gap-2 text-xs text-gray-400">
+
+            <span class="live-dot"></span>
+            <span id="pingText">-- ms</span>
+
+        </div>
 
     </div>
 
-    <div class="flex items-center gap-2 text-xs text-gray-400">
-        <span class="live-dot"></span>
-        <span id="pingText">-- ms</span>
-    </div>
+</div>
 
+</div>
+</div>
 </div>
 
 <!-- STYLE -->
@@ -181,43 +189,20 @@ transform:translateY(-1px);
 box-shadow:0 10px 30px rgba(99,102,241,0.3);
 }
 
-/* FLOATING BAR */
-.status-bar{
-position:fixed;
-bottom:20px;
-left:50%;
-transform:translateX(-50%);
-width:90%;
-max-width:650px;
-
-display:flex;
-justify-content:space-between;
-align-items:center;
-
-padding:10px 16px;
-border-radius:999px;
-
-background:rgba(20,20,25,0.6);
-backdrop-filter: blur(16px);
-border:1px solid rgba(255,255,255,0.08);
-
-box-shadow:0 10px 40px rgba(0,0,0,0.4);
-}
-
 /* Pills */
 .pill{
-padding:6px 12px;
+padding:5px 10px;
 border-radius:999px;
-background:rgba(255,255,255,0.05);
+background:rgba(255,255,255,0.04);
 border:1px solid rgba(255,255,255,0.08);
-font-size:12px;
+font-size:11px;
 color:#9ca3af;
 }
 
 .pill.highlight{
 color:#e5e7eb;
-background:rgba(99,102,241,0.15);
-border-color:rgba(99,102,241,0.3);
+background:rgba(99,102,241,0.12);
+border-color:rgba(99,102,241,0.25);
 }
 
 /* Live dot */
@@ -244,8 +229,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // THEME
     window.toggleTheme = function(){
-        const root = document.getElementById("appRoot");
-        root.classList.toggle("light");
+        document.getElementById("appRoot").classList.toggle("light");
     };
 
     // DEVICE + BROWSER
