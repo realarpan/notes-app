@@ -38,9 +38,28 @@ Admin Panel
 <input placeholder="Search..." class="px-3 py-1 bg-gray-800 rounded text-sm outline-none">
 </div>
 
-<div class="card">
-<p class="label">Logged in as</p>
-<h2 class="value">{{ current_user.username }}</h2>
+<div class="flex items-center gap-3">
+
+    <!-- Avatar -->
+    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-sm font-semibold text-white shadow">
+        {{ current_user.username[0]|upper }}
+    </div>
+
+    <!-- Info -->
+    <div class="flex flex-col leading-tight">
+
+        <span class="text-sm font-medium text-white tracking-wide">
+            {{ current_user.username }}
+        </span>
+
+        <div id="deviceInfo" class="text-xs text-gray-400 flex items-center gap-2">
+            <span id="deviceType"></span>
+            <span class="w-1 h-1 bg-gray-500 rounded-full"></span>
+            <span id="browserType"></span>
+        </div>
+
+    </div>
+
 </div>
 
 </div>
@@ -386,6 +405,14 @@ border-radius:14px;
 border:1px solid rgba(255,255,255,0.08);
 backdrop-filter: blur(10px);
 transition: 0.3s;
+}
+
+/* subtle hover like SaaS */
+.user-hover:hover{
+background: rgba(255,255,255,0.05);
+border-radius: 10px;
+padding: 6px;
+transition: 0.2s;
 }
 
 .card:hover{
