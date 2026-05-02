@@ -78,30 +78,30 @@ class="w-full max-w-md p-8 rounded-2xl bg-white/5 border border-white/10 backdro
 </form>
 
 <!-- PREMIUM FOOTER CLEAN -->
-<div class="mt-6 border-t border-white/10 pt-4 text-xs">
+<!-- ULTRA CLEAN FOOTER -->
+<div class="mt-6 border-t border-white/10 pt-4">
 
-    <!-- Row 1 -->
-    <div class="flex justify-between items-center text-gray-400">
+    <div class="flex justify-between items-center text-sm">
 
-        <div class="flex items-center gap-5 flex-wrap">
+        <!-- LEFT INFO -->
+        <div class="flex items-center gap-6 text-gray-400 font-medium">
 
-            <span>
-                Device: <span id="deviceType" class="text-white font-medium"></span>
-            </span>
+            <span id="deviceType" class="tracking-wide"></span>
 
-            <span>
-                Browser: <span id="browserType" class="text-white font-medium"></span>
-            </span>
+            <span id="browserType" class="tracking-wide"></span>
 
-            <span>
-                Location: <span id="locationText" class="text-white font-medium">Detecting...</span>
+            <span id="locationText" class="tracking-wide text-gray-300">
+                Detecting...
             </span>
 
         </div>
 
-        <div id="timeNow" class="text-white font-medium tracking-wide"></div>
+        <!-- TIME -->
+        <div id="timeNow" class="text-gray-200 font-semibold tracking-wide"></div>
 
     </div>
+
+</div>
 
 </div>
 
@@ -265,13 +265,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ===== TIME =====
     function updateTime(){
-        if(timeEl){
-            const now = new Date();
-            timeEl.innerText = now.toLocaleTimeString([], {
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }
+        const now = new Date();
+
+        const time = now.toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        const date = now.toLocaleDateString([], {
+            day: '2-digit',
+            month: 'short'
+        });
+
+        document.getElementById("timeNow").innerText = `${time} • ${date}`;
     }
 
     updateTime();
