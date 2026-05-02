@@ -1,130 +1,105 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="min-h-screen flex items-center justify-center bg-black text-white relative overflow-hidden">
+<div class="min-h-screen flex bg-black text-white">
 
-<!-- 🌌 Animated Background -->
-<div class="absolute inset-0">
-    <div class="absolute w-[500px] h-[500px] bg-blue-600/20 blur-[120px] top-[-100px] left-[-100px] animate-pulse"></div>
-    <div class="absolute w-[400px] h-[400px] bg-purple-600/20 blur-[120px] bottom-[-100px] right-[-100px] animate-pulse"></div>
+<!-- LEFT SIDE (BRANDING) -->
+<div class="hidden md:flex w-1/2 relative items-center justify-center bg-gradient-to-br from-blue-700 to-purple-700">
+
+    <div class="absolute inset-0 bg-black/30"></div>
+
+    <div class="relative z-10 max-w-md px-10 text-white">
+
+        <h1 class="text-4xl font-bold mb-4 leading-tight">
+            Manage your notes<br>like a pro.
+        </h1>
+
+        <p class="text-white/80 text-sm mb-8">
+            Secure cloud storage, instant access, and seamless experience across devices.
+        </p>
+
+        <div class="space-y-3 text-sm text-white/80">
+            <p>✔ Secure authentication</p>
+            <p>✔ Fast uploads</p>
+            <p>✔ Real-time dashboard</p>
+        </div>
+
+    </div>
 </div>
 
-<!-- 🔐 Login Card -->
-<div id="loginCard"
-class="relative z-10 w-[340px] p-8 rounded-2xl bg-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl transition duration-300 hover:border-white/20">
 
-<h2 class="text-2xl font-semibold text-center mb-6 tracking-tight">
-    Welcome Back
-</h2>
+<!-- RIGHT SIDE (LOGIN) -->
+<div class="flex w-full md:w-1/2 items-center justify-center px-6">
 
-<form method="POST" id="loginForm" class="space-y-5">
+<div id="loginCard" class="w-full max-w-sm">
 
-    <!-- Username -->
-    <div class="relative">
-        <input name="username" required
-        class="peer w-full p-3 bg-gray-900/70 rounded-lg outline-none border border-white/10 focus:border-blue-500 transition placeholder-transparent"
-        placeholder="Username">
+    <h2 class="text-2xl font-semibold mb-2">
+        Sign in to your account
+    </h2>
 
-        <label class="absolute left-3 top-3 text-gray-400 text-sm transition-all
-        peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-500
-        peer-focus:-top-2 peer-focus:text-xs peer-focus:text-blue-400
-        peer-valid:-top-2 peer-valid:text-xs">
-        Username
-        </label>
-    </div>
-
-    <!-- Password -->
-    <div class="relative">
-        <input type="password" name="password" id="password" required
-        class="peer w-full p-3 pr-10 bg-gray-900/70 rounded-lg outline-none border border-white/10 focus:border-blue-500 transition placeholder-transparent"
-        placeholder="Password"
-        onkeyup="checkCaps(event)">
-
-        <label class="absolute left-3 top-3 text-gray-400 text-sm transition-all
-        peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-500
-        peer-focus:-top-2 peer-focus:text-xs peer-focus:text-blue-400
-        peer-valid:-top-2 peer-valid:text-xs">
-        Password
-        </label>
-
-        <!-- 👁 Toggle -->
-        <button type="button" onclick="togglePassword()"
-        class="absolute right-3 top-3 text-gray-400 hover:text-white">
-        👁️
-        </button>
-    </div>
-
-    <!-- Caps Lock -->
-    <p id="capsWarning" class="text-xs text-yellow-400 hidden">
-        Caps Lock is ON
+    <p class="text-sm text-gray-400 mb-6">
+        Enter your credentials to continue
     </p>
 
-    <!-- Login Button -->
-    <button id="loginBtn"
-    class="w-full py-2.5 rounded-lg font-medium bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 transition flex justify-center items-center gap-2 shadow-lg">
+    <form method="POST" id="loginForm" class="space-y-4">
 
-        <span id="btnText">Login</span>
+        <!-- Username -->
+        <div>
+            <label class="text-xs text-gray-400">Username</label>
+            <input name="username" required
+            class="w-full mt-1 p-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 transition">
+        </div>
 
-        <svg id="spinner" class="hidden w-4 h-4 animate-spin" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" stroke="white" stroke-width="3" fill="none" opacity="0.3"/>
-            <path d="M22 12a10 10 0 0 1-10 10" stroke="white" stroke-width="3"/>
-        </svg>
-    </button>
+        <!-- Password -->
+        <div class="relative">
+            <label class="text-xs text-gray-400">Password</label>
+            <input type="password" name="password" id="password" required
+            class="w-full mt-1 p-3 pr-10 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 transition"
+            onkeyup="checkCaps(event)">
 
-</form>
+            <button type="button" onclick="togglePassword()"
+            class="absolute right-3 top-9 text-gray-400 hover:text-white">
+            👁️
+            </button>
+        </div>
 
-<!-- Divider -->
-<div class="my-6 border-t border-white/10"></div>
+        <!-- Caps -->
+        <p id="capsWarning" class="text-xs text-yellow-400 hidden">
+            Caps Lock is ON
+        </p>
 
-<!-- Security -->
-<p class="text-[11px] text-gray-400 text-center leading-relaxed">
-Secure login powered by encrypted sessions and protected backend infrastructure.
-</p>
+        <!-- Login Button -->
+        <button id="loginBtn"
+        class="w-full py-3 rounded-lg font-medium bg-white text-black hover:opacity-90 transition flex justify-center items-center gap-2">
 
-<!-- Terms -->
-<p class="text-[11px] text-gray-500 text-center mt-2">
-By continuing, you agree to our 
-<span onclick="openModal()" class="underline cursor-pointer hover:text-white">
-Terms & Privacy
-</span>
-</p>
+            <span id="btnText">Sign In</span>
+
+            <svg id="spinner" class="hidden w-4 h-4 animate-spin" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" stroke="black" stroke-width="3" fill="none" opacity="0.3"/>
+                <path d="M22 12a10 10 0 0 1-10 10" stroke="black" stroke-width="3"/>
+            </svg>
+        </button>
+
+    </form>
+
+    <!-- Divider -->
+    <div class="my-6 flex items-center gap-3">
+        <div class="flex-1 h-px bg-gray-700"></div>
+        <span class="text-xs text-gray-500">secure login</span>
+        <div class="flex-1 h-px bg-gray-700"></div>
+    </div>
+
+    <!-- Footer -->
+    <p class="text-xs text-gray-500 text-center">
+        Protected by encrypted backend and role-based access control.
+    </p>
 
 </div>
 </div>
-
-<!-- 📜 MODAL -->
-<div id="privacyModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50">
-
-<div class="bg-gray-900 p-6 rounded-2xl max-w-md w-full border border-white/10 shadow-xl">
-
-<h2 class="text-lg font-semibold mb-4">Privacy & Security</h2>
-
-<p class="text-sm text-gray-300 leading-relaxed">
-Your data is handled securely using encrypted connections (HTTPS) and protected backend systems.
-Access is controlled, and sensitive operations are validated to prevent misuse.
-</p>
-
-<button onclick="closeModal()"
-class="mt-5 w-full bg-blue-600 hover:bg-blue-700 py-2 rounded-lg">
-Close
-</button>
-
-</div>
 </div>
 
-<!-- 🔥 Animations -->
-<style>
-@keyframes shake {
-0% { transform: translateX(0); }
-25% { transform: translateX(-6px); }
-50% { transform: translateX(6px); }
-75% { transform: translateX(-6px); }
-100% { transform: translateX(0); }
-}
-.shake { animation: shake 0.3s; }
-</style>
 
-<!-- ⚡ JS -->
+<!-- JS -->
 <script>
 
 // Toggle password
@@ -139,31 +114,21 @@ const w = document.getElementById("capsWarning");
 w.classList.toggle("hidden", !e.getModifierState("CapsLock"));
 }
 
-// Loading
+// Loading state
 document.getElementById("loginForm").addEventListener("submit", ()=>{
-const btn = document.getElementById("loginBtn");
-document.getElementById("btnText").innerText = "Logging in...";
+document.getElementById("btnText").innerText = "Signing in...";
 document.getElementById("spinner").classList.remove("hidden");
-btn.disabled = true;
+document.getElementById("loginBtn").disabled = true;
 });
 
-// Modal
-function openModal(){
-document.getElementById("privacyModal").classList.remove("hidden");
-document.getElementById("privacyModal").classList.add("flex");
-}
-
-function closeModal(){
-document.getElementById("privacyModal").classList.add("hidden");
-}
-
-// Error shake
+// Error animation
 window.onload = function(){
 const hasError = {{ 'true' if get_flashed_messages() else 'false' }};
 if(hasError){
-document.getElementById("loginCard").classList.add("shake");
+document.getElementById("loginCard").classList.add("animate-pulse");
 }
 };
+
 </script>
 
 {% endblock %}
