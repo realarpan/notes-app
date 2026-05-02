@@ -77,29 +77,33 @@ class="w-full max-w-md p-8 rounded-2xl bg-white/5 border border-white/10 backdro
 
 </form>
 
-<!-- PREMIUM FOOTER -->
-<div class="mt-6 border-t border-white/10 pt-4 text-xs text-gray-400">
+<!-- PREMIUM FOOTER CLEAN -->
+<div class="mt-6 border-t border-white/10 pt-4 text-xs">
 
     <!-- Row 1 -->
-    <div class="flex justify-between items-center">
+    <div class="flex justify-between items-center text-gray-400">
 
-        <div class="flex items-center gap-4">
-            <span class="flex items-center gap-1 text-green-400">
-                <span class="w-1.5 h-1.5 bg-green-400 rounded-full"></span>
-                Encrypted
+        <div class="flex items-center gap-5 flex-wrap">
+
+            <span>
+                Device: <span id="deviceType" class="text-white font-medium"></span>
             </span>
 
-            <span>Device: <span id="deviceType" class="text-gray-300"></span></span>
-            <span>Browser: <span id="browserType" class="text-gray-300"></span></span>
+            <span>
+                Browser: <span id="browserType" class="text-white font-medium"></span>
+            </span>
+
+            <span>
+                Location: <span id="locationText" class="text-white font-medium">Detecting...</span>
+            </span>
+
         </div>
 
-        <div class="text-gray-500" id="timeNow"></div>
+        <div id="timeNow" class="text-white font-medium tracking-wide"></div>
+
     </div>
 
-    <!-- Row 2 -->
-    <div class="mt-2 text-gray-500">
-        Location: <span id="locationText" class="text-gray-400">Detecting...</span>
-    </div>
+</div>
 
 </div>
 
