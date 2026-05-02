@@ -86,7 +86,7 @@ class="w-full max-w-md p-8 rounded-2xl bg-white/5 border border-white/10 backdro
         <div class="flex items-center gap-4">
             <span class="flex items-center gap-1 text-green-400">
                 <span class="w-1.5 h-1.5 bg-green-400 rounded-full"></span>
-                Secure
+                Encrypted
             </span>
 
             <span>Device: <span id="deviceType" class="text-gray-300"></span></span>
@@ -214,49 +214,94 @@ border:1px solid #e5e7eb;
 <!-- JS -->
 <script>
 
-// Theme
-function toggleTheme(){
-const root = document.getElementById("appRoot");
-root.classList.toggle("light");
-localStorage.setItem("theme", root.classList.contains("light") ? "light":"dark");
-}
+document.addEventListener("DOMContentLoaded", () => {
 
-// Load
-window.onload = function(){
+    // ===== THEME =====
+    function toggleTheme(){
+        const root = document.getElementById("appRoot");
+        root.classList.toggle("light");
+        localStorage.setItem("theme", root.classList.contains("light") ? "light":"dark");
+    }
+    window.toggleTheme = toggleTheme;
 
-if(localStorage.getItem("theme")==="light"){
-document.getElementById("appRoot").classList.add("light");
-}
+    if(localStorage.getItem("theme")==="light"){
+        document.getElementById("appRoot").classList.add("light");
+    }
 
-// Device + Browser
-// Device + Browser detection
-const ua = navigator.userAgent;
+    // ===== DEVICE + BROWSER =====
+    const ua = navigator.userAgent;
 
-document.getElementById("deviceType").innerText =
-/Mobi|Android/i.test(ua) ? "Mobile" : "Desktop";
+    const deviceEl = document.getElementById("deviceType");
+    const browserEl = document.getElementById("browserType");
+    const locationEl = document.getElementById("locationText");
+    const timeEl = document.getElementById("timeNow");
 
-document.getElementById("browserType").innerText =
-ua.includes("Chrome") ? "Chrome" :
-ua.includes("Firefox") ? "Firefox" :
-ua.includes("Safari") ? "Safari" : "Browser";
+    if(deviceEl){
+        deviceEl.innerText = /Mobi|Android/i.test(ua) ? "Mobile" : "Desktop";
+    }
 
-// Location (clean + fallback safe)
-fetch("https://ipapi.co/json/")
-.then(res => res.json())
-.then(data => {
-    document.getElementById("locationText").innerText =
-    `${data.city}, ${data.country_name}`;
-})
-.catch(() => {
-    document.getElementById("locationText").innerText = "Unknown";
+    if(browserEl){
+        browserEl.innerText =
+            ua.includes("Chrome") ? "Chrome" :
+            ua.includes("Firefox") ? "Firefox" :
+            ua.includes("Safari") ? "Safari" : "Browser";
+    }
+
+    // ===== LOCATION =====
+    if(locationEl){
+        fetch("https://ipapi.co/json/")
+        .then(res => res.json())
+        .then(data => {
+            locationEl.innerText = `${data.city}, ${data.country_name}`;
+        })
+        .catch(() => {
+            locationEl.innerText = "Unavailable";
+        });
+    }
+
+    // ===== TIME =====
+    function updateTime(){
+        if(timeEl){
+            const now = new Date();
+            timeEl.innerText = now.toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+    }
+
+    updateTime();
+    setInterval(updateTime, 1000);
+
+    // ===== PASSWORD TOGGLE =====
+    window.togglePassword = function(){
+        const p = document.getElementById("password");
+        if(p){
+            p.type = p.type === "password" ? "text" : "password";
+        }
+    };
+
+    // ===== CAPS LOCK =====
+    window.checkCaps = function(e){
+        const warn = document.getElementById("capsWarning");
+        if(warn){
+            warn.classList.toggle("hidden", !e.getModifierState("CapsLock"));
+        }
+    };
+
+    // ===== LOADING STATE =====
+    const form = document.getElementById("loginForm");
+    if(form){
+        form.addEventListener("submit", () => {
+            const btnText = document.getElementById("btnText");
+            const spinner = document.getElementById("spinner");
+
+            if(btnText) btnText.innerText = "Signing in...";
+            if(spinner) spinner.classList.remove("hidden");
+        });
+    }
+
 });
-
-// Time (clean format)
-setInterval(() => {
-    const now = new Date();
-    document.getElementById("timeNow").innerText =
-    now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}, 1000);
 
 </script>
 
