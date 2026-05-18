@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 import time
 import os
 import requests
-import socket  # ✅ NEW
+import socket
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(BASE_DIR, "../templates")
