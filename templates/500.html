@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#080b14">
+    <title>Server Error | Sunday School Notes</title>
+
+    <style>
+        :root {
+            color-scheme: dark;
+            --background: #080b14;
+            --panel: rgba(19, 24, 40, 0.78);
+            --border: rgba(255, 255, 255, 0.09);
+            --text: #f4f6ff;
+            --muted: #969db3;
+            --accent: #a78bfa;
+            --accent-light: #c4b5fd;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            overflow-x: hidden;
+            background:
+                radial-gradient(
+                    ellipse at 15% 15%,
+                    rgba(124, 58, 237, 0.17),
+                    transparent 45%
+                ),
+                radial-gradient(
+                    ellipse at 85% 85%,
+                    rgba(59, 130, 246, 0.12),
+                    transparent 42%
+                ),
+                var(--background);
+            color: var(--text);
+            font-family:
+                Inter, -apple-system, BlinkMacSystemFont,
+                "Segoe UI", sans-serif;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.13;
+            background-image:
+                linear-gradient(
+                    rgba(255, 255, 255, 0.035) 1px,
+                    transparent 1px
+                ),
+                linear-gradient(
+                    90deg,
+                    rgba(255, 255, 255, 0.035) 1px,
+                    transparent 1px
+                );
+            background-size: 42px 42px;
+            mask-image: linear-gradient(
+                to bottom,
+                black,
+                transparent 85%
+            );
+        }
+
+        .page {
+            width: 100%;
+            max-width: 520px;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            animation: appear 0.65s ease both;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 11px;
+            margin-bottom: 32px;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            color: white;
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            box-shadow: 0 5px 25px rgba(139, 92, 246, 0.25);
+        }
+
+        .brand-icon svg {
+            width: 21px;
+            height: 21px;
+        }
+
+        .panel {
+            padding: 44px 36px 36px;
+            border: 1px solid var(--border);
+            border-radius: 26px;
+            background: var(--panel);
+            box-shadow:
+                0 25px 80px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.035);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .error-icon {
+            width: 76px;
+            height: 76px;
+            margin: 0 auto 24px;
+            display: grid;
+            place-items: center;
+            border: 1px solid rgba(248, 113, 113, 0.2);
+            border-radius: 24px;
+            background: rgba(248, 113, 113, 0.08);
+            color: #fca5a5;
+        }
+
+        .error-icon svg {
+            width: 35px;
+            height: 35px;
+        }
+
+        .error-code {
+            margin-bottom: 12px;
+            color: var(--accent-light);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin-bottom: 15px;
+            font-size: clamp(26px, 6vw, 34px);
+            line-height: 1.2;
+            letter-spacing: -1.2px;
+        }
+
+        .description {
+            max-width: 360px;
+            margin: 0 auto;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.85;
+        }
+
+        .divider {
+            height: 1px;
+            margin: 30px 0;
+            background: var(--border);
+        }
+
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .button {
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            padding: 12px 18px;
+            border: 1px solid transparent;
+            border-radius: 13px;
+            text-decoration: none;
+            font: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition:
+                transform 0.2s ease,
+                background 0.2s ease,
+                border-color 0.2s ease;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+        }
+
+        .button:focus-visible {
+            outline: 2px solid var(--accent-light);
+            outline-offset: 4px;
+        }
+
+        .button svg {
+            width: 17px;
+            height: 17px;
+            flex-shrink: 0;
+        }
+
+        .button-primary {
+            color: #fff;
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            box-shadow: 0 8px 22px rgba(99, 102, 241, 0.2);
+        }
+
+        .button-primary:hover {
+            background: linear-gradient(135deg, #9b70fa, #7477f5);
+        }
+
+        .button-secondary {
+            color: #d4d8e6;
+            border-color: var(--border);
+            background: rgba(255, 255, 255, 0.025);
+        }
+
+        .button-secondary:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.16);
+        }
+
+        .footer {
+            margin-top: 25px;
+            color: #737b91;
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        .footer span {
+            color: #a5adbf;
+        }
+
+        @keyframes appear {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 18px;
+            }
+
+            .panel {
+                padding: 34px 23px 27px;
+                border-radius: 21px;
+            }
+
+            .brand {
+                margin-bottom: 24px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="page">
+        <div class="brand">
+            <div class="brand-icon">
+                <svg viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round"
+                     aria-hidden="true">
+                    <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22z"/>
+                    <path d="M4 5.5v14A2.5 2.5 0 0 1 6.5 17H20"/>
+                    <path d="M12 7v6"/>
+                    <path d="M9 10h6"/>
+                </svg>
+            </div>
+
+            <span>Sunday School Notes</span>
+        </div>
+
+        <section class="panel" aria-labelledby="error-title">
+            <div class="error-icon">
+                <svg viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="1.7"
+                     stroke-linecap="round" stroke-linejoin="round"
+                     aria-hidden="true">
+                    <circle cx="12" cy="12" r="9"/>
+                    <path d="M12 8v5"/>
+                    <path d="M12 16.5h.01"/>
+                </svg>
+            </div>
+
+            <p class="error-code">Error 500 · Server Error</p>
+
+            <h1 id="error-title">Something went wrong.</h1>
+
+            <p class="description">
+                We couldn't complete your request right now.
+                This may be a temporary server issue.
+                Please try again in a moment.
+            </p>
+
+            <div class="divider"></div>
+
+            <div class="actions">
+                <button class="button button-primary" type="button"
+                        onclick="window.location.reload()">
+                    <svg viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round"
+                         aria-hidden="true">
+                        <path d="M20 7v5h-5"/>
+                        <path d="M4 17v-5h5"/>
+                        <path d="M5.6 9a7 7 0 0 1 11.6-2L20 12"/>
+                        <path d="M4 12l2.8 5a7 7 0 0 0 11.6-2"/>
+                    </svg>
+                    Try Again
+                </button>
+
+                <a class="button button-secondary" href="/">
+                    <svg viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round"
+                         aria-hidden="true">
+                        <path d="m3 10 9-7 9 7"/>
+                        <path d="M5 9v12h14V9"/>
+                        <path d="M9 21v-7h6v7"/>
+                    </svg>
+                    Return to Home
+                </a>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <span>Sunday School Notes</span><br>
+            Thank you for your patience.
+        </footer>
+    </main>
+</body>
+</html>
