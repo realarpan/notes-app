@@ -1,3 +1,4 @@
+```python
 from flask import Flask, render_template, redirect, url_for, request, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -14,6 +15,13 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(BASE_DIR, "../templates")
 
 app = Flask(__name__, template_folder=TEMPLATE_DIR)
+
+# ================= CUSTOM 500 ERROR PAGE =================
+
+@app.errorhandler(500)
+def internal_server_error(error):
+    db.session.rollback()
+    return render_template("500.html"), 500
 
 app.config["SECRET_KEY"] = "supersecretkey"
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
@@ -285,3 +293,4 @@ def delete_note(id):
 def logout():
     logout_user()
     return redirect(url_for("login"))
+```
