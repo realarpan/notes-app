@@ -15,18 +15,24 @@ TEMPLATE_DIR = os.path.join(BASE_DIR, "../templates")
 
 app = Flask(__name__, template_folder=TEMPLATE_DIR)
 
-# ================= CUSTOM 500 ERROR PAGE =================
+app.config["SECRET_KEY"] = "supersecretkey"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+db = SQLAlchemy(app)
+
+# ================= CUSTOM ERROR PAGES =================
+
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template("404.html"), 404
+
 
 @app.errorhandler(500)
 def internal_server_error(error):
     db.session.rollback()
     return render_template("500.html"), 500
 
-app.config["SECRET_KEY"] = "supersecretkey"
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-db = SQLAlchemy(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -201,7 +207,7 @@ def admin():
                 "Authorization": f"Bearer {SUPABASE_KEY}"
             }
 
-            # ✅ Correct endpoint
+            # Correct endpoint
             r = requests.get(
                 f"{SUPABASE_URL}/storage/v1/bucket",
                 headers=headers,
