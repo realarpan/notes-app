@@ -1,459 +1,592 @@
-
 {% extends "base.html" %}
 
 {% block title %}Sign In | Sunday School Notes{% endblock %}
 
 {% block content %}
 
-<div id="appRoot" class="login-page">
+<div class="login-page" id="loginPage">
 
-    <!-- Animated background -->
-    <div class="login-background">
-        <div class="ambient ambient-one"></div>
-        <div class="ambient ambient-two"></div>
-        <div class="ambient ambient-three"></div>
-        <div class="grid-overlay"></div>
+    <div class="login-effects">
+        <div class="glow glow-one"></div>
+        <div class="glow glow-two"></div>
+        <div class="glow glow-three"></div>
+        <div class="background-grid"></div>
     </div>
 
-    <div class="login-layout">
+    <main class="login-container">
 
-        <!-- LEFT WELCOME PANEL -->
-        <section class="welcome-panel">
+        <!-- Login card -->
+        <section class="login-card">
 
-            <div class="welcome-heading">
-                <h1>
-                    Welcome<br>
-                    <span>back.</span>
-                </h1>
+            <div class="card-top-line"></div>
+
+            <!-- Header -->
+            <div class="login-header">
+
+                <div class="header-content">
+                    <div class="eyebrow">
+                        <span class="eyebrow-dot"></span>
+                        SECURE ACCOUNT ACCESS
+                    </div>
+
+                    <h1>Sign in<span>.</span></h1>
+
+                    <p>Welcome back. Enter your details to continue.</p>
+                </div>
+
+                <button type="button"
+                        class="theme-toggle"
+                        id="themeToggle"
+                        aria-label="Toggle theme"
+                        onclick="toggleTheme()">
+
+                    <span id="themeIcon">☼</span>
+                    <span id="themeText">Light</span>
+
+                </button>
+
+            </div>
+
+
+            <!-- Form -->
+            <form method="POST" id="loginForm" class="login-form">
+
+                <div class="field-group">
+
+                    <label for="username">USERNAME</label>
+
+                    <div class="input-shell">
+
+                        <div class="field-icon">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="8" r="3.5"/>
+                                <path d="M5 20c.5-4 2.8-6 7-6s6.5 2 7 6"/>
+                            </svg>
+                        </div>
+
+                        <input
+                            type="text"
+                            name="username"
+                            id="username"
+                            placeholder="Enter your username"
+                            autocomplete="username"
+                            required
+                        >
+
+                        <span class="input-status" id="usernameStatus"></span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="field-group">
+
+                    <div class="label-row">
+                        <label for="password">PASSWORD</label>
+                        <span class="field-hint">Keep it secure</span>
+                    </div>
+
+                    <div class="input-shell">
+
+                        <div class="field-icon">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <rect x="5" y="10" width="14" height="11" rx="2"/>
+                                <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+                                <path d="M12 14v3"/>
+                            </svg>
+                        </div>
+
+                        <input
+                            type="password"
+                            name="password"
+                            id="password"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            onkeyup="checkCaps(event)"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            id="passwordToggle"
+                            onclick="togglePassword()">
+                            Show
+                        </button>
+
+                    </div>
+
+                    <div class="caps-warning hidden" id="capsWarning">
+                        <span>!</span>
+                        Caps Lock is enabled
+                    </div>
+
+                </div>
+
+
+                <!-- Submit -->
+                <button type="submit" id="loginBtn" class="login-submit">
+
+                    <span id="btnText">Continue to dashboard</span>
+
+                    <span class="button-arrow" id="buttonArrow">↗</span>
+
+                    <svg id="spinner"
+                         class="loading-spinner hidden"
+                         viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="9"
+                                stroke="currentColor"
+                                stroke-width="3"
+                                fill="none"
+                                opacity=".25"/>
+                        <path d="M21 12a9 9 0 0 1-9 9"
+                              stroke="currentColor"
+                              stroke-width="3"
+                              fill="none"/>
+                    </svg>
+
+                </button>
+
+            </form>
+
+
+            <!-- Security note -->
+            <div class="security-note">
+                <div class="security-icon">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M12 3 19 6v5c0 5-3 8-7 10-4-2-7-5-7-10V6l7-3Z"/>
+                        <path d="m9 12 2 2 4-4"/>
+                    </svg>
+                </div>
+
+                <span>Your session is protected by secure authentication.</span>
+            </div>
+
+
+            <!-- Connection panel -->
+            <div class="connection-panel">
+
+                <div class="connection-header">
+
+                    <div class="connection-title">
+                        <span class="connection-symbol">◈</span>
+                        CONNECTION STATUS
+                    </div>
+
+                    <div class="live-status">
+                        <span class="live-dot"></span>
+                        LIVE
+                    </div>
+
+                </div>
+
+
+                <div class="connection-grid">
+
+                    <div class="connection-item">
+                        <span class="connection-label">DEVICE</span>
+                        <strong id="deviceType">Detecting...</strong>
+                    </div>
+
+                    <div class="connection-item">
+                        <span class="connection-label">BROWSER</span>
+                        <strong id="browserType">Detecting...</strong>
+                    </div>
+
+                    <div class="connection-item">
+                        <span class="connection-label">LOCATION</span>
+                        <strong id="locationText">Detecting...</strong>
+                    </div>
+
+                    <div class="connection-item">
+                        <span class="connection-label">RESPONSE TIME</span>
+                        <strong id="pingText">-- ms</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="card-footer">
+                <span>SECURE ACCESS</span>
+                <span class="footer-separator"></span>
+                <span>PERSONAL LEARNING SPACE</span>
             </div>
 
         </section>
 
+        <div class="page-decoration decoration-left"></div>
+        <div class="page-decoration decoration-right"></div>
 
-        <!-- RIGHT LOGIN PANEL -->
-        <section class="login-panel">
-
-            <div id="loginCard" class="login-card">
-
-                <!-- Card heading -->
-                <div class="login-card-header">
-
-                    <div>
-                        <span class="card-eyebrow">ACCOUNT ACCESS</span>
-                        <h2>Sign in</h2>
-                        <p>Enter your credentials to access your dashboard.</p>
-                    </div>
-
-                    <button type="button"
-                            onclick="toggleTheme()"
-                            class="theme-toggle"
-                            id="themeToggle">
-                        <span id="themeIcon">☼</span>
-                        <span id="themeText">Light mode</span>
-                    </button>
-
-                </div>
-
-
-                <!-- Login form -->
-                <form method="POST" id="loginForm" class="login-form">
-
-                    <div class="input-group">
-                        <label for="username">Username</label>
-
-                        <div class="input-wrapper">
-                            <span class="input-icon">♙</span>
-
-                            <input
-                                type="text"
-                                name="username"
-                                id="username"
-                                placeholder="Enter your username"
-                                autocomplete="username"
-                                required
-                            >
-                        </div>
-                    </div>
-
-
-                    <div class="input-group">
-                        <label for="password">Password</label>
-
-                        <div class="input-wrapper">
-                            <span class="input-icon">⌑</span>
-
-                            <input
-                                type="password"
-                                name="password"
-                                id="password"
-                                placeholder="Enter your password"
-                                autocomplete="current-password"
-                                onkeyup="checkCaps(event)"
-                                required
-                            >
-
-                            <button
-                                type="button"
-                                class="password-toggle"
-                                onclick="togglePassword()"
-                                id="passwordToggle">
-                                Show
-                            </button>
-                        </div>
-                    </div>
-
-
-                    <p id="capsWarning" class="caps-warning hidden">
-                        <span>⚠</span> Caps Lock is ON
-                    </p>
-
-
-                    <button type="submit" id="loginBtn" class="login-submit">
-
-                        <span id="btnText">Sign in to your account</span>
-
-                        <svg id="spinner"
-                             class="hidden loading-spinner"
-                             viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="10"
-                                    stroke="currentColor"
-                                    stroke-width="3"
-                                    fill="none"
-                                    opacity="0.25"/>
-                            <path d="M22 12a10 10 0 0 1-10 10"
-                                  stroke="currentColor"
-                                  stroke-width="3"
-                                  fill="none"/>
-                        </svg>
-
-                        <span class="submit-arrow">→</span>
-
-                    </button>
-
-                </form>
-
-
-                <!-- Security information -->
-                <div class="security-note">
-                    <span class="security-icon">◇</span>
-                    <span>Your account credentials are handled securely.</span>
-                </div>
-
-
-                <!-- Connection status -->
-                <div class="connection-card">
-
-                    <div class="connection-heading">
-                        <span>CONNECTION INFORMATION</span>
-                        <span class="connection-live">
-                            <span class="live-dot"></span>
-                            LIVE
-                        </span>
-                    </div>
-
-                    <div class="connection-details">
-
-                        <div class="connection-item">
-                            <span class="connection-label">DEVICE</span>
-                            <strong id="deviceType">Detecting...</strong>
-                        </div>
-
-                        <div class="connection-item">
-                            <span class="connection-label">BROWSER</span>
-                            <strong id="browserType">Detecting...</strong>
-                        </div>
-
-                        <div class="connection-item">
-                            <span class="connection-label">LOCATION</span>
-                            <strong id="locationText">Detecting...</strong>
-                        </div>
-
-                        <div class="connection-item">
-                            <span class="connection-label">RESPONSE TIME</span>
-                            <strong id="pingText">-- ms</strong>
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-    </div>
+    </main>
 
 </div>
 
 
 <style>
 
-/* =========================
-   MAIN LAYOUT
-========================= */
+/* ========================================
+   PAGE FOUNDATION
+======================================== */
 
 .login-page {
+    --accent: #818cf8;
+    --accent-strong: #6366f1;
+    --accent-secondary: #a78bfa;
+    --text-primary: #f4f4f8;
+    --text-secondary: #9298a9;
+    --text-muted: #656d80;
+    --card-bg: rgba(20, 23, 34, .88);
+    --field-bg: rgba(8, 11, 19, .75);
+    --border: rgba(255, 255, 255, .085);
+
     position: relative;
     min-height: calc(100vh - 120px);
     display: flex;
     align-items: center;
-    overflow: hidden;
+    justify-content: center;
+    padding: 55px 20px;
     isolation: isolate;
+    overflow: hidden;
 }
 
-.login-background {
+.login-page * {
+    box-sizing: border-box;
+}
+
+.login-effects {
     position: absolute;
     inset: 0;
-    z-index: -1;
+    z-index: -2;
     overflow: hidden;
     pointer-events: none;
 }
 
-.ambient {
+.background-grid {
     position: absolute;
-    width: 480px;
-    height: 480px;
+    inset: 0;
+    opacity: .16;
+    background-image:
+        linear-gradient(rgba(148, 163, 184, .07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, .07) 1px, transparent 1px);
+    background-size: 48px 48px;
+
+    mask-image: radial-gradient(ellipse at center, black 10%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 10%, transparent 75%);
+}
+
+.glow {
+    position: absolute;
     border-radius: 50%;
     filter: blur(100px);
-    opacity: 0.17;
-    animation: ambientMove 18s ease-in-out infinite alternate;
+    pointer-events: none;
+    animation: glowFloat 15s ease-in-out infinite alternate;
 }
 
-.ambient-one {
+.glow-one {
+    width: 420px;
+    height: 420px;
     top: -180px;
-    left: -120px;
-    background: #6366f1;
+    left: -130px;
+    background: rgba(99, 102, 241, .20);
 }
 
-.ambient-two {
-    right: -150px;
-    bottom: -180px;
-    background: #3b82f6;
+.glow-two {
+    width: 420px;
+    height: 420px;
+    right: -160px;
+    bottom: -190px;
+    background: rgba(139, 92, 246, .17);
     animation-delay: -5s;
 }
 
-.ambient-three {
-    top: 35%;
+.glow-three {
+    width: 250px;
+    height: 250px;
     left: 45%;
-    width: 300px;
-    height: 300px;
-    background: #8b5cf6;
-    opacity: 0.08;
-    animation-delay: -9s;
+    top: 35%;
+    background: rgba(59, 130, 246, .10);
+    animation-delay: -8s;
 }
 
-.grid-overlay {
-    position: absolute;
-    inset: 0;
-    opacity: 0.25;
-    background-image:
-        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-    background-size: 44px 44px;
-}
-
-@keyframes ambientMove {
+@keyframes glowFloat {
     from {
-        transform: translate(0, 0);
+        transform: translate3d(0, 0, 0);
     }
     to {
-        transform: translate(55px, 35px);
+        transform: translate3d(35px, 30px, 0);
     }
 }
 
-.login-layout {
+
+/* ========================================
+   MAIN CONTAINER
+======================================== */
+
+.login-container {
+    position: relative;
     width: 100%;
-    max-width: 1440px;
-    margin: auto;
-    padding: 65px 7%;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: center;
-    gap: 70px;
-}
-
-
-/* =========================
-   LEFT WELCOME PANEL
-========================= */
-
-.welcome-panel {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-height: 420px;
-    padding: 15px 0;
-}
-
-.welcome-heading {
-    margin-top: 0;
-}
-
-.welcome-heading h1 {
-    margin: 0;
-    font-size: clamp(54px, 6vw, 82px);
-    line-height: 1.05;
-    font-weight: 700;
-    letter-spacing: -5px;
-    color: #fafafa;
-}
-
-.welcome-heading h1 span {
-    background: linear-gradient(110deg, #a5b4fc, #60a5fa);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-}
-
-
-/* =========================
-   LOGIN CARD
-========================= */
-
-.login-panel {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    max-width: 500px;
+    z-index: 1;
 }
 
 .login-card {
+    position: relative;
     width: 100%;
-    max-width: 455px;
-    padding: 38px;
-    border-radius: 23px;
-    background: rgba(255,255,255,0.045);
-    border: 1px solid rgba(255,255,255,0.10);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
+    padding: 43px 39px 28px;
+    overflow: hidden;
+
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 25px;
+
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+
     box-shadow:
-        0 25px 80px rgba(0,0,0,0.30),
-        inset 0 1px rgba(255,255,255,0.04);
+        0 35px 100px rgba(0, 0, 0, .38),
+        0 8px 25px rgba(0, 0, 0, .18),
+        inset 0 1px 0 rgba(255, 255, 255, .055);
+
+    animation: cardAppear .7s cubic-bezier(.2, .8, .2, 1) both;
 }
 
-.login-card-header {
+@keyframes cardAppear {
+    from {
+        opacity: 0;
+        transform: translateY(18px) scale(.985);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.card-top-line {
+    position: absolute;
+    top: 0;
+    left: 15%;
+    width: 70%;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(165, 180, 252, .65),
+        rgba(167, 139, 250, .65),
+        transparent
+    );
+}
+
+
+/* ========================================
+   HEADER
+======================================== */
+
+.login-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 12px;
-    margin-bottom: 34px;
+    gap: 15px;
+    margin-bottom: 38px;
 }
 
-.card-eyebrow {
-    color: #818cf8;
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 1.8px;
-}
-
-.login-card-header h2 {
-    margin: 9px 0 5px;
-    color: #fafafa;
-    font-size: 29px;
-    font-weight: 700;
-    letter-spacing: -1.2px;
-}
-
-.login-card-header p {
-    color: #858b99;
-    font-size: 11px;
-    line-height: 1.6;
-}
-
-
-/* =========================
-   THEME TOGGLE
-========================= */
-
-.theme-toggle {
+.eyebrow {
     display: flex;
     align-items: center;
-    gap: 7px;
-    padding: 8px 10px;
-    border: 1px solid rgba(255,255,255,0.10);
-    border-radius: 9px;
-    color: #a1a1aa;
-    background: rgba(255,255,255,0.04);
+    gap: 9px;
+    color: var(--accent);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.eyebrow-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 12px rgba(129, 140, 248, .8);
+}
+
+.login-header h1 {
+    margin: 15px 0 7px;
+    color: var(--text-primary);
+    font-size: 43px;
+    font-weight: 750;
+    letter-spacing: -2.2px;
+    line-height: 1.1;
+}
+
+.login-header h1 span {
+    color: var(--accent);
+}
+
+.login-header p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+
+/* ========================================
+   THEME BUTTON
+======================================== */
+
+.theme-toggle {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    color: var(--text-secondary);
+    background: rgba(255, 255, 255, .035);
+
+    font-family: inherit;
     font-size: 10px;
+    font-weight: 600;
     cursor: pointer;
-    transition: 0.2s;
+
+    transition: .25s ease;
 }
 
 .theme-toggle:hover {
-    color: white;
-    background: rgba(255,255,255,0.09);
+    color: var(--text-primary);
+    border-color: rgba(129, 140, 248, .35);
+    background: rgba(129, 140, 248, .09);
+    transform: translateY(-1px);
+}
+
+#themeIcon {
+    font-size: 15px;
 }
 
 
-/* =========================
-   FORM INPUTS
-========================= */
+/* ========================================
+   FORM
+======================================== */
 
 .login-form {
     display: flex;
     flex-direction: column;
-    gap: 23px;
+    gap: 25px;
 }
 
-.input-group {
+.field-group {
     display: flex;
     flex-direction: column;
-    gap: 9px;
+    gap: 10px;
 }
 
-.input-group label {
-    color: #c4c7d0;
-    font-size: 11px;
-    font-weight: 600;
+.field-group label {
+    color: #c4c8d4;
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: .65px;
 }
 
-.input-wrapper {
-    position: relative;
+.label-row {
     display: flex;
+    justify-content: space-between;
     align-items: center;
 }
 
-.input-icon {
+.field-hint {
+    color: var(--text-muted);
+    font-size: 9px;
+}
+
+.input-shell {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 53px;
+
+    border: 1px solid rgba(255, 255, 255, .085);
+    border-radius: 12px;
+
+    background: var(--field-bg);
+
+    transition:
+        border-color .25s ease,
+        box-shadow .25s ease,
+        background .25s ease;
+}
+
+.input-shell:focus-within {
+    border-color: rgba(129, 140, 248, .85);
+    background: rgba(16, 19, 32, .95);
+    box-shadow:
+        0 0 0 3px rgba(99, 102, 241, .12),
+        0 0 25px rgba(99, 102, 241, .07);
+}
+
+.field-icon {
     position: absolute;
     left: 15px;
-    color: #737b8e;
-    font-size: 17px;
+    width: 18px;
+    height: 18px;
+    color: #788198;
     pointer-events: none;
 }
 
-.input-wrapper input {
+.field-icon svg,
+.security-icon svg {
     width: 100%;
-    height: 49px;
-    padding: 0 75px 0 44px;
+    height: 100%;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.input-shell input {
+    width: 100%;
+    height: 100%;
+    padding: 0 65px 0 46px;
+
+    border: none;
     outline: none;
-    border: 1px solid rgba(255,255,255,0.09);
-    border-radius: 11px;
-    color: #f4f4f5;
-    background: rgba(5,8,15,0.60);
+    background: transparent;
+
+    color: var(--text-primary);
     font-family: inherit;
     font-size: 12px;
-    transition: 0.25s;
 }
 
-.input-wrapper input::placeholder {
-    color: #626978;
+.input-shell input::placeholder {
+    color: #626b7e;
+    opacity: 1;
 }
 
-.input-wrapper input:focus {
-    border-color: rgba(129,140,248,0.75);
-    background: rgba(15,18,30,0.90);
-    box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+.input-status {
+    position: absolute;
+    right: 15px;
+    color: #86efac;
+    font-size: 13px;
 }
 
 .password-toggle {
     position: absolute;
-    right: 14px;
-    color: #9299a9;
-    background: transparent;
+    right: 15px;
+    padding: 5px;
+
     border: none;
+    background: transparent;
+
+    color: #9299ad;
     font-family: inherit;
     font-size: 10px;
-    font-weight: 600;
+    font-weight: 700;
+
     cursor: pointer;
+    transition: color .2s;
 }
 
 .password-toggle:hover {
@@ -461,40 +594,92 @@
 }
 
 .caps-warning {
-    margin-top: -12px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: -2px;
     color: #fbbf24;
     font-size: 10px;
 }
 
+.caps-warning span {
+    display: inline-flex;
+    width: 15px;
+    height: 15px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    font-weight: 800;
+}
 
-/* =========================
-   SIGN IN BUTTON
-========================= */
+
+/* ========================================
+   SUBMIT BUTTON
+======================================== */
 
 .login-submit {
-    width: 100%;
-    min-height: 49px;
-    margin-top: 3px;
-    padding: 0 17px;
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    border: none;
-    border-radius: 11px;
+    gap: 13px;
+
+    width: 100%;
+    height: 53px;
+    margin-top: 3px;
+
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 12px;
+
     color: white;
-    background: linear-gradient(110deg, #6366f1, #4f73e8 55%, #8b5cf6);
-    box-shadow: 0 8px 25px rgba(79,70,229,0.20);
+    background: linear-gradient(
+        110deg,
+        #6266ed 0%,
+        #596fe9 48%,
+        #8b5cf6 100%
+    );
+
+    box-shadow:
+        0 10px 28px rgba(79, 70, 229, .24),
+        inset 0 1px 0 rgba(255, 255, 255, .20);
+
     font-family: inherit;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 750;
+
     cursor: pointer;
-    transition: 0.25s;
+    transition: transform .25s, box-shadow .25s, filter .25s;
+}
+
+.login-submit::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 70%;
+    height: 100%;
+    transform: skewX(-20deg);
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, .17),
+        transparent
+    );
+    transition: left .65s ease;
+}
+
+.login-submit:hover::before {
+    left: 150%;
 }
 
 .login-submit:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 30px rgba(79,70,229,0.35);
+    filter: brightness(1.08);
+    box-shadow:
+        0 15px 35px rgba(79, 70, 229, .35),
+        inset 0 1px 0 rgba(255, 255, 255, .22);
 }
 
 .login-submit:active {
@@ -502,18 +687,25 @@
 }
 
 .login-submit:disabled {
-    opacity: 0.7;
+    opacity: .75;
     cursor: wait;
+    transform: none;
 }
 
-.submit-arrow {
-    font-size: 17px;
+.button-arrow {
+    font-size: 18px;
+    font-weight: 400;
+    transition: transform .2s;
+}
+
+.login-submit:hover .button-arrow {
+    transform: translate(3px, -2px);
 }
 
 .loading-spinner {
-    width: 16px;
-    height: 16px;
-    animation: spin 0.8s linear infinite;
+    width: 17px;
+    height: 17px;
+    animation: spin .8s linear infinite;
 }
 
 @keyframes spin {
@@ -523,54 +715,74 @@
 }
 
 
-/* =========================
+/* ========================================
    SECURITY NOTE
-========================= */
+======================================== */
 
 .security-note {
     display: flex;
     align-items: center;
-    gap: 9px;
-    margin: 23px 0;
-    color: #858b99;
+    gap: 10px;
+    margin: 26px 0 23px;
+    color: var(--text-secondary);
     font-size: 10px;
+    line-height: 1.5;
 }
 
 .security-icon {
-    color: #818cf8;
-    font-size: 16px;
+    flex-shrink: 0;
+    width: 17px;
+    height: 17px;
+    color: #9b9cff;
 }
 
 
-/* =========================
-   CONNECTION INFORMATION
-========================= */
+/* ========================================
+   CONNECTION PANEL
+======================================== */
 
-.connection-card {
-    padding: 15px;
-    border: 1px solid rgba(255,255,255,0.075);
-    border-radius: 13px;
-    background: rgba(0,0,0,0.18);
+.connection-panel {
+    padding: 17px 17px 18px;
+
+    border: 1px solid rgba(255, 255, 255, .075);
+    border-radius: 15px;
+
+    background: rgba(4, 7, 15, .25);
 }
 
-.connection-heading {
+.connection-header {
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    align-items: center;
-    padding-bottom: 13px;
-    border-bottom: 1px solid rgba(255,255,255,0.07);
-    color: #737b8d;
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 1.2px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, .07);
 }
 
-.connection-live {
+.connection-title {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
+
+    color: #7f899e;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.3px;
+}
+
+.connection-symbol {
+    color: #a5b4fc;
+    font-size: 15px;
+}
+
+.live-status {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
     color: #86efac;
     font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1px;
 }
 
 .live-dot {
@@ -578,198 +790,254 @@
     height: 6px;
     border-radius: 50%;
     background: #22c55e;
-    box-shadow: 0 0 9px rgba(34,197,94,0.7);
-    animation: pulse 1.5s infinite;
+    box-shadow: 0 0 10px rgba(34, 197, 94, .7);
+    animation: livePulse 1.8s infinite;
 }
 
-@keyframes pulse {
+@keyframes livePulse {
     0%, 100% {
         opacity: 1;
+        box-shadow: 0 0 10px rgba(34, 197, 94, .7);
     }
     50% {
-        opacity: 0.35;
+        opacity: .45;
+        box-shadow: 0 0 3px rgba(34, 197, 94, .3);
     }
 }
 
-.connection-details {
+.connection-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 17px 12px;
-    padding-top: 14px;
+    gap: 19px 14px;
+    padding-top: 16px;
 }
 
 .connection-item {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 7px;
     min-width: 0;
 }
 
 .connection-label {
-    color: #646d7e;
+    color: #697389;
     font-size: 8px;
-    font-weight: 700;
-    letter-spacing: 1px;
+    font-weight: 800;
+    letter-spacing: 1.15px;
 }
 
 .connection-item strong {
     overflow: hidden;
-    color: #c4c8d2;
+    color: #c9ceda;
     font-size: 10px;
-    font-weight: 500;
+    font-weight: 650;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
 
-/* =========================
-   LIGHT MODE
-========================= */
+/* ========================================
+   FOOTER
+======================================== */
 
-.login-page.light-mode {
-    color: #18181b;
+.card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 11px;
+    margin-top: 24px;
+
+    color: #5d667a;
+    font-size: 8px;
+    font-weight: 750;
+    letter-spacing: 1.1px;
 }
 
-.light-mode .welcome-heading h1 {
-    color: #18181b;
+.footer-separator {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #737c92;
+}
+
+
+/* ========================================
+   DECORATIVE ELEMENTS
+======================================== */
+
+.page-decoration {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    border: 1px solid rgba(165, 180, 252, .5);
+    transform: rotate(45deg);
+    pointer-events: none;
+}
+
+.decoration-left {
+    left: -35px;
+    top: 22%;
+}
+
+.decoration-right {
+    right: -35px;
+    bottom: 20%;
+}
+
+
+/* ========================================
+   LIGHT THEME
+======================================== */
+
+.login-page.light-mode {
+    --text-primary: #18181b;
+    --text-secondary: #71717a;
+    --text-muted: #a1a1aa;
+    --card-bg: rgba(255, 255, 255, .88);
+    --field-bg: rgba(244, 245, 249, .90);
+    --border: rgba(99, 102, 241, .14);
 }
 
 .light-mode .login-card {
-    background: rgba(255,255,255,0.82);
-    border-color: rgba(99,102,241,0.16);
-    box-shadow: 0 25px 80px rgba(31,41,55,0.12);
+    box-shadow:
+        0 30px 90px rgba(31, 41, 55, .12),
+        inset 0 1px 0 rgba(255, 255, 255, .8);
 }
 
-.light-mode .login-card-header h2 {
-    color: #18181b;
-}
-
-.light-mode .login-card-header p,
-.light-mode .security-note {
-    color: #71717a;
-}
-
-.light-mode .input-group label {
+.light-mode .field-group label {
     color: #3f3f46;
 }
 
-.light-mode .input-wrapper input {
-    color: #18181b;
-    background: rgba(241,245,249,0.9);
-    border-color: #e4e4e7;
+.light-mode .input-shell {
+    border-color: rgba(0, 0, 0, .09);
 }
 
-.light-mode .input-wrapper input::placeholder {
-    color: #a1a1aa;
-}
-
-.light-mode .input-wrapper input:focus {
+.light-mode .input-shell:focus-within {
     background: white;
 }
 
-.light-mode .connection-card {
-    background: rgba(241,245,249,0.8);
-    border-color: #e4e4e7;
+.light-mode .input-shell input {
+    color: #18181b;
 }
 
-.light-mode .connection-heading {
-    border-color: #e4e4e7;
+.light-mode .connection-panel {
+    background: rgba(241, 245, 249, .75);
+    border-color: rgba(0, 0, 0, .07);
+}
+
+.light-mode .connection-header {
+    border-color: rgba(0, 0, 0, .08);
 }
 
 .light-mode .connection-item strong {
     color: #27272a;
 }
 
-.light-mode .theme-toggle {
-    color: #52525b;
-    border-color: #e4e4e7;
-    background: #f4f4f5;
+.light-mode .connection-title {
+    color: #71717a;
 }
 
-.light-mode .password-toggle {
+.light-mode .theme-toggle {
+    color: #52525b;
+    background: rgba(0, 0, 0, .035);
+    border-color: rgba(0, 0, 0, .09);
+}
+
+.light-mode .field-hint {
+    color: #a1a1aa;
+}
+
+.light-mode .security-note {
     color: #71717a;
 }
 
 
-/* =========================
-   RESPONSIVE DESIGN
-========================= */
+/* ========================================
+   RESPONSIVE
+======================================== */
 
-@media (max-width: 950px) {
-
-    .login-layout {
-        gap: 35px;
-        padding: 50px 4%;
-    }
-
-    .login-card {
-        padding: 28px;
-    }
-
-    .welcome-heading h1 {
-        font-size: 58px;
-    }
-
-}
-
-@media (max-width: 700px) {
+@media (max-width: 600px) {
 
     .login-page {
         min-height: auto;
-    }
-
-    .login-layout {
-        display: flex;
-        flex-direction: column;
-        padding: 35px 17px 45px;
-        gap: 25px;
-    }
-
-    .welcome-panel {
-        min-height: auto;
-        padding: 5px 2px;
-    }
-
-    .welcome-heading h1 {
-        font-size: 48px;
-        letter-spacing: -3px;
+        padding: 35px 14px 45px;
     }
 
     .login-card {
-        max-width: 480px;
-        padding: 26px 21px;
+        padding: 32px 24px 24px;
+        border-radius: 21px;
+    }
+
+    .login-header {
+        margin-bottom: 32px;
+    }
+
+    .login-header h1 {
+        font-size: 38px;
+    }
+
+    .login-header p {
+        max-width: 240px;
+        font-size: 11px;
+    }
+
+    .theme-toggle {
+        padding: 9px;
+    }
+
+    .theme-toggle #themeText {
+        display: none;
+    }
+
+    .login-form {
+        gap: 22px;
+    }
+
+    .connection-panel {
+        padding: 15px 13px;
+    }
+
+    .connection-grid {
+        gap: 17px 10px;
+    }
+
+    .card-footer {
+        font-size: 7px;
+        letter-spacing: .8px;
+    }
+
+    .page-decoration {
+        display: none;
     }
 
 }
 
-@media (max-width: 390px) {
+@media (max-width: 360px) {
 
-    .login-card-header {
-        flex-direction: column;
+    .login-card {
+        padding: 27px 18px 22px;
     }
 
-    .theme-toggle {
-        align-self: flex-start;
+    .login-header h1 {
+        font-size: 34px;
     }
 
-    .welcome-heading h1 {
-        font-size: 42px;
-    }
-
-    .connection-details {
-        gap: 14px 8px;
+    .connection-title {
+        font-size: 8px;
     }
 
 }
 
 @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
+
+    .login-page *,
+    .login-page *::before,
+    .login-page *::after {
+        animation-duration: .01ms !important;
         animation-iteration-count: 1 !important;
-        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
     }
+
 }
 
 </style>
@@ -777,49 +1045,50 @@
 
 <script>
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", function() {
 
-    const appRoot = document.getElementById("appRoot");
+    const loginPage = document.getElementById("loginPage");
 
-    /* =========================
-       THEME TOGGLE
-    ========================= */
+
+    /* ========================================
+       THEME
+    ======================================== */
 
     window.toggleTheme = function() {
 
-        appRoot.classList.toggle("light-mode");
+        loginPage.classList.toggle("light-mode");
 
-        const isLight = appRoot.classList.contains("light-mode");
+        const light = loginPage.classList.contains("light-mode");
 
-        document.getElementById("themeIcon").innerText =
-            isLight ? "☾" : "☼";
+        document.getElementById("themeIcon").textContent =
+            light ? "☾" : "☼";
 
-        document.getElementById("themeText").innerText =
-            isLight ? "Dark mode" : "Light mode";
+        document.getElementById("themeText").textContent =
+            light ? "Dark" : "Light";
 
     };
 
 
-    /* =========================
+    /* ========================================
        DEVICE DETECTION
-    ========================= */
+    ======================================== */
 
     const ua = navigator.userAgent;
 
-    document.getElementById("deviceType").innerText =
+    document.getElementById("deviceType").textContent =
         /Mobi|Android|iPhone|iPad/i.test(ua)
         ? "Mobile"
         : "Desktop";
 
 
-    /* =========================
+    /* ========================================
        BROWSER DETECTION
-    ========================= */
+    ======================================== */
 
-    let browser = "Browser";
+    let browser = "Unknown";
 
     if (ua.includes("Edg/")) {
-        browser = "Edge";
+        browser = "Microsoft Edge";
     } else if (ua.includes("Firefox/")) {
         browser = "Firefox";
     } else if (ua.includes("Chrome/")) {
@@ -828,14 +1097,15 @@ document.addEventListener("DOMContentLoaded", () => {
         browser = "Safari";
     }
 
-    document.getElementById("browserType").innerText = browser;
+    document.getElementById("browserType").textContent = browser;
 
 
-    /* =========================
-       LOCATION DETECTION
-    ========================= */
+    /* ========================================
+       LOCATION
+    ======================================== */
 
-    const locationElement = document.getElementById("locationText");
+    const locationElement =
+        document.getElementById("locationText");
 
     fetch("https://ipapi.co/json/")
         .then(response => {
@@ -845,23 +1115,23 @@ document.addEventListener("DOMContentLoaded", () => {
             return response.json();
         })
         .then(data => {
-            locationElement.innerText =
+            locationElement.textContent =
                 data.city && data.country_name
                 ? `${data.city}, ${data.country_name}`
                 : "Unavailable";
         })
         .catch(() => {
-            locationElement.innerText = "Unavailable";
+            locationElement.textContent = "Unavailable";
         });
 
 
-    /* =========================
-       CONNECTION PING
-    ========================= */
+    /* ========================================
+       RESPONSE TIME
+    ======================================== */
 
     const pingElement = document.getElementById("pingText");
 
-    async function ping() {
+    async function updatePing() {
 
         const start = performance.now();
 
@@ -872,73 +1142,91 @@ document.addEventListener("DOMContentLoaded", () => {
                 cache: "no-store"
             });
 
-            const ms = Math.round(performance.now() - start);
+            const elapsed = Math.round(performance.now() - start);
 
-            pingElement.innerText = ms + " ms";
+            pingElement.textContent = elapsed + " ms";
 
-        } catch {
+        } catch (error) {
 
-            pingElement.innerText = "Offline";
+            pingElement.textContent = "Unavailable";
 
         }
 
     }
 
-    ping();
+    updatePing();
 
-    const pingInterval = setInterval(ping, 5000);
+    setInterval(updatePing, 10000);
 
 
-    /* =========================
+    /* ========================================
        PASSWORD VISIBILITY
-    ========================= */
+    ======================================== */
 
     window.togglePassword = function() {
 
         const password = document.getElementById("password");
         const toggle = document.getElementById("passwordToggle");
 
-        const isHidden = password.type === "password";
+        const showing = password.type === "text";
 
-        password.type = isHidden ? "text" : "password";
-        toggle.innerText = isHidden ? "Hide" : "Show";
+        password.type = showing ? "password" : "text";
+        toggle.textContent = showing ? "Show" : "Hide";
 
     };
 
 
-    /* =========================
-       CAPS LOCK WARNING
-    ========================= */
+    /* ========================================
+       CAPS LOCK
+    ======================================== */
 
     window.checkCaps = function(event) {
 
-        document.getElementById("capsWarning")
-            .classList.toggle(
-                "hidden",
-                !event.getModifierState("CapsLock")
-            );
+        const warning = document.getElementById("capsWarning");
+
+        warning.classList.toggle(
+            "hidden",
+            !event.getModifierState("CapsLock")
+        );
 
     };
 
 
-    /* =========================
+    /* ========================================
+       INPUT FEEDBACK
+    ======================================== */
+
+    const username = document.getElementById("username");
+    const usernameStatus = document.getElementById("usernameStatus");
+
+    username.addEventListener("input", function() {
+
+        usernameStatus.textContent =
+            username.value.trim().length > 0 ? "✓" : "";
+
+    });
+
+
+    /* ========================================
        LOGIN LOADING STATE
-    ========================= */
+    ======================================== */
 
     const loginForm = document.getElementById("loginForm");
 
-    loginForm.addEventListener("submit", () => {
+    loginForm.addEventListener("submit", function() {
 
-        document.getElementById("btnText").innerText =
-            "Signing in...";
+        const button = document.getElementById("loginBtn");
+
+        button.disabled = true;
+
+        document.getElementById("btnText").textContent =
+            "Signing you in...";
+
+        document.getElementById("buttonArrow")
+            .classList.add("hidden");
 
         document.getElementById("spinner")
             .classList.remove("hidden");
-
-        document.getElementById("loginBtn").disabled = true;
-
-        document.getElementById("loginBtn")
-            .querySelector(".submit-arrow").classList.add("hidden");
 
     });
 
