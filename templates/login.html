@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 
 {% block title %}Sign In | Sunday School Notes{% endblock %}
@@ -15,7 +16,6 @@
 
     <main class="login-container">
 
-        <!-- Login card -->
         <section class="login-card">
 
             <div class="card-top-line"></div>
@@ -48,7 +48,7 @@
             </div>
 
 
-            <!-- Form -->
+            <!-- Login Form -->
             <form method="POST" id="loginForm" class="login-form">
 
                 <div class="field-group">
@@ -103,7 +103,6 @@
                             id="password"
                             placeholder="Enter your password"
                             autocomplete="current-password"
-                            onkeyup="checkCaps(event)"
                             required
                         >
 
@@ -117,7 +116,10 @@
 
                     </div>
 
-                    <div class="caps-warning hidden" id="capsWarning">
+                    <div class="caps-warning hidden"
+                         id="capsWarning"
+                         role="status"
+                         aria-live="polite">
                         <span>!</span>
                         Caps Lock is enabled
                     </div>
@@ -125,7 +127,7 @@
                 </div>
 
 
-                <!-- Submit -->
+                <!-- Submit Button -->
                 <button type="submit" id="loginBtn" class="login-submit">
 
                     <span id="btnText">Continue to dashboard</span>
@@ -151,8 +153,9 @@
             </form>
 
 
-            <!-- Security note -->
+            <!-- Security Note -->
             <div class="security-note">
+
                 <div class="security-icon">
                     <svg viewBox="0 0 24 24" fill="none">
                         <path d="M12 3 19 6v5c0 5-3 8-7 10-4-2-7-5-7-10V6l7-3Z"/>
@@ -161,10 +164,11 @@
                 </div>
 
                 <span>Your session is protected by secure authentication.</span>
+
             </div>
 
 
-            <!-- Connection panel -->
+            <!-- Connection Information -->
             <div class="connection-panel">
 
                 <div class="connection-header">
@@ -593,13 +597,22 @@
     color: #a5b4fc;
 }
 
+
+/* ========================================
+   CAPS LOCK WARNING - FIXED
+======================================== */
+
 .caps-warning {
-    display: flex;
+    display: none;
     align-items: center;
     gap: 7px;
     margin-top: -2px;
     color: #fbbf24;
     font-size: 10px;
+}
+
+.caps-warning.visible {
+    display: flex;
 }
 
 .caps-warning span {
@@ -1048,6 +1061,8 @@
 document.addEventListener("DOMContentLoaded", function() {
 
     const loginPage = document.getElementById("loginPage");
+    const passwordInput = document.getElementById("password");
+    const capsWarning = document.getElementById("capsWarning");
 
 
     /* ========================================
@@ -1067,6 +1082,55 @@ document.addEventListener("DOMContentLoaded", function() {
             light ? "Dark" : "Light";
 
     };
+
+
+    /* ========================================
+       CAPS LOCK DETECTION - FIXED
+    ======================================== */
+
+    function updateCapsLock(event) {
+
+        if (!event || typeof event.getModifierState !== "function") {
+            return;
+        }
+
+        const capsEnabled = event.getModifierState("CapsLock");
+
+        capsWarning.classList.toggle("visible", capsEnabled);
+
+    }
+
+    // Check Caps Lock while typing or pressing keys.
+    passwordInput.addEventListener("keydown", updateCapsLock);
+    passwordInput.addEventListener("keyup", updateCapsLock);
+
+    // Check again when the password field receives focus.
+    passwordInput.addEventListener("focus", function(event) {
+        updateCapsLock(event);
+    });
+
+    // Hide the warning when leaving the password field.
+    passwordInput.addEventListener("blur", function() {
+        capsWarning.classList.remove("visible");
+    });
+
+    // Also monitor keyboard events at document level.
+    // This helps detect Caps Lock changes when focus is in the password field.
+    document.addEventListener("keydown", function(event) {
+
+        if (document.activeElement === passwordInput) {
+            updateCapsLock(event);
+        }
+
+    });
+
+    document.addEventListener("keyup", function(event) {
+
+        if (document.activeElement === passwordInput) {
+            updateCapsLock(event);
+        }
+
+    });
 
 
     /* ========================================
@@ -1172,22 +1236,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
         password.type = showing ? "password" : "text";
         toggle.textContent = showing ? "Show" : "Hide";
-
-    };
-
-
-    /* ========================================
-       CAPS LOCK
-    ======================================== */
-
-    window.checkCaps = function(event) {
-
-        const warning = document.getElementById("capsWarning");
-
-        warning.classList.toggle(
-            "hidden",
-            !event.getModifierState("CapsLock")
-        );
 
     };
 
