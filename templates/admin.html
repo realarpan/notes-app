@@ -1,546 +1,1973 @@
+
 {% extends "base.html" %}
+
+{% block title %}Admin Control Center | Sunday School Notes{% endblock %}
+
+{% block head %}
+<style>
+    /* ================= ADMIN THEME ================= */
+
+    .admin-page {
+        display: flex;
+        width: 100%;
+        min-height: 750px;
+        color: #f1f5f9;
+        background:
+            radial-gradient(ellipse at 10% 0%, rgba(37, 99, 235, .09), transparent 35%),
+            radial-gradient(ellipse at 90% 100%, rgba(124, 58, 237, .08), transparent 35%);
+        position: relative;
+    }
+
+    .admin-sidebar {
+        width: 245px;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 22px 15px;
+        background: rgba(9, 15, 29, .88);
+        border-right: 1px solid rgba(148, 163, 184, .12);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        transition: transform .3s ease;
+        z-index: 40;
+    }
+
+    .sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 5px 9px 23px;
+        border-bottom: 1px solid rgba(148, 163, 184, .12);
+        margin-bottom: 24px;
+    }
+
+    .sidebar-logo {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 13px;
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        box-shadow: 0 5px 20px rgba(59, 130, 246, .25);
+        color: white;
+        font-size: 19px;
+        font-weight: 900;
+    }
+
+    .sidebar-brand h2 {
+        font-size: 15px;
+        font-weight: 800;
+        color: #f8fafc;
+        letter-spacing: -.3px;
+    }
+
+    .sidebar-brand p {
+        font-size: 10px;
+        color: #64748b;
+        margin-top: 3px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .sidebar-label {
+        padding: 0 10px;
+        margin: 0 0 10px;
+        color: #64748b;
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: 1.6px;
+        text-transform: uppercase;
+    }
+
+    .sidebar-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .tab-btn {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 13px;
+        border: 1px solid transparent;
+        border-radius: 11px;
+        background: transparent;
+        color: #94a3b8;
+        text-align: left;
+        font-size: 12px;
+        font-weight: 650;
+        cursor: pointer;
+        transition: .2s ease;
+    }
+
+    .tab-btn:hover {
+        color: #e2e8f0;
+        background: rgba(255, 255, 255, .045);
+    }
+
+    .tab-btn.active {
+        color: #bfdbfe;
+        border-color: rgba(96, 165, 250, .18);
+        background: linear-gradient(100deg, rgba(37, 99, 235, .2), rgba(79, 70, 229, .1));
+        box-shadow: inset 3px 0 #60a5fa;
+    }
+
+    .tab-icon {
+        width: 19px;
+        text-align: center;
+        font-size: 15px;
+    }
+
+    .sidebar-bottom {
+        margin-top: auto;
+        padding-top: 20px;
+    }
+
+    .admin-sidebar-note {
+        padding: 14px;
+        border: 1px solid rgba(148, 163, 184, .12);
+        border-radius: 13px;
+        background: rgba(30, 41, 59, .4);
+    }
+
+    .admin-sidebar-note p {
+        color: #94a3b8;
+        font-size: 10px;
+        line-height: 1.6;
+    }
+
+    .admin-sidebar-note strong {
+        display: block;
+        color: #cbd5e1;
+        font-size: 11px;
+        margin-bottom: 4px;
+    }
+
+    /* ================= MAIN AREA ================= */
+
+    .admin-main {
+        min-width: 0;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .admin-topbar {
+        min-height: 76px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 13px 27px;
+        border-bottom: 1px solid rgba(148, 163, 184, .12);
+        background: rgba(9, 15, 29, .48);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+    }
+
+    .topbar-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        min-width: 0;
+    }
+
+    .sidebar-toggle {
+        display: none;
+        width: 38px;
+        height: 38px;
+        border: 1px solid rgba(148, 163, 184, .17);
+        border-radius: 10px;
+        background: rgba(30, 41, 59, .7);
+        color: #e2e8f0;
+        cursor: pointer;
+    }
+
+    .topbar-heading {
+        color: #f8fafc;
+        font-size: 16px;
+        font-weight: 800;
+        letter-spacing: -.4px;
+    }
+
+    .topbar-description {
+        color: #64748b;
+        font-size: 10px;
+        margin-top: 4px;
+    }
+
+    .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .admin-search {
+        width: 205px;
+        height: 38px;
+        padding: 0 13px;
+        border: 1px solid rgba(148, 163, 184, .14);
+        border-radius: 10px;
+        outline: none;
+        background: rgba(15, 23, 42, .7);
+        color: #e2e8f0;
+        font-size: 11px;
+        transition: .2s;
+    }
+
+    .admin-search::placeholder {
+        color: #64748b;
+    }
+
+    .admin-search:focus {
+        border-color: rgba(96, 165, 250, .6);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, .1);
+    }
+
+    .admin-profile {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding-left: 13px;
+        border-left: 1px solid rgba(148, 163, 184, .15);
+    }
+
+    .admin-avatar {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        box-shadow: 0 4px 14px rgba(59, 130, 246, .2);
+        color: white;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .profile-name {
+        color: #e2e8f0;
+        font-size: 11px;
+        font-weight: 750;
+    }
+
+    .profile-role {
+        color: #64748b;
+        font-size: 9px;
+        margin-top: 3px;
+    }
+
+    .admin-content {
+        flex: 1;
+        padding: 27px;
+        overflow-x: hidden;
+    }
+
+    .tab-content {
+        animation: adminFade .25s ease;
+    }
+
+    @keyframes adminFade {
+        from {
+            opacity: 0;
+            transform: translateY(5px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .page-intro {
+        margin-bottom: 23px;
+    }
+
+    .page-intro h1 {
+        color: #f8fafc;
+        font-size: 24px;
+        font-weight: 850;
+        letter-spacing: -.8px;
+    }
+
+    .page-intro p {
+        color: #8493a8;
+        font-size: 12px;
+        margin-top: 7px;
+    }
+
+    /* ================= CARDS ================= */
+
+    .card {
+        padding: 19px;
+        border: 1px solid rgba(148, 163, 184, .13);
+        border-radius: 16px;
+        background: linear-gradient(
+            145deg,
+            rgba(30, 41, 59, .72),
+            rgba(15, 23, 42, .65)
+        );
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        transition: border-color .2s ease, transform .2s ease;
+    }
+
+    .card:hover {
+        border-color: rgba(96, 165, 250, .25);
+    }
+
+    .metric-card {
+        position: relative;
+        overflow: hidden;
+        min-height: 145px;
+    }
+
+    .metric-card::after {
+        content: "";
+        position: absolute;
+        width: 95px;
+        height: 95px;
+        right: -35px;
+        top: -35px;
+        border-radius: 50%;
+        background: var(--metric-glow, rgba(59, 130, 246, .13));
+        filter: blur(3px);
+    }
+
+    .metric-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .label {
+        color: #94a3b8;
+        font-size: 11px;
+        font-weight: 650;
+    }
+
+    .metric-icon {
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 11px;
+        background: var(--metric-bg, rgba(59, 130, 246, .13));
+        color: var(--metric-color, #93c5fd);
+        font-size: 16px;
+    }
+
+    .value {
+        color: #f8fafc;
+        font-size: 27px;
+        font-weight: 850;
+        letter-spacing: -1px;
+        margin-top: 15px;
+        line-height: 1;
+    }
+
+    .sub {
+        color: #64748b;
+        font-size: 10px;
+        margin-top: 9px;
+    }
+
+    .section-title {
+        color: #e2e8f0;
+        font-size: 13px;
+        font-weight: 750;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 9px 0;
+        border-bottom: 1px solid rgba(148, 163, 184, .08);
+        font-size: 11px;
+    }
+
+    .info-row:last-child {
+        border-bottom: 0;
+    }
+
+    .info-label {
+        color: #8493a8;
+    }
+
+    .info-value {
+        color: #e2e8f0;
+        text-align: right;
+        overflow-wrap: anywhere;
+    }
+
+    .status-dot {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        margin-right: 6px;
+        background: currentColor;
+    }
+
+    /* ================= UPLOAD ================= */
+
+    .upload-wrapper {
+        max-width: 650px;
+        margin: 0 auto;
+    }
+
+    .upload-card {
+        padding: 25px;
+    }
+
+    .form-label {
+        display: block;
+        color: #cbd5e1;
+        font-size: 11px;
+        font-weight: 700;
+        margin-bottom: 9px;
+    }
+
+    .admin-select {
+        width: 100%;
+        height: 45px;
+        padding: 0 13px;
+        border: 1px solid rgba(148, 163, 184, .17);
+        border-radius: 10px;
+        outline: none;
+        background: #111c30;
+        color: #e2e8f0;
+        font-size: 12px;
+    }
+
+    .admin-select:focus {
+        border-color: #60a5fa;
+    }
+
+    .drop-zone {
+        padding: 38px 20px;
+        border: 2px dashed rgba(100, 116, 139, .5);
+        border-radius: 15px;
+        background: rgba(15, 23, 42, .35);
+        text-align: center;
+        cursor: pointer;
+        transition: .2s ease;
+    }
+
+    .drop-zone:hover,
+    .drop-zone.dragover {
+        border-color: #60a5fa;
+        background: rgba(37, 99, 235, .08);
+    }
+
+    .drop-icon {
+        width: 54px;
+        height: 54px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 14px;
+        border-radius: 16px;
+        background: rgba(59, 130, 246, .13);
+        color: #93c5fd;
+        font-size: 25px;
+    }
+
+    .drop-title {
+        color: #e2e8f0;
+        font-size: 13px;
+        font-weight: 750;
+    }
+
+    .drop-subtitle {
+        color: #64748b;
+        font-size: 10px;
+        margin-top: 7px;
+    }
+
+    .browse-text {
+        color: #60a5fa;
+        font-weight: 750;
+    }
+
+    .upload-btn {
+        width: 100%;
+        padding: 13px 18px;
+        border: 0;
+        border-radius: 11px;
+        background: linear-gradient(110deg, #2563eb, #4f46e5);
+        color: white;
+        font-size: 12px;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: 0 7px 20px rgba(37, 99, 235, .2);
+        transition: .2s ease;
+    }
+
+    .upload-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 25px rgba(37, 99, 235, .3);
+    }
+
+    .upload-btn:disabled {
+        opacity: .6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .file-preview {
+        padding: 13px;
+        border: 1px solid rgba(52, 211, 153, .2);
+        border-radius: 12px;
+        background: rgba(16, 185, 129, .07);
+    }
+
+    .file-preview-name {
+        color: #d1fae5;
+        font-size: 11px;
+        font-weight: 700;
+        overflow-wrap: anywhere;
+    }
+
+    .file-preview-sub {
+        color: #6ee7b7;
+        font-size: 10px;
+        margin-top: 4px;
+    }
+
+    .remove-file {
+        color: #f87171;
+        font-size: 10px;
+        font-weight: 750;
+        cursor: pointer;
+        background: transparent;
+        border: 0;
+    }
+
+    /* ================= NOTES MANAGEMENT ================= */
+
+    .notes-search-wrap {
+        margin-bottom: 17px;
+    }
+
+    .notes-search-input {
+        width: 100%;
+        height: 43px;
+        padding: 0 14px;
+        border: 1px solid rgba(148, 163, 184, .15);
+        border-radius: 11px;
+        outline: none;
+        background: rgba(15, 23, 42, .7);
+        color: #e2e8f0;
+        font-size: 11px;
+    }
+
+    .notes-search-input:focus {
+        border-color: rgba(96, 165, 250, .6);
+    }
+
+    .note-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 15px 17px;
+        margin-bottom: 10px;
+    }
+
+    .note-class {
+        color: #e2e8f0;
+        font-size: 12px;
+        font-weight: 750;
+    }
+
+    .note-filename {
+        max-width: 300px;
+        color: #718096;
+        font-size: 10px;
+        margin-top: 5px;
+        overflow-wrap: anywhere;
+    }
+
+    .note-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .btn-blue,
+    .btn-red {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 13px;
+        border-radius: 8px;
+        font-size: 10px;
+        font-weight: 750;
+        text-decoration: none;
+        cursor: pointer;
+        border: 1px solid transparent;
+        transition: .2s;
+    }
+
+    .btn-blue {
+        color: #bfdbfe;
+        border-color: rgba(96, 165, 250, .2);
+        background: rgba(37, 99, 235, .15);
+    }
+
+    .btn-blue:hover {
+        background: rgba(37, 99, 235, .35);
+        color: white;
+    }
+
+    .btn-red {
+        color: #fecaca;
+        border-color: rgba(248, 113, 113, .2);
+        background: rgba(220, 38, 38, .13);
+    }
+
+    .btn-red:hover {
+        background: rgba(220, 38, 38, .3);
+        color: white;
+    }
+
+    /* ================= HISTORY & USERS ================= */
+
+    .history-card {
+        margin-bottom: 11px;
+        padding: 16px 18px;
+    }
+
+    .history-main {
+        color: #e2e8f0;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .history-file,
+    .history-date {
+        color: #8493a8;
+        font-size: 10px;
+        margin-top: 6px;
+        overflow-wrap: anywhere;
+    }
+
+    .user-card {
+        min-width: 0;
+    }
+
+    .user-name {
+        color: #e2e8f0;
+        font-size: 13px;
+        font-weight: 800;
+        overflow-wrap: anywhere;
+    }
+
+    .role-badge {
+        padding: 5px 9px;
+        border-radius: 7px;
+        font-size: 9px;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .user-meta {
+        color: #8493a8;
+        font-size: 10px;
+        line-height: 1.9;
+        margin-top: 14px;
+    }
+
+    /* ================= ACTIVITY ================= */
+
+    .activity-entry {
+        padding: 10px 12px;
+        border: 1px solid rgba(148, 163, 184, .08);
+        border-radius: 9px;
+        background: rgba(2, 6, 23, .28);
+        color: #94a3b8;
+        font-size: 10px;
+    }
+
+    .activity-indicator {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #60a5fa;
+        margin-right: 8px;
+    }
+
+    .empty-admin {
+        padding: 35px 18px;
+        text-align: center;
+        border: 1px dashed rgba(148, 163, 184, .2);
+        border-radius: 13px;
+        color: #94a3b8;
+        font-size: 11px;
+    }
+
+    /* ================= MOBILE ================= */
+
+    .sidebar-overlay {
+        display: none;
+    }
+
+    @media (max-width: 900px) {
+        .admin-sidebar {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            height: 100vh;
+            transform: translateX(-105%);
+            box-shadow: 15px 0 40px rgba(0, 0, 0, .35);
+        }
+
+        .admin-sidebar.sidebar-open {
+            transform: translateX(0);
+        }
+
+        .sidebar-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-overlay.visible {
+            display: block;
+            position: fixed;
+            inset: 0;
+            z-index: 30;
+            background: rgba(0, 0, 0, .55);
+            backdrop-filter: blur(3px);
+        }
+    }
+
+    @media (max-width: 650px) {
+        .admin-topbar {
+            padding: 12px 15px;
+        }
+
+        .admin-content {
+            padding: 19px 14px;
+        }
+
+        .admin-search {
+            display: none;
+        }
+
+        .profile-name {
+            max-width: 90px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .page-intro h1 {
+            font-size: 21px;
+        }
+
+        .upload-card {
+            padding: 17px;
+        }
+
+        .note-item {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .note-actions {
+            width: 100%;
+        }
+
+        .note-actions > * {
+            flex: 1;
+        }
+
+        .note-actions a,
+        .note-actions button {
+            width: 100%;
+        }
+
+        .note-filename {
+            max-width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+
 {% block content %}
 
-<div class="flex h-screen overflow-hidden bg-gradient-to-br from-black via-gray-900 to-black text-white">
+<div class="admin-page">
 
-<!-- ================= SIDEBAR ================= -->
-<div id="sidebar"
-class="fixed md:relative z-50 h-full w-64 bg-black/90 backdrop-blur-xl border-r border-white/10 transform -translate-x-full md:translate-x-0 transition duration-300 flex flex-col">
+    <!-- Mobile Sidebar Overlay -->
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
-<div class="p-5 text-lg font-semibold border-b border-white/10">
-Admin Panel
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside id="sidebar" class="admin-sidebar">
+
+        <div class="sidebar-brand">
+
+            <div class="sidebar-logo">S</div>
+
+            <div>
+                <h2>Sunday School</h2>
+                <p>Administration</p>
+            </div>
+
+        </div>
+
+
+        <div class="sidebar-label">Workspace</div>
+
+        <nav class="sidebar-nav">
+
+            <button
+                type="button"
+                onclick="showTab('overview', this)"
+                class="tab-btn active"
+            >
+                <span class="tab-icon">▦</span>
+                Overview
+            </button>
+
+            <button
+                type="button"
+                onclick="showTab('upload', this)"
+                class="tab-btn"
+            >
+                <span class="tab-icon">↑</span>
+                Upload Notes
+            </button>
+
+            <button
+                type="button"
+                onclick="showTab('manage', this)"
+                class="tab-btn"
+            >
+                <span class="tab-icon">▤</span>
+                Manage Notes
+            </button>
+
+            <button
+                type="button"
+                onclick="showTab('history', this)"
+                class="tab-btn"
+            >
+                <span class="tab-icon">◷</span>
+                Upload History
+            </button>
+
+            <button
+                type="button"
+                onclick="showTab('usersTab', this)"
+                class="tab-btn"
+            >
+                <span class="tab-icon">♙</span>
+                Users
+            </button>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="admin-sidebar-note">
+                <strong>Admin Workspace</strong>
+                <p>Manage study materials, uploads and registered users from one place.</p>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="admin-main">
+
+
+        <!-- TOPBAR -->
+
+        <header class="admin-topbar">
+
+            <div class="topbar-left">
+
+                <button
+                    type="button"
+                    class="sidebar-toggle"
+                    onclick="toggleSidebar()"
+                    aria-label="Toggle sidebar"
+                >
+                    ☰
+                </button>
+
+                <div>
+                    <div class="topbar-heading" id="topbarHeading">
+                        Overview
+                    </div>
+
+                    <div class="topbar-description">
+                        Sunday School Notes / Administration
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="topbar-right">
+
+                <input
+                    id="adminTopSearch"
+                    class="admin-search"
+                    type="text"
+                    placeholder="Search notes..."
+                    autocomplete="off"
+                >
+
+                <div class="admin-profile">
+
+                    <div class="admin-avatar">
+                        {{ current_user.username[0]|upper }}
+                    </div>
+
+                    <div>
+                        <div class="profile-name">
+                            {{ current_user.username }}
+                        </div>
+
+                        <div class="profile-role">
+                            Administrator
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- ================= CONTENT ================= -->
+
+        <div class="admin-content">
+
+
+            <!-- ================= OVERVIEW ================= -->
+
+            <section id="overview" class="tab-content">
+
+                <div class="page-intro">
+                    <h1>Dashboard Overview</h1>
+                    <p>Monitor your study library and system information.</p>
+                </div>
+
+
+                <!-- METRICS -->
+
+                <div class="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-5">
+
+                    <div class="card metric-card" style="--metric-bg:rgba(59,130,246,.14);--metric-color:#93c5fd;--metric-glow:rgba(59,130,246,.13);">
+
+                        <div class="metric-top">
+                            <p class="label">Total Notes</p>
+                            <div class="metric-icon">▤</div>
+                        </div>
+
+                        <h2 class="value">{{ notes|length }}</h2>
+                        <p class="sub">All uploaded files</p>
+
+                    </div>
+
+
+                    <div class="card metric-card" style="--metric-bg:rgba(139,92,246,.14);--metric-color:#c4b5fd;--metric-glow:rgba(139,92,246,.13);">
+
+                        <div class="metric-top">
+                            <p class="label">Classes</p>
+                            <div class="metric-icon">▦</div>
+                        </div>
+
+                        <h2 class="value">{{ classes_with_notes }}</h2>
+                        <p class="sub">Classes with notes</p>
+
+                    </div>
+
+
+                    <div class="card metric-card" style="--metric-bg:rgba(16,185,129,.13);--metric-color:#6ee7b7;--metric-glow:rgba(16,185,129,.13);">
+
+                        <div class="metric-top">
+                            <p class="label">Uploads (24h)</p>
+                            <div class="metric-icon">↑</div>
+                        </div>
+
+                        <h2 class="value">{{ recent_uploads }}</h2>
+                        <p class="sub">Recent activity</p>
+
+                    </div>
+
+
+                    <div class="card metric-card" style="--metric-bg:rgba(245,158,11,.13);--metric-color:#fcd34d;--metric-glow:rgba(245,158,11,.12);">
+
+                        <div class="metric-top">
+                            <p class="label">Database</p>
+                            <div class="metric-icon">◈</div>
+                        </div>
+
+                        {% if db_status == "online" %}
+                            <h2 class="value" style="color:#6ee7b7;">{{ db_ping }} ms</h2>
+                            <p class="sub" style="color:#6ee7b7;">● Connected</p>
+                        {% else %}
+                            <h2 class="value" style="color:#f87171;">Offline</h2>
+                            <p class="sub" style="color:#f87171;">● Connection issue</p>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <!-- SYSTEM INFORMATION -->
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-5">
+
+
+                    <!-- SYSTEM INFO -->
+
+                    <div class="card">
+
+                        <h3 class="section-title mb-4">
+                            System Information
+                        </h3>
+
+                        <div>
+
+                            <div class="info-row">
+                                <span class="info-label">Admin User</span>
+                                <span class="info-value">{{ current_user.username }}</span>
+                            </div>
+
+                            <div class="info-row">
+                                <span class="info-label">Device</span>
+                                <span class="info-value" id="deviceType">--</span>
+                            </div>
+
+                            <div class="info-row">
+                                <span class="info-label">Browser</span>
+                                <span class="info-value" id="browserType">--</span>
+                            </div>
+
+                            <div class="info-row">
+                                <span class="info-label">IP / Location</span>
+                                <span class="info-value" id="locationInfo">Loading...</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- SERVER STATUS -->
+
+                    <div class="card">
+
+                        <h3 class="section-title mb-4">
+                            Server Status
+                        </h3>
+
+                        <div>
+
+                            <div class="info-row">
+                                <span class="info-label">API Response</span>
+                                <span class="info-value">
+                                    {% if api_ping %}{{ api_ping }} ms{% else %}--{% endif %}
+                                </span>
+                            </div>
+
+                            <div class="info-row">
+                                <span class="info-label">Uptime</span>
+                                <span class="info-value">{{ uptime }}</span>
+                            </div>
+
+                            <div class="info-row">
+                                <span class="info-label">Host</span>
+                                <span class="info-value">{{ host }}</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- STORAGE -->
+
+                    <div class="card">
+
+                        <h3 class="section-title mb-4">
+                            Storage Status
+                        </h3>
+
+                        <div>
+
+                            <div class="info-row">
+                                <span class="info-label">Connection</span>
+
+                                <span class="info-value {% if storage_status == 'online' %}text-green-400{% else %}text-red-400{% endif %}">
+                                    <span class="status-dot"></span>
+                                    {{ storage_status }}
+                                </span>
+                            </div>
+
+                            <div class="info-row">
+                                <span class="info-label">Provider</span>
+                                <span class="info-value">Supabase</span>
+                            </div>
+
+                            <div class="info-row">
+                                <span class="info-label">Database Health</span>
+
+                                {% if db_ping and db_ping < 150 %}
+                                    <span class="info-value text-green-400">Optimal</span>
+                                {% elif db_ping and db_ping < 400 %}
+                                    <span class="info-value text-yellow-400">Stable</span>
+                                {% else %}
+                                    <span class="info-value text-red-400">Slow</span>
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- LIVE ACTIVITY -->
+
+                <div class="card">
+
+                    <div class="flex justify-between items-center gap-3 mb-4">
+
+                        <div>
+                            <h3 class="section-title">Live Activity</h3>
+                            <p class="text-xs text-gray-500 mt-1">
+                                Dashboard activity feed
+                            </p>
+                        </div>
+
+                        <span class="text-xs text-blue-400">
+                            ● Activity feed
+                        </span>
+
+                    </div>
+
+                    <div
+                        id="activityFeed"
+                        class="space-y-2 max-h-[210px] overflow-y-auto"
+                    >
+                        <div class="text-gray-500 text-xs">
+                            Waiting for activity...
+                        </div>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- ================= UPLOAD ================= -->
+
+            <section id="upload" class="tab-content hidden">
+
+                <div class="page-intro">
+                    <h1>Upload Study Materials</h1>
+                    <p>Add PDF notes to the appropriate class library.</p>
+                </div>
+
+
+                <div class="upload-wrapper">
+
+                    <form
+                        method="POST"
+                        enctype="multipart/form-data"
+                        class="card upload-card space-y-5"
+                    >
+
+                        <div>
+                            <label class="form-label">
+                                Select Destination Class
+                            </label>
+
+                            <select
+                                name="class_number"
+                                class="admin-select"
+                                required
+                            >
+                                {% for i in range(1,12) %}
+                                    <option value="{{i}}">
+                                        Class {{i}}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+
+                        <div>
+
+                            <label class="form-label">
+                                Select PDF File
+                            </label>
+
+                            <div id="dropZone" class="drop-zone">
+
+                                <div class="drop-icon">↑</div>
+
+                                <p class="drop-title">
+                                    Drag & Drop your PDF here
+                                </p>
+
+                                <p class="drop-subtitle">
+                                    or <span class="browse-text">browse files</span> from your device
+                                </p>
+
+                                <p class="drop-subtitle">
+                                    PDF documents only
+                                </p>
+
+                                <input
+                                    type="file"
+                                    name="file"
+                                    id="fileInput"
+                                    accept=".pdf,application/pdf"
+                                    class="hidden"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- FILE PREVIEW -->
+
+                        <div
+                            id="filePreview"
+                            class="file-preview hidden flex justify-between items-center gap-3"
+                        >
+
+                            <div class="min-w-0">
+                                <p id="fileName" class="file-preview-name"></p>
+                                <p class="file-preview-sub">
+                                    Selected and ready to upload
+                                </p>
+                            </div>
+
+                            <button
+                                type="button"
+                                id="removeFile"
+                                class="remove-file"
+                            >
+                                Remove
+                            </button>
+
+                        </div>
+
+
+                        <!-- EXISTING PROGRESS UI -->
+
+                        <div id="progressContainer" class="hidden">
+
+                            <div class="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+                                <div
+                                    id="progressBar"
+                                    class="h-full bg-green-500 w-0"
+                                ></div>
+                            </div>
+
+                            <p class="text-xs text-gray-400 mt-2">
+                                Uploading...
+                            </p>
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            id="uploadBtn"
+                            class="upload-btn"
+                        >
+                            ↑ &nbsp; Upload Notes
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- ================= NOTES MANAGEMENT ================= -->
+
+            <section id="manage" class="tab-content hidden">
+
+                <div class="page-intro">
+                    <h1>Manage Notes</h1>
+                    <p>View and manage uploaded PDF materials.</p>
+                </div>
+
+
+                <div class="notes-search-wrap">
+
+                    <input
+                        id="searchNotes"
+                        class="notes-search-input"
+                        type="text"
+                        placeholder="Search by class or PDF filename..."
+                        autocomplete="off"
+                    >
+
+                </div>
+
+
+                <div id="notesContainer">
+
+                    {% for note in notes %}
+
+                        <div class="note-item card">
+
+                            <div class="min-w-0">
+
+                                <p class="note-class">
+                                    Class {{ note.class_number }}
+                                </p>
+
+                                <p class="note-filename">
+                                    {{ note.pdf_url.split('/')[-1] }}
+                                </p>
+
+                            </div>
+
+
+                            <div class="note-actions">
+
+                                <a
+                                    href="{{ note.pdf_url }}"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="btn-blue"
+                                >
+                                    ↗ View
+                                </a>
+
+                                <form
+                                    method="POST"
+                                    action="/delete-note/{{ note.id }}"
+                                    onsubmit="return confirm('Are you sure you want to delete this note?');"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        class="btn-red"
+                                    >
+                                        Delete
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="empty-admin">
+                            No notes have been uploaded yet.
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <div id="notesNoResults" class="empty-admin hidden">
+                    No matching notes found.
+                </div>
+
+            </section>
+
+
+
+            <!-- ================= HISTORY ================= -->
+
+            <section id="history" class="tab-content hidden">
+
+                <div class="page-intro">
+                    <h1>Upload History</h1>
+                    <p>Review previously recorded upload activity.</p>
+                </div>
+
+
+                {% if logs is defined and logs %}
+
+                    {% for log in logs %}
+
+                        <div class="card history-card">
+
+                            <div class="history-main">
+                                ↑ &nbsp; {{ log.uploaded_by }} → Class {{ log.class_number }}
+                            </div>
+
+                            <div class="history-file">
+                                {{ log.filename }}
+                            </div>
+
+                            <div class="history-date">
+                                {{ log.timestamp.strftime("%d %b %Y, %I:%M %p") }}
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="empty-admin">
+                        <div class="text-2xl mb-3">◷</div>
+                        <p class="text-gray-200 font-semibold mb-2">
+                            No history available
+                        </p>
+                        <p>
+                            Upload history will appear here when available.
+                        </p>
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+
+
+            <!-- ================= USERS ================= -->
+
+            <section id="usersTab" class="tab-content hidden">
+
+                <div class="page-intro">
+                    <h1>Registered Users</h1>
+                    <p>View user accounts and their assigned access roles.</p>
+                </div>
+
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+
+                    {% for user in users %}
+
+                        <div class="card user-card">
+
+                            <div class="flex justify-between items-center gap-3 mb-2">
+
+                                <p class="user-name">
+                                    {{ user.username }}
+                                </p>
+
+                                <span class="role-badge
+                                    {% if user.role == 'admin' %}
+                                        bg-red-500/15 text-red-400
+                                    {% else %}
+                                        bg-blue-500/15 text-blue-400
+                                    {% endif %}
+                                ">
+                                    {{ user.role }}
+                                </span>
+
+                            </div>
+
+
+                            <div class="user-meta">
+
+                                <p>User ID: {{ user.id }}</p>
+
+                                <p>Status: Active</p>
+
+                                <p>Access: {{ user.role }}</p>
+
+                            </div>
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="empty-admin col-span-full">
+                            No registered users found.
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </section>
+
+
+        </div>
+
+    </main>
+
 </div>
 
-<div class="flex-1 p-3 space-y-2 text-sm">
+{% endblock %}
 
-<button onclick="showTab('overview', this)" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-white/10">📊 Overview</button>
 
-<button onclick="showTab('upload', this)" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-white/10">⬆⬆ Upload</button>
-
-<button onclick="showTab('manage', this)" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-white/10">📂 Notes</button>
-
-<button onclick="showTab('history', this)" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-white/10">🕒 History</button>
-
-<button onclick="showTab('usersTab', this)" class="tab-btn w-full text-left px-3 py-2 rounded hover:bg-white/10">👤 Users</button>
-
-</div>
-</div>
-
-
-<!-- ================= MAIN ================= -->
-<div class="flex-1 flex flex-col overflow-hidden">
-
-<!-- TOPBAR -->
-<div class="flex justify-between items-center px-4 py-3 border-b border-white/10 bg-black/70 backdrop-blur">
-
-<div class="flex items-center gap-3">
-<button onclick="toggleSidebar()" class="md:hidden text-lg">☰</button>
-<input placeholder="Search..." class="px-3 py-1 bg-gray-800 rounded text-sm outline-none">
-</div>
-
-<div class="flex items-center gap-3">
-
-    <!-- Avatar -->
-    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-sm font-semibold text-white shadow">
-        {{ current_user.username[0]|upper }}
-    </div>
-
-    <!-- Info -->
-    <div class="flex flex-col leading-tight">
-
-        <span class="text-sm font-medium text-white tracking-wide">
-            {{ current_user.username }}
-        </span>
-
-    </div>
-
-</div>
-
-</div>
-
-
-<!-- ================= CONTENT ================= -->
-<div class="flex-1 overflow-y-auto p-4 space-y-6">
-
-<!-- ===== OVERVIEW ===== -->
-<div id="overview" class="tab-content space-y-6">
-
-<!-- ===== TOP METRICS ===== -->
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-
-<div class="card">
-<p class="label">Total Notes</p>
-<h2 class="value">{{ notes|length }}</h2>
-<p class="sub">All uploaded files</p>
-</div>
-
-<div class="card">
-<p class="label">Classes</p>
-<h2 class="value">{{ classes_with_notes }}</h2>
-<p class="sub">Active classes</p>
-</div>
-
-<div class="card">
-<p class="label">Uploads (24h)</p>
-<h2 class="value">{{ recent_uploads }}</h2>
-<p class="sub">Recent activity</p>
-</div>
-
-<div class="card">
-<p class="label">Database</p>
-{% if db_status=="online" %}
-<h2 class="value text-green-400">{{ db_ping }} ms</h2>
-<p class="sub text-green-400">Connected</p>
-{% else %}
-<h2 class="value text-red-400">Offline</h2>
-<p class="sub text-red-400">Connection issue</p>
-{% endif %}
-</div>
-
-</div>
-
-
-<!-- ===== SECOND ROW ===== -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-<!-- SYSTEM INFO -->
-<div class="card">
-<h3 class="section-title mb-3">System Info</h3>
-
-<div class="space-y-2 text-xs">
-
-<div class="flex justify-between">
-<span class="text-gray-400">User</span>
-<span>{{ current_user.username }}</span>
-</div>
-
-<div class="flex justify-between">
-<span class="text-gray-400">Device</span>
-<span id="deviceType">--</span>
-</div>
-
-<div class="flex justify-between">
-<span class="text-gray-400">Browser</span>
-<span id="browserType">--</span>
-</div>
-
-<div class="flex justify-between">
-<span class="text-gray-400">IP / Location</span>
-<span id="locationInfo">Loading...</span>
-</div>
-
-</div>
-</div>
-
-
-<!-- SERVER STATUS -->
-<div class="card">
-<h3 class="section-title mb-3">Server Status</h3>
-
-<div class="space-y-2 text-xs">
-
-<div class="flex justify-between">
-<span class="text-gray-400">API</span>
-<span>{% if api_ping %}{{ api_ping }} ms{% else %}--{% endif %}</span>
-</div>
-
-<div class="flex justify-between">
-<span class="text-gray-400">Uptime</span>
-<span>{{ uptime }}</span>
-</div>
-
-<div class="flex justify-between">
-<span class="text-gray-400">Host</span>
-<span>{{ host }}</span>
-</div>
-
-</div>
-</div>
-
-
-<!-- STORAGE -->
-<div class="card">
-<h3 class="section-title mb-3">Storage</h3>
-
-<div class="space-y-2 text-xs">
-
-<div class="flex justify-between">
-<span class="text-gray-400">Status</span>
-<span class="{% if storage_status=='online' %}text-green-400{% else %}text-red-400{% endif %}">
-{{ storage_status }}
-</span>
-</div>
-
-<div class="flex justify-between">
-<span class="text-gray-400">Provider</span>
-<span>Supabase</span>
-</div>
-
-<div class="flex justify-between">
-<span class="text-gray-400">Health</span>
-{% if db_ping and db_ping < 150 %}
-<span class="text-green-400">Optimal</span>
-{% elif db_ping and db_ping < 400 %}
-<span class="text-yellow-400">Stable</span>
-{% else %}
-<span class="text-red-400">Slow</span>
-{% endif %}
-</div>
-
-</div>
-</div>
-
-</div>
-
-
-<!-- ===== LIVE ACTIVITY ===== -->
-<div class="card">
-<div class="flex justify-between items-center mb-3">
-<h3 class="section-title">Live Activity</h3>
-<span class="text-xs text-gray-500">auto updating</span>
-</div>
-
-<div id="activityFeed" class="space-y-2 text-xs text-gray-400 max-h-[180px] overflow-y-auto">
-<div class="text-gray-500">Waiting for activity...</div>
-</div>
-
-</div>
-
-</div>
-
-
-<!-- ===== UPLOAD (ADVANCED) ===== -->
-<div id="upload" class="tab-content hidden">
-
-<div class="max-w-lg mx-auto">
-
-<form method="POST" enctype="multipart/form-data" class="space-y-4">
-
-<div class="card">
-<label class="text-xs text-gray-400 mb-1 block">Select Class</label>
-<select name="class_number"
-class="w-full p-3 bg-gray-900 rounded-lg border border-white/10 focus:outline-none focus:ring-2 focus:ring-green-500">
-{% for i in range(1,12) %}
-<option value="{{i}}">Class {{i}}</option>
-{% endfor %}
-</select>
-</div>
-
-<div id="dropZone"
-class="border-2 border-dashed border-gray-600 rounded-xl p-8 text-center cursor-pointer hover:border-green-400 hover:bg-green-500/5 transition">
-
-<div class="text-4xl mb-3">📄</div>
-<p class="text-sm text-gray-300">Drag & Drop PDF here</p>
-<p class="text-xs text-gray-500">or click to browse</p>
-
-<input type="file" name="file" id="fileInput" class="hidden">
-</div>
-
-<div id="filePreview" class="hidden card flex justify-between items-center">
-<div>
-<p id="fileName" class="text-sm font-medium"></p>
-<p class="text-xs text-gray-400">Ready to upload</p>
-</div>
-
-<button type="button" id="removeFile" class="text-red-400 text-xs">Remove</button>
-</div>
-
-<div id="progressContainer" class="hidden">
-<div class="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
-<div id="progressBar" class="h-full bg-green-500 w-0"></div>
-</div>
-<p class="text-xs text-gray-400 mt-1">Uploading...</p>
-</div>
-
-<button id="uploadBtn"
-class="w-full py-3 rounded-xl font-medium bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 transition">
-🚀 Upload Notes
-</button>
-
-</form>
-
-</div>
-</div>
-
-
-<!-- ===== NOTES ===== -->
-<div id="manage" class="tab-content hidden">
-
-<input id="searchNotes" class="w-full mb-3 p-2 bg-gray-800 rounded" placeholder="Search notes...">
-
-<div class="space-y-3">
-
-{% for note in notes %}
-<div class="note-item card flex justify-between items-center hover:bg-white/10 transition">
-
-<div>
-<p class="font-medium">Class {{note.class_number}}</p>
-<p class="text-xs text-gray-400 truncate max-w-[180px]">
-{{ note.pdf_url.split('/')[-1] }}
-</p>
-</div>
-
-<div class="flex gap-2">
-
-<a href="{{note.pdf_url}}" target="_blank"
-class="btn-blue">View</a>
-
-<form method="POST" action="/delete-note/{{note.id}}">
-<button class="btn-red">Delete</button>
-</form>
-
-</div>
-
-</div>
-{% endfor %}
-
-</div>
-</div>
-
-
-<!-- ===== HISTORY ===== -->
-<div id="history" class="tab-content hidden">
-
-{% if logs is defined and logs %}
-{% for log in logs %}
-<div class="card">
-<p>{{ log.uploaded_by }} → Class {{ log.class_number }}</p>
-<p class="text-xs text-gray-400">{{ log.filename }}</p>
-<p class="text-xs text-gray-500">
-{{ log.timestamp.strftime("%d %b %Y, %I:%M %p") }}
-</p>
-</div>
-{% endfor %}
-{% else %}
-<div class="text-gray-400">No history available</div>
-{% endif %}
-
-</div>
-
-
-<!-- ===== USERS ===== -->
-<div id="usersTab" class="tab-content hidden">
-
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-
-{% for user in users %}
-<div class="card hover:bg-white/10 transition">
-
-<div class="flex justify-between items-center mb-2">
-<p class="font-semibold">{{ user.username }}</p>
-
-<span class="text-xs px-2 py-1 rounded
-{% if user.role=='admin' %}
-bg-red-500/20 text-red-400
-{% else %}
-bg-blue-500/20 text-blue-400
-{% endif %}">
-{{ user.role }}
-</span>
-
-</div>
-
-<div class="text-xs text-gray-400 space-y-1">
-<p>ID: {{ user.id }}</p>
-<p>Status: Active</p>
-<p>Access: {{ user.role }}</p>
-</div>
-
-</div>
-{% endfor %}
-
-</div>
-
-</div>
-
-
-</div>
-</div>
-</div>
-
-
-<!-- ================= STYLE ================= -->
-<style>
-.label{
-font-size:11px;
-color:#9ca3af;
-margin-bottom:4px;
-}
-
-.value{
-font-size:22px;
-font-weight:600;
-}
-
-.sub{
-font-size:11px;
-color:#6b7280;
-margin-top:2px;
-}
-
-.section-title{
-font-size:13px;
-color:#d1d5db;
-}
-
-.card{
-background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
-padding:16px;
-border-radius:14px;
-border:1px solid rgba(255,255,255,0.08);
-backdrop-filter: blur(10px);
-transition: 0.3s;
-}
-
-.card{
-background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
-padding:16px;
-border-radius:14px;
-border:1px solid rgba(255,255,255,0.08);
-backdrop-filter: blur(10px);
-transition: 0.3s;
-}
-
-/* subtle hover like SaaS */
-.user-hover:hover{
-background: rgba(255,255,255,0.05);
-border-radius: 10px;
-padding: 6px;
-transition: 0.2s;
-}
-
-.card:hover{
-border-color: rgba(255,255,255,0.15);
-transform: translateY(-2px);
-}
-
-.btn-blue, .btn-red{
-padding:5px 10px;
-border-radius:6px;
-font-size:12px;
-}
-
-.btn-blue{background:#2563eb;}
-.btn-red{background:#dc2626;}
-</style>
-
-
-<!-- ================= SCRIPT ================= -->
+{% block scripts %}
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-function showTab(id, el){
-document.querySelectorAll(".tab-content").forEach(x=>x.classList.add("hidden"));
-document.getElementById(id).classList.remove("hidden");
+    /* ================= TAB NAVIGATION ================= */
 
-document.querySelectorAll(".tab-btn").forEach(btn=>btn.classList.remove("bg-white/10"));
-el.classList.add("bg-white/10");
+    const tabTitles = {
+        overview: "Overview",
+        upload: "Upload Notes",
+        manage: "Manage Notes",
+        history: "Upload History",
+        usersTab: "Registered Users"
+    };
 
-if(window.innerWidth < 768){
-document.getElementById("sidebar").classList.add("-translate-x-full");
-}
-}
+    window.showTab = function(id, el) {
 
-window.showTab = showTab;
-document.querySelector(".tab-btn")?.click();
+        document.querySelectorAll(".tab-content").forEach(section => {
+            section.classList.add("hidden");
+        });
 
-window.toggleSidebar = function(){
-document.getElementById("sidebar").classList.toggle("-translate-x-full");
-};
+        const selectedTab = document.getElementById(id);
 
-/* UPLOAD */
-const dz = document.getElementById("dropZone");
-const fi = document.getElementById("fileInput");
-const fn = document.getElementById("fileName");
-const preview = document.getElementById("filePreview");
-const remove = document.getElementById("removeFile");
+        if (selectedTab) {
+            selectedTab.classList.remove("hidden");
+        }
 
-if(dz){
-dz.onclick = ()=>fi.click();
+        document.querySelectorAll(".tab-btn").forEach(btn => {
+            btn.classList.remove("active");
+        });
 
-fi.onchange = ()=>{
-if(fi.files[0]){
-fn.innerText = fi.files[0].name;
-preview.classList.remove("hidden");
-}
-};
+        if (el) {
+            el.classList.add("active");
+        } else {
+            const matchingButton = Array.from(
+                document.querySelectorAll(".tab-btn")
+            ).find(btn => btn.getAttribute("onclick")?.includes(id));
 
-remove.onclick = ()=>{
-fi.value = "";
-preview.classList.add("hidden");
-};
-}
+            matchingButton?.classList.add("active");
+        }
 
-/* SEARCH */
-const search = document.getElementById("searchNotes");
-if(search){
-search.addEventListener("input", e=>{
-const val = e.target.value.toLowerCase();
-document.querySelectorAll(".note-item").forEach(item=>{
-item.style.display = item.innerText.toLowerCase().includes(val) ? "flex" : "none";
-});
-});
-}
+        const heading = document.getElementById("topbarHeading");
 
-/* DEVICE */
-const ua = navigator.userAgent;
+        if (heading) {
+            heading.textContent = tabTitles[id] || "Admin";
+        }
 
-let device = /Mobi|Android/i.test(ua) ? "Mobile" : "Desktop";
-let browser =
-ua.includes("Chrome") ? "Chrome" :
-ua.includes("Firefox") ? "Firefox" :
-ua.includes("Safari") ? "Safari" : "Browser";
+        if (window.innerWidth < 900) {
+            document.getElementById("sidebar")?.classList.remove("sidebar-open");
+            document.getElementById("sidebarOverlay")?.classList.remove("visible");
+        }
 
-const dEl = document.getElementById("deviceType");
-const bEl = document.getElementById("browserType");
+    };
 
-if(dEl) dEl.innerText = device;
-if(bEl) bEl.innerText = browser;
 
-/* LOCATION */
-const locEl = document.getElementById("locationInfo");
+    /* ================= SIDEBAR ================= */
 
-if(locEl){
-fetch("https://ipapi.co/json/")
-.then(res => res.json())
-.then(data => {
-locEl.innerText = data.city + ", " + data.country_name;
-})
-.catch(()=>{
-locEl.innerText = "Unavailable";
-});
-}
+    window.toggleSidebar = function() {
 
-/* ACTIVITY */
-const feed = document.getElementById("activityFeed");
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("sidebarOverlay");
 
-function addActivity(msg){
-if(!feed) return;
+        if (!sidebar || !overlay) return;
 
-const div = document.createElement("div");
-div.className = "bg-black/40 px-3 py-2 rounded";
-div.innerText = msg;
-feed.prepend(div);
+        sidebar.classList.toggle("sidebar-open");
+        overlay.classList.toggle("visible");
 
-if(feed.children.length > 6){
-feed.removeChild(feed.lastChild);
-}
-}
+    };
 
-setInterval(()=>{
-const actions = [
-"User logged in",
-"New note uploaded",
-"Database ping checked",
-"User opened dashboard",
-"Storage checked"
-];
 
-const random = actions[Math.floor(Math.random()*actions.length)];
-addActivity(random + " • " + new Date().toLocaleTimeString());
-}, 4000);
+    // Start on Overview
+    const firstTab = document.querySelector(".tab-btn");
+
+    if (firstTab) {
+        showTab("overview", firstTab);
+    }
+
+
+    /* ================= FILE UPLOAD ================= */
+
+    const dz = document.getElementById("dropZone");
+    const fi = document.getElementById("fileInput");
+    const fn = document.getElementById("fileName");
+    const preview = document.getElementById("filePreview");
+    const remove = document.getElementById("removeFile");
+    const uploadBtn = document.getElementById("uploadBtn");
+
+    function showSelectedFile(file) {
+
+        if (!file) return;
+
+        const isPdf =
+            file.type === "application/pdf" ||
+            file.name.toLowerCase().endsWith(".pdf");
+
+        if (!isPdf) {
+            alert("Please select a PDF file.");
+            fi.value = "";
+            preview.classList.add("hidden");
+            return;
+        }
+
+        fn.textContent = file.name;
+        preview.classList.remove("hidden");
+
+    }
+
+
+    if (dz && fi) {
+
+        dz.addEventListener("click", () => {
+            fi.click();
+        });
+
+        fi.addEventListener("change", () => {
+            showSelectedFile(fi.files[0]);
+        });
+
+
+        // Drag and drop
+        ["dragenter", "dragover"].forEach(eventName => {
+
+            dz.addEventListener(eventName, event => {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                dz.classList.add("dragover");
+
+            });
+
+        });
+
+
+        ["dragleave", "drop"].forEach(eventName => {
+
+            dz.addEventListener(eventName, event => {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                dz.classList.remove("dragover");
+
+            });
+
+        });
+
+
+        dz.addEventListener("drop", event => {
+
+            const files = event.dataTransfer.files;
+
+            if (!files.length) return;
+
+            try {
+
+                const transfer = new DataTransfer();
+
+                transfer.items.add(files[0]);
+
+                fi.files = transfer.files;
+
+                showSelectedFile(files[0]);
+
+            } catch (error) {
+
+                alert("Unable to select this file. Please use the browse option.");
+
+            }
+
+        });
+
+    }
+
+
+    if (remove) {
+
+        remove.addEventListener("click", () => {
+
+            fi.value = "";
+
+            preview.classList.add("hidden");
+
+        });
+
+    }
+
+
+    // Prevent accidental empty submission
+    const uploadForm = document.querySelector(
+        '#upload form[method="POST"]'
+    );
+
+    if (uploadForm) {
+
+        uploadForm.addEventListener("submit", event => {
+
+            if (!fi || !fi.files.length) {
+
+                event.preventDefault();
+
+                alert("Please select a PDF file before uploading.");
+
+                return;
+
+            }
+
+            const file = fi.files[0];
+
+            const isPdf =
+                file.type === "application/pdf" ||
+                file.name.toLowerCase().endsWith(".pdf");
+
+            if (!isPdf) {
+
+                event.preventDefault();
+
+                alert("Only PDF files are allowed.");
+
+                return;
+
+            }
+
+            if (uploadBtn) {
+
+                uploadBtn.disabled = true;
+                uploadBtn.textContent = "Uploading...";
+
+            }
+
+        });
+
+    }
+
+
+    /* ================= NOTES SEARCH ================= */
+
+    const search = document.getElementById("searchNotes");
+    const topSearch = document.getElementById("adminTopSearch");
+    const noteItems = document.querySelectorAll(".note-item");
+    const noResults = document.getElementById("notesNoResults");
+
+    function filterNotes(value) {
+
+        const query = value.toLowerCase().trim();
+
+        let visible = 0;
+
+        noteItems.forEach(item => {
+
+            const matches = item.innerText
+                .toLowerCase()
+                .includes(query);
+
+            item.style.display = matches ? "flex" : "none";
+
+            if (matches) visible++;
+
+        });
+
+        if (noResults) {
+
+            noResults.classList.toggle(
+                "hidden",
+                visible !== 0 || noteItems.length === 0
+            );
+
+        }
+
+    }
+
+
+    if (search) {
+
+        search.addEventListener("input", event => {
+
+            filterNotes(event.target.value);
+
+            if (topSearch) {
+                topSearch.value = event.target.value;
+            }
+
+        });
+
+    }
+
+
+    if (topSearch) {
+
+        topSearch.addEventListener("input", event => {
+
+            filterNotes(event.target.value);
+
+            if (search) {
+                search.value = event.target.value;
+            }
+
+        });
+
+        topSearch.addEventListener("focus", () => {
+
+            // Switch to notes management when searching from the top bar.
+            showTab(
+                "manage",
+                Array.from(document.querySelectorAll(".tab-btn"))
+                    .find(btn => btn.getAttribute("onclick")?.includes("manage"))
+            );
+
+        });
+
+    }
+
+
+    /* ================= DEVICE INFORMATION ================= */
+
+    const ua = navigator.userAgent;
+
+    const device =
+        /Mobi|Android|iPhone|iPad/i.test(ua)
+            ? "Mobile"
+            : "Desktop";
+
+    let browser = "Browser";
+
+    if (ua.includes("Edg/")) {
+        browser = "Microsoft Edge";
+    } else if (ua.includes("Chrome/")) {
+        browser = "Chrome";
+    } else if (ua.includes("Firefox/")) {
+        browser = "Firefox";
+    } else if (ua.includes("Safari/")) {
+        browser = "Safari";
+    }
+
+    const dEl = document.getElementById("deviceType");
+    const bEl = document.getElementById("browserType");
+
+    if (dEl) dEl.textContent = device;
+    if (bEl) bEl.textContent = browser;
+
+
+    /* ================= LOCATION ================= */
+
+    const locEl = document.getElementById("locationInfo");
+
+    if (locEl) {
+
+        fetch("https://ipapi.co/json/")
+            .then(response => {
+
+                if (!response.ok) {
+                    throw new Error("Location unavailable");
+                }
+
+                return response.json();
+
+            })
+            .then(data => {
+
+                if (data.city && data.country_name) {
+                    locEl.textContent =
+                        data.city + ", " + data.country_name;
+                } else {
+                    locEl.textContent = "Unavailable";
+                }
+
+            })
+            .catch(() => {
+
+                locEl.textContent = "Unavailable";
+
+            });
+
+    }
+
+
+    /* ================= ACTIVITY FEED ================= */
+
+    const feed = document.getElementById("activityFeed");
+
+    function addActivity(message) {
+
+        if (!feed) return;
+
+        const div = document.createElement("div");
+
+        div.className = "activity-entry";
+
+        const indicator = document.createElement("span");
+
+        indicator.className = "activity-indicator";
+
+        div.appendChild(indicator);
+
+        div.appendChild(
+            document.createTextNode(message)
+        );
+
+        feed.prepend(div);
+
+        if (feed.children.length > 6) {
+            feed.removeChild(feed.lastChild);
+        }
+
+    }
+
+
+    // This is a local dashboard activity display,
+    // not a server-side audit log.
+    const activityMessages = [
+        "Dashboard activity feed initialized",
+        "Admin workspace opened",
+        "System information displayed",
+        "Notes management is available",
+        "Storage information displayed"
+    ];
+
+    let activityIndex = 0;
+
+    if (feed) {
+
+        setInterval(() => {
+
+            const message =
+                activityMessages[
+                    activityIndex % activityMessages.length
+                ];
+
+            addActivity(
+                message + " • " +
+                new Date().toLocaleTimeString()
+            );
+
+            activityIndex++;
+
+        }, 4000);
+
+    }
 
 });
 </script>
-
 {% endblock %}
