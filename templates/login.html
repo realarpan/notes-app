@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 
 {% block title %}Sign In | Sunday School Notes{% endblock %}
@@ -16,78 +17,14 @@
 
     <div class="login-layout">
 
-        <!-- LEFT BRANDING PANEL -->
+        <!-- LEFT WELCOME PANEL -->
         <section class="welcome-panel">
 
-            <div class="welcome-content">
-
-                <div class="welcome-logo">
-                    <span class="welcome-logo-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24"
-                             fill="none"
-                             stroke="currentColor"
-                             stroke-width="1.6"
-                             stroke-linecap="round"
-                             stroke-linejoin="round">
-                            <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22z"/>
-                            <path d="M4 5.5v14A2.5 2.5 0 0 1 6.5 17H20"/>
-                            <path d="M12 7v6"/>
-                            <path d="M9 10h6"/>
-                        </svg>
-                    </span>
-                    <span>Sunday School Notes</span>
-                </div>
-
-                <div class="welcome-heading">
-                    <span class="eyebrow">
-                        <span class="eyebrow-dot"></span>
-                        YOUR PERSONAL STUDY SPACE
-                    </span>
-
-                    <h1>
-                        Welcome<br>
-                        <span>back.</span>
-                    </h1>
-
-                    <p>
-                        Your academic resources, organized in one place.
-                        Sign in to continue learning with clarity and focus.
-                    </p>
-                </div>
-
-                <div class="welcome-features">
-
-                    <div class="feature-item">
-                        <span class="feature-icon">✦</span>
-                        <div>
-                            <strong>Organized learning</strong>
-                            <span>Study materials arranged by class</span>
-                        </div>
-                    </div>
-
-                    <div class="feature-item">
-                        <span class="feature-icon">▤</span>
-                        <div>
-                            <strong>Easy access</strong>
-                            <span>Your notes and PDFs in one place</span>
-                        </div>
-                    </div>
-
-                    <div class="feature-item">
-                        <span class="feature-icon">⌑</span>
-                        <div>
-                            <strong>Personal workspace</strong>
-                            <span>A simple space for focused learning</span>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div class="welcome-bottom">
-                <span>DESIGNED FOR BETTER LEARNING</span>
-                <span>01 / 01</span>
+            <div class="welcome-heading">
+                <h1>
+                    Welcome<br>
+                    <span>back.</span>
+                </h1>
             </div>
 
         </section>
@@ -337,69 +274,23 @@
 
 
 /* =========================
-   LEFT PANEL
+   LEFT WELCOME PANEL
 ========================= */
 
 .welcome-panel {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    min-height: 530px;
+    justify-content: center;
+    min-height: 420px;
     padding: 15px 0;
 }
 
-.welcome-logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 16px;
-    font-weight: 700;
-    letter-spacing: -0.4px;
-}
-
-/* NEW OPEN-BOOK PLUS LOGO */
-.welcome-logo-icon {
-    display: grid;
-    place-items: center;
-    flex: 0 0 42px;
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
-    color: #ffffff;
-    background: linear-gradient(135deg, #8b5cf6, #6366f1);
-    box-shadow: 0 5px 25px rgba(139, 92, 246, .25);
-}
-
-.welcome-logo-icon svg {
-    display: block;
-    width: 24px;
-    height: 24px;
-}
-
 .welcome-heading {
-    margin-top: 65px;
-}
-
-.eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 9px;
-    color: #a5b4fc;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 2px;
-}
-
-.eyebrow-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #818cf8;
-    box-shadow: 0 0 12px #818cf8;
+    margin-top: 0;
 }
 
 .welcome-heading h1 {
-    margin: 22px 0;
+    margin: 0;
     font-size: clamp(54px, 6vw, 82px);
     line-height: 1.05;
     font-weight: 700;
@@ -412,65 +303,6 @@
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-}
-
-.welcome-heading p {
-    max-width: 430px;
-    color: #9298a6;
-    font-size: 14px;
-    line-height: 1.9;
-}
-
-.welcome-features {
-    display: grid;
-    gap: 22px;
-    margin-top: 45px;
-}
-
-.feature-item {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.feature-icon {
-    display: grid;
-    place-items: center;
-    flex-shrink: 0;
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    color: #a5b4fc;
-    background: rgba(99,102,241,0.10);
-    border: 1px solid rgba(129,140,248,0.15);
-    font-size: 17px;
-}
-
-.feature-item div {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.feature-item strong {
-    font-size: 12px;
-    font-weight: 600;
-    color: #e4e4e7;
-}
-
-.feature-item div span {
-    color: #777e8d;
-    font-size: 11px;
-}
-
-.welcome-bottom {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 50px;
-    color: #555d6b;
-    font-size: 9px;
-    font-weight: 600;
-    letter-spacing: 1.5px;
 }
 
 
@@ -802,19 +634,6 @@
     color: #18181b;
 }
 
-.light-mode .welcome-heading p,
-.light-mode .feature-item div span {
-    color: #71717a;
-}
-
-.light-mode .feature-item strong {
-    color: #27272a;
-}
-
-.light-mode .welcome-logo {
-    color: #18181b;
-}
-
 .light-mode .login-card {
     background: rgba(255,255,255,0.82);
     border-color: rgba(99,102,241,0.16);
@@ -903,7 +722,7 @@
         display: flex;
         flex-direction: column;
         padding: 35px 17px 45px;
-        gap: 35px;
+        gap: 25px;
     }
 
     .welcome-panel {
@@ -911,26 +730,9 @@
         padding: 5px 2px;
     }
 
-    .welcome-heading {
-        margin-top: 38px;
-    }
-
     .welcome-heading h1 {
-        margin: 15px 0;
         font-size: 48px;
         letter-spacing: -3px;
-    }
-
-    .welcome-heading p {
-        font-size: 12px;
-    }
-
-    .welcome-features {
-        display: none;
-    }
-
-    .welcome-bottom {
-        display: none;
     }
 
     .login-card {
