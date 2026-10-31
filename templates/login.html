@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 
 {% block title %}Sign In | Sunday School Notes{% endblock %}
@@ -22,7 +23,19 @@
             <div class="welcome-content">
 
                 <div class="welcome-logo">
-                    <span class="welcome-logo-icon">S</span>
+                    <span class="welcome-logo-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="1.6"
+                             stroke-linecap="round"
+                             stroke-linejoin="round">
+                            <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22z"/>
+                            <path d="M4 5.5v14A2.5 2.5 0 0 1 6.5 17H20"/>
+                            <path d="M12 7v6"/>
+                            <path d="M9 10h6"/>
+                        </svg>
+                    </span>
                     <span>Sunday School Notes</span>
                 </div>
 
@@ -345,16 +358,23 @@
     letter-spacing: -0.4px;
 }
 
+/* NEW OPEN-BOOK PLUS LOGO */
 .welcome-logo-icon {
     display: grid;
     place-items: center;
+    flex: 0 0 42px;
     width: 42px;
     height: 42px;
-    border-radius: 13px;
-    background: linear-gradient(135deg, #6366f1, #3b82f6);
-    box-shadow: 0 8px 30px rgba(99,102,241,0.25);
-    font-size: 21px;
-    font-weight: 800;
+    border-radius: 12px;
+    color: #ffffff;
+    background: linear-gradient(135deg, #8b5cf6, #6366f1);
+    box-shadow: 0 5px 25px rgba(139, 92, 246, .25);
+}
+
+.welcome-logo-icon svg {
+    display: block;
+    width: 24px;
+    height: 24px;
 }
 
 .welcome-heading {
