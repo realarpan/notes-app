@@ -1,317 +1,1124 @@
 {% extends "base.html" %}
+
+{% block title %}Sign In | Sunday School Notes{% endblock %}
+
 {% block content %}
 
-<div id="appRoot" class="min-h-screen flex flex-col md:flex-row overflow-x-hidden bg-[#0c0d10] text-white">
+<div id="appRoot" class="login-page">
 
-<!-- BACKGROUND -->
-<div class="fixed inset-0 -z-10 overflow-hidden">
-    <div class="bg-gradient"></div>
-    <div class="grid-overlay"></div>
-</div>
-
-<!-- LEFT PANEL -->
-<div class="hidden md:flex w-1/2 items-center px-10 lg:px-20">
-    <div>
-        <h1 class="text-4xl lg:text-6xl font-semibold mb-6 tracking-tight">
-            Welcome back.
-        </h1>
-        <p class="text-gray-400 text-sm lg:text-base max-w-md leading-relaxed">
-            Fast, minimal and secure platform to manage your academic workflow with clarity.
-        </p>
-    </div>
-</div>
-
-<!-- RIGHT PANEL -->
-<div class="flex-1 flex items-center justify-center px-4 sm:px-6">
-
-<div id="loginCard"
-class="w-full max-w-md p-6 sm:p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl">
-
-<!-- HEADER -->
-<div class="flex justify-between items-center mb-6">
-    <div>
-        <h2 class="text-xl sm:text-2xl font-semibold">Sign in</h2>
-        <p class="text-xs sm:text-sm text-gray-400">Access your dashboard</p>
+    <!-- Animated background -->
+    <div class="login-background">
+        <div class="ambient ambient-one"></div>
+        <div class="ambient ambient-two"></div>
+        <div class="ambient ambient-three"></div>
+        <div class="grid-overlay"></div>
     </div>
 
-    <button onclick="toggleTheme()"
-    class="text-xs px-2.5 py-1.5 rounded-md border border-white/10 hover:bg-white/10">
-    Change Mode
-    </button>
-</div>
+    <div class="login-layout">
 
-<!-- FORM -->
-<form method="POST" id="loginForm" class="space-y-4">
+        <!-- LEFT BRANDING PANEL -->
+        <section class="welcome-panel">
 
-    <div class="input-group">
-        <input name="username" required placeholder=" " class="input">
-        <label>Username</label>
+            <div class="welcome-content">
+
+                <div class="welcome-logo">
+                    <span class="welcome-logo-icon">S</span>
+                    <span>Sunday School Notes</span>
+                </div>
+
+                <div class="welcome-heading">
+                    <span class="eyebrow">
+                        <span class="eyebrow-dot"></span>
+                        YOUR PERSONAL STUDY SPACE
+                    </span>
+
+                    <h1>
+                        Welcome<br>
+                        <span>back.</span>
+                    </h1>
+
+                    <p>
+                        Your academic resources, organized in one place.
+                        Sign in to continue learning with clarity and focus.
+                    </p>
+                </div>
+
+                <div class="welcome-features">
+
+                    <div class="feature-item">
+                        <span class="feature-icon">✦</span>
+                        <div>
+                            <strong>Organized learning</strong>
+                            <span>Study materials arranged by class</span>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <span class="feature-icon">▤</span>
+                        <div>
+                            <strong>Easy access</strong>
+                            <span>Your notes and PDFs in one place</span>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <span class="feature-icon">⌑</span>
+                        <div>
+                            <strong>Personal workspace</strong>
+                            <span>A simple space for focused learning</span>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="welcome-bottom">
+                <span>DESIGNED FOR BETTER LEARNING</span>
+                <span>01 / 01</span>
+            </div>
+
+        </section>
+
+
+        <!-- RIGHT LOGIN PANEL -->
+        <section class="login-panel">
+
+            <div id="loginCard" class="login-card">
+
+                <!-- Card heading -->
+                <div class="login-card-header">
+
+                    <div>
+                        <span class="card-eyebrow">ACCOUNT ACCESS</span>
+                        <h2>Sign in</h2>
+                        <p>Enter your credentials to access your dashboard.</p>
+                    </div>
+
+                    <button type="button"
+                            onclick="toggleTheme()"
+                            class="theme-toggle"
+                            id="themeToggle">
+                        <span id="themeIcon">☼</span>
+                        <span id="themeText">Light mode</span>
+                    </button>
+
+                </div>
+
+
+                <!-- Login form -->
+                <form method="POST" id="loginForm" class="login-form">
+
+                    <div class="input-group">
+                        <label for="username">Username</label>
+
+                        <div class="input-wrapper">
+                            <span class="input-icon">♙</span>
+
+                            <input
+                                type="text"
+                                name="username"
+                                id="username"
+                                placeholder="Enter your username"
+                                autocomplete="username"
+                                required
+                            >
+                        </div>
+                    </div>
+
+
+                    <div class="input-group">
+                        <label for="password">Password</label>
+
+                        <div class="input-wrapper">
+                            <span class="input-icon">⌑</span>
+
+                            <input
+                                type="password"
+                                name="password"
+                                id="password"
+                                placeholder="Enter your password"
+                                autocomplete="current-password"
+                                onkeyup="checkCaps(event)"
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                class="password-toggle"
+                                onclick="togglePassword()"
+                                id="passwordToggle">
+                                Show
+                            </button>
+                        </div>
+                    </div>
+
+
+                    <p id="capsWarning" class="caps-warning hidden">
+                        <span>⚠</span> Caps Lock is ON
+                    </p>
+
+
+                    <button type="submit" id="loginBtn" class="login-submit">
+
+                        <span id="btnText">Sign in to your account</span>
+
+                        <svg id="spinner"
+                             class="hidden loading-spinner"
+                             viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10"
+                                    stroke="currentColor"
+                                    stroke-width="3"
+                                    fill="none"
+                                    opacity="0.25"/>
+                            <path d="M22 12a10 10 0 0 1-10 10"
+                                  stroke="currentColor"
+                                  stroke-width="3"
+                                  fill="none"/>
+                        </svg>
+
+                        <span class="submit-arrow">→</span>
+
+                    </button>
+
+                </form>
+
+
+                <!-- Security information -->
+                <div class="security-note">
+                    <span class="security-icon">◇</span>
+                    <span>Your account credentials are handled securely.</span>
+                </div>
+
+
+                <!-- Connection status -->
+                <div class="connection-card">
+
+                    <div class="connection-heading">
+                        <span>CONNECTION INFORMATION</span>
+                        <span class="connection-live">
+                            <span class="live-dot"></span>
+                            LIVE
+                        </span>
+                    </div>
+
+                    <div class="connection-details">
+
+                        <div class="connection-item">
+                            <span class="connection-label">DEVICE</span>
+                            <strong id="deviceType">Detecting...</strong>
+                        </div>
+
+                        <div class="connection-item">
+                            <span class="connection-label">BROWSER</span>
+                            <strong id="browserType">Detecting...</strong>
+                        </div>
+
+                        <div class="connection-item">
+                            <span class="connection-label">LOCATION</span>
+                            <strong id="locationText">Detecting...</strong>
+                        </div>
+
+                        <div class="connection-item">
+                            <span class="connection-label">RESPONSE TIME</span>
+                            <strong id="pingText">-- ms</strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
     </div>
 
-    <div class="input-group">
-        <input type="password" name="password" id="password" required placeholder=" "
-        class="input pr-10" onkeyup="checkCaps(event)">
-        <label>Password</label>
-
-        <button type="button" onclick="togglePassword()"
-        class="absolute right-3 top-3 text-gray-400 hover:text-white text-xs">
-        View
-        </button>
-    </div>
-
-    <p id="capsWarning" class="text-xs text-yellow-400 hidden">
-        Caps Lock is ON
-    </p>
-
-    <button id="loginBtn" class="btn-primary">
-        <span id="btnText">Sign in</span>
-
-        <svg id="spinner" class="hidden w-4 h-4 animate-spin" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" stroke="white" stroke-width="3" fill="none" opacity="0.3"/>
-            <path d="M22 12a10 10 0 0 1-10 10" stroke="white" stroke-width="3"/>
-        </svg>
-    </button>
-
-</form>
-
-<!-- STATUS BAR -->
-<div class="mt-5">
-
-    <div class="status-bar-clean flex-col sm:flex-row">
-
-        <!-- Combined pill -->
-        <div class="pill-combined flex-wrap justify-center sm:justify-start">
-            <span id="deviceType"></span>
-            <span class="dot-sep"></span>
-            <span id="browserType"></span>
-            <span class="dot-sep"></span>
-            <span id="locationText">Detecting...</span>
-        </div>
-
-        <!-- Ping -->
-        <div class="flex items-center justify-center sm:justify-end gap-2 text-xs text-gray-400 mt-2 sm:mt-0">
-            <span class="live-dot"></span>
-            <span id="pingText">-- ms</span>
-        </div>
-
-    </div>
-
 </div>
 
-</div>
-</div>
 
-</div>
-
-<!-- STYLE -->
 <style>
 
-/* Prevent scroll */
-html, body{
-overflow-x:hidden;
+/* =========================
+   MAIN LAYOUT
+========================= */
+
+.login-page {
+    position: relative;
+    min-height: calc(100vh - 120px);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    isolation: isolate;
 }
 
-/* BACKGROUND */
-.bg-gradient{
-position:absolute;
-width:150%;
-height:150%;
-background:
-radial-gradient(circle at 20% 30%, rgba(99,102,241,0.15), transparent 40%),
-radial-gradient(circle at 80% 70%, rgba(168,85,247,0.12), transparent 40%);
-animation: move 25s linear infinite;
+.login-background {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
 }
 
-.grid-overlay{
-position:absolute;
-width:100%;
-height:100%;
-background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-background-size: 40px 40px;
+.ambient {
+    position: absolute;
+    width: 480px;
+    height: 480px;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.17;
+    animation: ambientMove 18s ease-in-out infinite alternate;
 }
 
-@keyframes move{
-0%{ transform: translate(0,0); }
-50%{ transform: translate(-5%, -5%); }
-100%{ transform: translate(0,0); }
+.ambient-one {
+    top: -180px;
+    left: -120px;
+    background: #6366f1;
 }
 
-/* INPUTS */
-.input-group{ position:relative; }
-
-.input{
-width:100%;
-padding:12px;
-background:#111216;
-border:1px solid rgba(255,255,255,0.08);
-border-radius:10px;
-color:white;
-outline:none;
+.ambient-two {
+    right: -150px;
+    bottom: -180px;
+    background: #3b82f6;
+    animation-delay: -5s;
 }
 
-.input:focus{
-border-color:#6366f1;
-box-shadow:0 0 0 2px rgba(99,102,241,0.2);
-background:#16181d;
+.ambient-three {
+    top: 35%;
+    left: 45%;
+    width: 300px;
+    height: 300px;
+    background: #8b5cf6;
+    opacity: 0.08;
+    animation-delay: -9s;
 }
 
-.input-group label{
-position:absolute;
-left:12px;
-top:12px;
-color:#6b7280;
-font-size:12px;
-transition:0.2s;
+.grid-overlay {
+    position: absolute;
+    inset: 0;
+    opacity: 0.25;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 44px 44px;
 }
 
-.input:focus + label,
-.input:not(:placeholder-shown) + label{
-top:-7px;
-font-size:10px;
-color:#a5b4fc;
+@keyframes ambientMove {
+    from {
+        transform: translate(0, 0);
+    }
+    to {
+        transform: translate(55px, 35px);
+    }
 }
 
-/* BUTTON */
-.btn-primary{
-width:100%;
-padding:12px;
-border-radius:10px;
-background:linear-gradient(135deg,#6366f1,#8b5cf6);
-font-weight:500;
-display:flex;
-justify-content:center;
-align-items:center;
-gap:8px;
+.login-layout {
+    width: 100%;
+    max-width: 1440px;
+    margin: auto;
+    padding: 65px 7%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 70px;
 }
 
-.btn-primary:hover{
-box-shadow:0 10px 25px rgba(99,102,241,0.3);
+
+/* =========================
+   LEFT PANEL
+========================= */
+
+.welcome-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 530px;
+    padding: 15px 0;
 }
 
-/* STATUS BAR */
-.status-bar-clean{
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:10px;
-
-padding:10px;
-border-radius:12px;
-
-background:rgba(255,255,255,0.04);
-border:1px solid rgba(255,255,255,0.08);
-backdrop-filter: blur(12px);
+.welcome-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
 }
 
-/* Combined pill */
-.pill-combined{
-display:flex;
-align-items:center;
-gap:8px;
-flex-wrap:wrap;
-
-padding:6px 12px;
-border-radius:999px;
-
-background:rgba(99,102,241,0.12);
-border:1px solid rgba(99,102,241,0.25);
-
-font-size:11px;
+.welcome-logo-icon {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 13px;
+    background: linear-gradient(135deg, #6366f1, #3b82f6);
+    box-shadow: 0 8px 30px rgba(99,102,241,0.25);
+    font-size: 21px;
+    font-weight: 800;
 }
 
-/* Dot */
-.dot-sep{
-width:4px;
-height:4px;
-border-radius:50%;
-background:#6b7280;
+.welcome-heading {
+    margin-top: 65px;
 }
 
-/* Live dot */
-.live-dot{
-width:7px;
-height:7px;
-border-radius:50%;
-background:#22c55e;
-animation:pulse 1.5s infinite;
+.eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    color: #a5b4fc;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
 }
 
-@keyframes pulse{
-0%{opacity:1;}
-50%{opacity:0.4;}
-100%{opacity:1;}
+.eyebrow-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #818cf8;
+    box-shadow: 0 0 12px #818cf8;
 }
 
-/* LIGHT MODE */
-.light{
-background:#f9fafb !important;
-color:#111 !important;
+.welcome-heading h1 {
+    margin: 22px 0;
+    font-size: clamp(54px, 6vw, 82px);
+    line-height: 1.05;
+    font-weight: 700;
+    letter-spacing: -5px;
+    color: #fafafa;
 }
 
-.light #loginCard{
-background:white !important;
-color:black !important;
+.welcome-heading h1 span {
+    background: linear-gradient(110deg, #a5b4fc, #60a5fa);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.welcome-heading p {
+    max-width: 430px;
+    color: #9298a6;
+    font-size: 14px;
+    line-height: 1.9;
+}
+
+.welcome-features {
+    display: grid;
+    gap: 22px;
+    margin-top: 45px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.feature-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    color: #a5b4fc;
+    background: rgba(99,102,241,0.10);
+    border: 1px solid rgba(129,140,248,0.15);
+    font-size: 17px;
+}
+
+.feature-item div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.feature-item strong {
+    font-size: 12px;
+    font-weight: 600;
+    color: #e4e4e7;
+}
+
+.feature-item div span {
+    color: #777e8d;
+    font-size: 11px;
+}
+
+.welcome-bottom {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 50px;
+    color: #555d6b;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+}
+
+
+/* =========================
+   LOGIN CARD
+========================= */
+
+.login-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 455px;
+    padding: 38px;
+    border-radius: 23px;
+    background: rgba(255,255,255,0.045);
+    border: 1px solid rgba(255,255,255,0.10);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    box-shadow:
+        0 25px 80px rgba(0,0,0,0.30),
+        inset 0 1px rgba(255,255,255,0.04);
+}
+
+.login-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 34px;
+}
+
+.card-eyebrow {
+    color: #818cf8;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.8px;
+}
+
+.login-card-header h2 {
+    margin: 9px 0 5px;
+    color: #fafafa;
+    font-size: 29px;
+    font-weight: 700;
+    letter-spacing: -1.2px;
+}
+
+.login-card-header p {
+    color: #858b99;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+
+/* =========================
+   THEME TOGGLE
+========================= */
+
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 10px;
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 9px;
+    color: #a1a1aa;
+    background: rgba(255,255,255,0.04);
+    font-size: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.theme-toggle:hover {
+    color: white;
+    background: rgba(255,255,255,0.09);
+}
+
+
+/* =========================
+   FORM INPUTS
+========================= */
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 23px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.input-group label {
+    color: #c4c7d0;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 15px;
+    color: #737b8e;
+    font-size: 17px;
+    pointer-events: none;
+}
+
+.input-wrapper input {
+    width: 100%;
+    height: 49px;
+    padding: 0 75px 0 44px;
+    outline: none;
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 11px;
+    color: #f4f4f5;
+    background: rgba(5,8,15,0.60);
+    font-family: inherit;
+    font-size: 12px;
+    transition: 0.25s;
+}
+
+.input-wrapper input::placeholder {
+    color: #626978;
+}
+
+.input-wrapper input:focus {
+    border-color: rgba(129,140,248,0.75);
+    background: rgba(15,18,30,0.90);
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+}
+
+.password-toggle {
+    position: absolute;
+    right: 14px;
+    color: #9299a9;
+    background: transparent;
+    border: none;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.password-toggle:hover {
+    color: #a5b4fc;
+}
+
+.caps-warning {
+    margin-top: -12px;
+    color: #fbbf24;
+    font-size: 10px;
+}
+
+
+/* =========================
+   SIGN IN BUTTON
+========================= */
+
+.login-submit {
+    width: 100%;
+    min-height: 49px;
+    margin-top: 3px;
+    padding: 0 17px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: none;
+    border-radius: 11px;
+    color: white;
+    background: linear-gradient(110deg, #6366f1, #4f73e8 55%, #8b5cf6);
+    box-shadow: 0 8px 25px rgba(79,70,229,0.20);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.login-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(79,70,229,0.35);
+}
+
+.login-submit:active {
+    transform: translateY(0);
+}
+
+.login-submit:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+.submit-arrow {
+    font-size: 17px;
+}
+
+.loading-spinner {
+    width: 16px;
+    height: 16px;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* =========================
+   SECURITY NOTE
+========================= */
+
+.security-note {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 23px 0;
+    color: #858b99;
+    font-size: 10px;
+}
+
+.security-icon {
+    color: #818cf8;
+    font-size: 16px;
+}
+
+
+/* =========================
+   CONNECTION INFORMATION
+========================= */
+
+.connection-card {
+    padding: 15px;
+    border: 1px solid rgba(255,255,255,0.075);
+    border-radius: 13px;
+    background: rgba(0,0,0,0.18);
+}
+
+.connection-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 13px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    color: #737b8d;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+}
+
+.connection-live {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #86efac;
+    font-size: 8px;
+}
+
+.live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 9px rgba(34,197,94,0.7);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.35;
+    }
+}
+
+.connection-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 17px 12px;
+    padding-top: 14px;
+}
+
+.connection-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.connection-label {
+    color: #646d7e;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.connection-item strong {
+    overflow: hidden;
+    color: #c4c8d2;
+    font-size: 10px;
+    font-weight: 500;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* =========================
+   LIGHT MODE
+========================= */
+
+.login-page.light-mode {
+    color: #18181b;
+}
+
+.light-mode .welcome-heading h1 {
+    color: #18181b;
+}
+
+.light-mode .welcome-heading p,
+.light-mode .feature-item div span {
+    color: #71717a;
+}
+
+.light-mode .feature-item strong {
+    color: #27272a;
+}
+
+.light-mode .welcome-logo {
+    color: #18181b;
+}
+
+.light-mode .login-card {
+    background: rgba(255,255,255,0.82);
+    border-color: rgba(99,102,241,0.16);
+    box-shadow: 0 25px 80px rgba(31,41,55,0.12);
+}
+
+.light-mode .login-card-header h2 {
+    color: #18181b;
+}
+
+.light-mode .login-card-header p,
+.light-mode .security-note {
+    color: #71717a;
+}
+
+.light-mode .input-group label {
+    color: #3f3f46;
+}
+
+.light-mode .input-wrapper input {
+    color: #18181b;
+    background: rgba(241,245,249,0.9);
+    border-color: #e4e4e7;
+}
+
+.light-mode .input-wrapper input::placeholder {
+    color: #a1a1aa;
+}
+
+.light-mode .input-wrapper input:focus {
+    background: white;
+}
+
+.light-mode .connection-card {
+    background: rgba(241,245,249,0.8);
+    border-color: #e4e4e7;
+}
+
+.light-mode .connection-heading {
+    border-color: #e4e4e7;
+}
+
+.light-mode .connection-item strong {
+    color: #27272a;
+}
+
+.light-mode .theme-toggle {
+    color: #52525b;
+    border-color: #e4e4e7;
+    background: #f4f4f5;
+}
+
+.light-mode .password-toggle {
+    color: #71717a;
+}
+
+
+/* =========================
+   RESPONSIVE DESIGN
+========================= */
+
+@media (max-width: 950px) {
+
+    .login-layout {
+        gap: 35px;
+        padding: 50px 4%;
+    }
+
+    .login-card {
+        padding: 28px;
+    }
+
+    .welcome-heading h1 {
+        font-size: 58px;
+    }
+
+}
+
+@media (max-width: 700px) {
+
+    .login-page {
+        min-height: auto;
+    }
+
+    .login-layout {
+        display: flex;
+        flex-direction: column;
+        padding: 35px 17px 45px;
+        gap: 35px;
+    }
+
+    .welcome-panel {
+        min-height: auto;
+        padding: 5px 2px;
+    }
+
+    .welcome-heading {
+        margin-top: 38px;
+    }
+
+    .welcome-heading h1 {
+        margin: 15px 0;
+        font-size: 48px;
+        letter-spacing: -3px;
+    }
+
+    .welcome-heading p {
+        font-size: 12px;
+    }
+
+    .welcome-features {
+        display: none;
+    }
+
+    .welcome-bottom {
+        display: none;
+    }
+
+    .login-card {
+        max-width: 480px;
+        padding: 26px 21px;
+    }
+
+}
+
+@media (max-width: 390px) {
+
+    .login-card-header {
+        flex-direction: column;
+    }
+
+    .theme-toggle {
+        align-self: flex-start;
+    }
+
+    .welcome-heading h1 {
+        font-size: 42px;
+    }
+
+    .connection-details {
+        gap: 14px 8px;
+    }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+    }
 }
 
 </style>
 
-<!-- JS -->
+
 <script>
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    window.toggleTheme = function(){
-        document.getElementById("appRoot").classList.toggle("light");
+    const appRoot = document.getElementById("appRoot");
+
+    /* =========================
+       THEME TOGGLE
+    ========================= */
+
+    window.toggleTheme = function() {
+
+        appRoot.classList.toggle("light-mode");
+
+        const isLight = appRoot.classList.contains("light-mode");
+
+        document.getElementById("themeIcon").innerText =
+            isLight ? "☾" : "☼";
+
+        document.getElementById("themeText").innerText =
+            isLight ? "Dark mode" : "Light mode";
+
     };
+
+
+    /* =========================
+       DEVICE DETECTION
+    ========================= */
 
     const ua = navigator.userAgent;
 
     document.getElementById("deviceType").innerText =
-        /Mobi|Android/i.test(ua) ? "Mobile" : "Desktop";
+        /Mobi|Android|iPhone|iPad/i.test(ua)
+        ? "Mobile"
+        : "Desktop";
 
-    document.getElementById("browserType").innerText =
-        ua.includes("Chrome") ? "Chrome" :
-        ua.includes("Firefox") ? "Firefox" :
-        ua.includes("Safari") ? "Safari" : "Browser";
+
+    /* =========================
+       BROWSER DETECTION
+    ========================= */
+
+    let browser = "Browser";
+
+    if (ua.includes("Edg/")) {
+        browser = "Edge";
+    } else if (ua.includes("Firefox/")) {
+        browser = "Firefox";
+    } else if (ua.includes("Chrome/")) {
+        browser = "Chrome";
+    } else if (ua.includes("Safari/")) {
+        browser = "Safari";
+    }
+
+    document.getElementById("browserType").innerText = browser;
+
+
+    /* =========================
+       LOCATION DETECTION
+    ========================= */
+
+    const locationElement = document.getElementById("locationText");
 
     fetch("https://ipapi.co/json/")
-    .then(res => res.json())
-    .then(data => {
-        document.getElementById("locationText").innerText =
-            `${data.city}, ${data.country_name}`;
-    })
-    .catch(()=>{
-        document.getElementById("locationText").innerText = "Unknown";
-    });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Location unavailable");
+            }
+            return response.json();
+        })
+        .then(data => {
+            locationElement.innerText =
+                data.city && data.country_name
+                ? `${data.city}, ${data.country_name}`
+                : "Unavailable";
+        })
+        .catch(() => {
+            locationElement.innerText = "Unavailable";
+        });
 
-    async function ping(){
+
+    /* =========================
+       CONNECTION PING
+    ========================= */
+
+    const pingElement = document.getElementById("pingText");
+
+    async function ping() {
+
         const start = performance.now();
-        try{
-            await fetch("/", {method:"HEAD"});
+
+        try {
+
+            await fetch("/", {
+                method: "HEAD",
+                cache: "no-store"
+            });
+
             const ms = Math.round(performance.now() - start);
-            document.getElementById("pingText").innerText = ms + " ms";
-        }catch{
-            document.getElementById("pingText").innerText = "offline";
+
+            pingElement.innerText = ms + " ms";
+
+        } catch {
+
+            pingElement.innerText = "Offline";
+
         }
+
     }
 
     ping();
-    setInterval(ping, 5000);
 
-    window.togglePassword = function(){
-        const p = document.getElementById("password");
-        p.type = p.type === "password" ? "text" : "password";
+    const pingInterval = setInterval(ping, 5000);
+
+
+    /* =========================
+       PASSWORD VISIBILITY
+    ========================= */
+
+    window.togglePassword = function() {
+
+        const password = document.getElementById("password");
+        const toggle = document.getElementById("passwordToggle");
+
+        const isHidden = password.type === "password";
+
+        password.type = isHidden ? "text" : "password";
+        toggle.innerText = isHidden ? "Hide" : "Show";
+
     };
 
-    window.checkCaps = function(e){
+
+    /* =========================
+       CAPS LOCK WARNING
+    ========================= */
+
+    window.checkCaps = function(event) {
+
         document.getElementById("capsWarning")
-        .classList.toggle("hidden", !e.getModifierState("CapsLock"));
+            .classList.toggle(
+                "hidden",
+                !event.getModifierState("CapsLock")
+            );
+
     };
 
-    document.getElementById("loginForm").addEventListener("submit", ()=>{
-        document.getElementById("btnText").innerText = "Signing in...";
-        document.getElementById("spinner").classList.remove("hidden");
+
+    /* =========================
+       LOGIN LOADING STATE
+    ========================= */
+
+    const loginForm = document.getElementById("loginForm");
+
+    loginForm.addEventListener("submit", () => {
+
+        document.getElementById("btnText").innerText =
+            "Signing in...";
+
+        document.getElementById("spinner")
+            .classList.remove("hidden");
+
+        document.getElementById("loginBtn").disabled = true;
+
+        document.getElementById("loginBtn")
+            .querySelector(".submit-arrow").classList.add("hidden");
+
     });
 
 });
