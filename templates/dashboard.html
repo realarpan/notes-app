@@ -1,176 +1,994 @@
 {% extends "base.html" %}
+
+{% block title %}Dashboard | Sunday School Notes{% endblock %}
+
 {% block content %}
 
-<div class="max-w-6xl mx-auto mt-10 px-4">
+<div class="dashboard-container">
 
-<!-- Header -->
-<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-10">
+    <!-- PAGE HEADER -->
+    <section class="dashboard-header">
 
-<!-- LEFT -->
-<div>
-    <h1 class="text-3xl font-semibold tracking-tight flex items-center gap-3 flex-wrap">
-        Welcome,
+        <div class="welcome-section">
 
-        <span class="text-blue-400 capitalize font-medium">
-            {{ current_user.username }}
-        </span>
+            <span class="dashboard-eyebrow">
+                <span class="eyebrow-dot"></span>
+                YOUR LEARNING WORKSPACE
+            </span>
 
-        <!-- 🔥 ROLE BADGE -->
-        {% if current_user.role == "admin" %}
-            <span class="badge admin">Ad</span>
-        {% else %}
-            <span class="badge user">Teacher</span>
-        {% endif %}
+            <h1>
+                Welcome back,
+                <span class="username">{{ current_user.username }}</span>
+                <span class="welcome-wave">👋</span>
+            </h1>
 
-        👋
-    </h1>
+            <p>Select a class to explore its study materials and notes.</p>
 
-    <p class="text-gray-400 text-sm mt-1">
-        Select your class to access notes
-    </p>
-</div>
+            <div class="user-meta">
+                {% if current_user.role == "admin" %}
+                    <span class="role-badge admin-badge">
+                        <span class="role-dot"></span>
+                        Administrator
+                    </span>
+                {% else %}
+                    <span class="role-badge teacher-badge">
+                        <span class="role-dot"></span>
+                        Teacher
+                    </span>
+                {% endif %}
 
-<!-- RIGHT -->
-<div class="flex gap-2 w-full md:w-64">
-    <input 
-        id="searchInput"
-        type="text" 
-        placeholder="Search classes..."
-        class="px-4 py-2 rounded-lg bg-gray-800/80 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
-    >
+                <span class="meta-divider"></span>
+                <span class="meta-text">Personal study workspace</span>
+            </div>
 
-    <button onclick="startVoice()" 
-        id="voiceBtn"
-        class="px-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition">
-        🎤
-    </button>
-</div>
+        </div>
 
-</div>
 
-<!-- Class Grid -->
-<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+        <!-- SEARCH -->
+        <div class="search-section">
 
-{% for i in range(1,12) %}
-<a href="/class/{{i}}" 
-   class="class-card group bg-white/5 backdrop-blur-lg p-6 rounded-2xl text-center border border-white/10 hover:border-blue-500/40 hover:bg-white/10 hover:scale-[1.04] transition-all duration-200 shadow-lg"
-   data-name="class {{i}}">
+            <div class="search-box">
 
-    <div class="text-2xl font-bold mb-3 bg-blue-600/20 text-blue-400 w-12 h-12 flex items-center justify-center rounded-xl mx-auto group-hover:scale-110 transition">
-        {{ i }}
+                <span class="search-icon">⌕</span>
+
+                <input
+                    id="searchInput"
+                    type="text"
+                    placeholder="Search classes..."
+                    autocomplete="off"
+                    aria-label="Search classes"
+                >
+
+                <button
+                    type="button"
+                    id="clearSearch"
+                    class="clear-search hidden"
+                    aria-label="Clear search">
+                    ×
+                </button>
+
+                <button
+                    type="button"
+                    onclick="startVoice()"
+                    id="voiceBtn"
+                    class="voice-button"
+                    title="Voice search"
+                    aria-label="Voice search">
+                    🎤
+                </button>
+
+            </div>
+
+            <p class="search-hint">
+                Search by class number or use voice search
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- STATISTICS -->
+    <section class="overview-section">
+
+        <div class="overview-card">
+
+            <div class="overview-icon">▦</div>
+
+            <div>
+                <strong>11</strong>
+                <span>Available Classes</span>
+            </div>
+
+        </div>
+
+        <div class="overview-card">
+
+            <div class="overview-icon blue-icon">▤</div>
+
+            <div>
+                <strong>Study</strong>
+                <span>Class-wise Notes</span>
+            </div>
+
+        </div>
+
+        <div class="overview-card">
+
+            <div class="overview-icon purple-icon">⌕</div>
+
+            <div>
+                <strong>Quick</strong>
+                <span>Search & Discover</span>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- CLASS SECTION -->
+    <section class="classes-section">
+
+        <div class="section-heading">
+
+            <div>
+                <span class="section-eyebrow">YOUR LIBRARY</span>
+                <h2>Explore Classes</h2>
+                <p>Choose a class to access its available notes.</p>
+            </div>
+
+            <div class="class-counter">
+                <span id="visibleCount">11</span>
+                <span>CLASSES</span>
+            </div>
+
+        </div>
+
+
+        <!-- CLASS GRID -->
+        <div id="classGrid" class="class-grid">
+
+            {% for i in range(1,12) %}
+
+            <a href="/class/{{i}}"
+               class="class-card"
+               data-name="class {{i}}"
+               data-number="{{i}}">
+
+                <div class="class-card-top">
+
+                    <span class="class-number">
+                        {{ "%02d"|format(i) }}
+                    </span>
+
+                    <span class="class-arrow">↗</span>
+
+                </div>
+
+                <div class="class-card-content">
+
+                    <div class="class-icon">▤</div>
+
+                    <h3>Class {{i}}</h3>
+
+                    <p>Study materials and notes</p>
+
+                </div>
+
+                <div class="class-card-bottom">
+                    <span>OPEN CLASS</span>
+                    <span class="bottom-arrow">→</span>
+                </div>
+
+            </a>
+
+            {% endfor %}
+
+        </div>
+
+
+        <!-- NO RESULTS -->
+        <div id="noResults" class="no-results hidden">
+
+            <div class="empty-icon">⌕</div>
+
+            <h3>No classes found</h3>
+
+            <p>Try searching with a different class number.</p>
+
+            <button type="button" onclick="resetSearch()">
+                Clear search
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- FOOTER NOTE -->
+    <div class="dashboard-bottom-note">
+        <span class="bottom-note-icon">✦</span>
+        <span>Your learning space, organized for simplicity.</span>
     </div>
-    
-    <h3 class="text-lg font-semibold">
-        Class {{i}}
-    </h3>
-
-    <p class="text-xs text-gray-400 mt-1">
-        Notes
-    </p>
-
-</a>
-{% endfor %}
 
 </div>
 
-<!-- No Results -->
-<div id="noResults" class="hidden text-center mt-10 text-gray-400">
-    No classes found
-</div>
 
-</div>
-
-<!-- 🔥 BADGE STYLES -->
 <style>
-/* 🔥 BASE BADGE (compact pill) */
-.badge {
-    font-size: 10px;
-    padding: 3px 10px;              /* tighter */
-    border-radius: 9999px;
-    font-weight: 600;
-    letter-spacing: 0.8px;
+
+/* =========================
+   DASHBOARD CONTAINER
+========================= */
+
+.dashboard-container {
+    width: 100%;
+    max-width: 1250px;
+    margin: 0 auto;
+    padding: 55px 28px 45px;
+    color: #f4f4f5;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 30px;
+    margin-bottom: 38px;
+}
+
+.welcome-section {
+    min-width: 0;
+}
+
+.dashboard-eyebrow,
+.section-eyebrow {
     display: inline-flex;
     align-items: center;
-    line-height: 1;
+    gap: 9px;
+    color: #818cf8;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.8px;
 }
 
-/* 🟢 SAME STYLE FOR ADMIN + TEACHER */
-.admin,
-.user {
-    color: #22c55e;
-    background: transparent;        /* no bulky background */
-
-    border: 1px solid rgba(34,197,94,0.9);
-
-    /* ✨ tight neon glow (controlled) */
-    box-shadow: 0 0 6px rgba(34,197,94,0.5);
-
-    text-shadow: 0 0 4px rgba(34,197,94,0.6);
+.eyebrow-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #818cf8;
+    box-shadow: 0 0 10px rgba(129,140,248,0.8);
 }
+
+.welcome-section h1 {
+    margin: 17px 0 9px;
+    color: #f4f4f5;
+    font-size: clamp(27px, 4vw, 39px);
+    line-height: 1.3;
+    font-weight: 700;
+    letter-spacing: -1.5px;
+    overflow-wrap: anywhere;
+}
+
+.username {
+    color: #a5b4fc;
+    text-transform: capitalize;
+}
+
+.welcome-wave {
+    display: inline-block;
+    font-size: 25px;
+    animation: wave 2.5s ease-in-out infinite;
+}
+
+@keyframes wave {
+    0%, 100% { transform: rotate(0); }
+    15%, 35% { transform: rotate(12deg); }
+    25%, 45% { transform: rotate(-8deg); }
+}
+
+.welcome-section > p {
+    margin: 0;
+    color: #858b99;
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+.user-meta {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-top: 19px;
+}
+
+.role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 11px;
+    border-radius: 999px;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.admin-badge,
+.teacher-badge {
+    color: #86efac;
+    background: rgba(34,197,94,0.08);
+    border: 1px solid rgba(34,197,94,0.22);
+}
+
+.role-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 7px rgba(74,222,128,0.6);
+}
+
+.meta-divider {
+    width: 1px;
+    height: 13px;
+    background: rgba(255,255,255,0.15);
+}
+
+.meta-text {
+    color: #737b89;
+    font-size: 10px;
+}
+
+
+/* =========================
+   SEARCH
+========================= */
+
+.search-section {
+    width: 100%;
+    max-width: 310px;
+    flex-shrink: 0;
+}
+
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 47px;
+    padding: 0 9px 0 14px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.045);
+    border: 1px solid rgba(255,255,255,0.10);
+    backdrop-filter: blur(15px);
+    transition: 0.25s;
+}
+
+.search-box:focus-within {
+    border-color: rgba(129,140,248,0.65);
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.10);
+    background: rgba(255,255,255,0.065);
+}
+
+.search-icon {
+    color: #818cf8;
+    font-size: 23px;
+    margin-right: 10px;
+}
+
+.search-box input {
+    width: 100%;
+    min-width: 0;
+    outline: none;
+    border: none;
+    color: #f4f4f5;
+    background: transparent;
+    font-family: inherit;
+    font-size: 11px;
+}
+
+.search-box input::placeholder {
+    color: #737b89;
+}
+
+.voice-button,
+.clear-search {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 31px;
+    height: 31px;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    background: rgba(255,255,255,0.06);
+    color: #c4b5fd;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.voice-button:hover,
+.clear-search:hover {
+    background: rgba(99,102,241,0.20);
+}
+
+.voice-button.listening {
+    background: rgba(239,68,68,0.16);
+    border-color: rgba(239,68,68,0.35);
+    animation: listeningPulse 1.2s infinite;
+}
+
+@keyframes listeningPulse {
+    50% {
+        box-shadow: 0 0 0 5px rgba(239,68,68,0.08);
+    }
+}
+
+.search-hint {
+    margin: 9px 0 0 3px;
+    color: #646d7e;
+    font-size: 9px;
+}
+
+
+/* =========================
+   OVERVIEW CARDS
+========================= */
+
+.overview-section {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 50px;
+}
+
+.overview-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 82px;
+    padding: 16px 18px;
+    border: 1px solid rgba(255,255,255,0.075);
+    border-radius: 15px;
+    background: rgba(255,255,255,0.035);
+    backdrop-filter: blur(15px);
+    transition: 0.25s;
+}
+
+.overview-card:hover {
+    transform: translateY(-3px);
+    background: rgba(255,255,255,0.055);
+    border-color: rgba(129,140,248,0.20);
+}
+
+.overview-icon {
+    display: grid;
+    place-items: center;
+    width: 43px;
+    height: 43px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    color: #a5b4fc;
+    background: rgba(99,102,241,0.12);
+    font-size: 20px;
+}
+
+.blue-icon {
+    color: #7dd3fc;
+    background: rgba(14,165,233,0.10);
+}
+
+.purple-icon {
+    color: #c4b5fd;
+    background: rgba(139,92,246,0.12);
+}
+
+.overview-card div:last-child {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.overview-card strong {
+    color: #f4f4f5;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.overview-card div:last-child span {
+    color: #858b99;
+    font-size: 10px;
+}
+
+
+/* =========================
+   CLASS SECTION
+========================= */
+
+.classes-section {
+    width: 100%;
+}
+
+.section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 23px;
+}
+
+.section-heading h2 {
+    margin: 9px 0 5px;
+    color: #f4f4f5;
+    font-size: 23px;
+    font-weight: 700;
+    letter-spacing: -0.8px;
+}
+
+.section-heading p {
+    margin: 0;
+    color: #858b99;
+    font-size: 11px;
+}
+
+.class-counter {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    color: #777f90;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.class-counter span:first-child {
+    color: #a5b4fc;
+    font-size: 20px;
+    letter-spacing: 0;
+}
+
+
+/* =========================
+   CLASS GRID
+========================= */
+
+.class-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 17px;
+}
+
+.class-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 205px;
+    padding: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.085);
+    border-radius: 17px;
+    color: #f4f4f5;
+    text-decoration: none;
+    background: linear-gradient(
+        145deg,
+        rgba(255,255,255,0.065),
+        rgba(255,255,255,0.025)
+    );
+    backdrop-filter: blur(18px);
+    transition: transform 0.25s, border-color 0.25s, background 0.25s;
+}
+
+.class-card::before {
+    content: "";
+    position: absolute;
+    top: -65px;
+    right: -65px;
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    background: rgba(99,102,241,0.10);
+    filter: blur(30px);
+    opacity: 0;
+    transition: 0.3s;
+}
+
+.class-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(129,140,248,0.42);
+    background: linear-gradient(
+        145deg,
+        rgba(99,102,241,0.11),
+        rgba(255,255,255,0.035)
+    );
+}
+
+.class-card:hover::before {
+    opacity: 1;
+}
+
+.class-card-top {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.class-number {
+    color: #818cf8;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.class-arrow {
+    color: #656d7e;
+    font-size: 15px;
+    transition: 0.25s;
+}
+
+.class-card:hover .class-arrow {
+    color: #a5b4fc;
+    transform: translate(3px, -3px);
+}
+
+.class-card-content {
+    margin-top: 22px;
+}
+
+.class-icon {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    color: #a5b4fc;
+    background: rgba(99,102,241,0.13);
+    border: 1px solid rgba(129,140,248,0.12);
+    font-size: 17px;
+}
+
+.class-card h3 {
+    margin: 14px 0 5px;
+    color: #f4f4f5;
+    font-size: 16px;
+    font-weight: 650;
+    letter-spacing: -0.3px;
+}
+
+.class-card-content p {
+    margin: 0;
+    color: #858b99;
+    font-size: 10px;
+}
+
+.class-card-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 19px;
+    color: #70798a;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.bottom-arrow {
+    color: #818cf8;
+    font-size: 15px;
+    transition: 0.2s;
+}
+
+.class-card:hover .bottom-arrow {
+    transform: translateX(4px);
+}
+
+
+/* =========================
+   EMPTY SEARCH STATE
+========================= */
+
+.no-results {
+    padding: 65px 20px;
+    text-align: center;
+    border: 1px dashed rgba(255,255,255,0.13);
+    border-radius: 17px;
+    background: rgba(255,255,255,0.02);
+}
+
+.empty-icon {
+    display: grid;
+    place-items: center;
+    width: 55px;
+    height: 55px;
+    margin: 0 auto 15px;
+    border-radius: 15px;
+    color: #a5b4fc;
+    background: rgba(99,102,241,0.12);
+    font-size: 27px;
+}
+
+.no-results h3 {
+    margin: 0 0 8px;
+    color: #e4e4e7;
+    font-size: 16px;
+}
+
+.no-results p {
+    margin: 0 0 18px;
+    color: #858b99;
+    font-size: 11px;
+}
+
+.no-results button {
+    padding: 9px 15px;
+    border: 1px solid rgba(129,140,248,0.25);
+    border-radius: 9px;
+    color: #a5b4fc;
+    background: rgba(99,102,241,0.10);
+    font-family: inherit;
+    font-size: 10px;
+    cursor: pointer;
+}
+
+.no-results button:hover {
+    background: rgba(99,102,241,0.20);
+}
+
+
+/* =========================
+   BOTTOM NOTE
+========================= */
+
+.dashboard-bottom-note {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 9px;
+    margin-top: 42px;
+    color: #656d7d;
+    font-size: 10px;
+}
+
+.bottom-note-icon {
+    color: #818cf8;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1000px) {
+
+    .class-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .dashboard-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .search-section {
+        max-width: 430px;
+    }
+
+}
+
+@media (max-width: 650px) {
+
+    .dashboard-container {
+        padding: 35px 17px;
+    }
+
+    .overview-section {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-bottom: 38px;
+    }
+
+    .overview-card {
+        min-height: 70px;
+    }
+
+    .class-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 11px;
+    }
+
+    .class-card {
+        min-height: 185px;
+        padding: 15px;
+    }
+
+    .section-heading h2 {
+        font-size: 20px;
+    }
+
+}
+
+@media (max-width: 370px) {
+
+    .class-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .user-meta {
+        flex-wrap: wrap;
+    }
+
+    .meta-text {
+        font-size: 9px;
+    }
+
+}
+
 </style>
 
-<!-- 🔥 SCRIPT -->
+
 <script>
+
+/* =========================
+   CLASS SEARCH
+========================= */
+
 const searchInput = document.getElementById("searchInput");
 const cards = document.querySelectorAll(".class-card");
 const noResults = document.getElementById("noResults");
+const visibleCount = document.getElementById("visibleCount");
 const voiceBtn = document.getElementById("voiceBtn");
+const clearSearch = document.getElementById("clearSearch");
 
-// SEARCH
-function applySearch(){
+
+function applySearch() {
+
     const value = searchInput.value.toLowerCase().trim();
+
     let visible = 0;
 
     cards.forEach(card => {
+
         const name = card.getAttribute("data-name");
 
         if (name.includes(value)) {
-            card.style.display = "block";
+
+            card.style.display = "flex";
             visible++;
+
         } else {
+
             card.style.display = "none";
+
         }
+
     });
 
     noResults.classList.toggle("hidden", visible !== 0);
+
+    visibleCount.innerText = visible;
+
+    clearSearch.classList.toggle(
+        "hidden",
+        searchInput.value.length === 0
+    );
+
 }
+
 
 searchInput.addEventListener("input", applySearch);
 
-// VOICE SEARCH
-function startVoice(){
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    if(!SpeechRecognition){
-        alert("Voice search not supported in your browser");
+/* =========================
+   CLEAR SEARCH
+========================= */
+
+function resetSearch() {
+
+    searchInput.value = "";
+
+    applySearch();
+
+    searchInput.focus();
+
+}
+
+clearSearch.addEventListener("click", resetSearch);
+
+
+/* =========================
+   VOICE SEARCH
+========================= */
+
+let recognition = null;
+
+function startVoice() {
+
+    const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+
+        alert("Voice search is not supported in this browser. Please use Chrome or Edge.");
+
         return;
+
     }
 
-    const recognition = new SpeechRecognition();
-    recognition.lang = "en-US";
+    if (recognition) {
 
+        recognition.stop();
+
+    }
+
+    recognition = new SpeechRecognition();
+
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    voiceBtn.classList.add("listening");
     voiceBtn.innerText = "🎙️";
+
     searchInput.placeholder = "Listening...";
 
-    recognition.onresult = function(event){
-        let text = event.results[0][0].transcript.toLowerCase();
-        searchInput.value = text;
+    recognition.onresult = function(event) {
+
+        const spokenText =
+            event.results[0][0].transcript.toLowerCase();
+
+        searchInput.value = spokenText;
+
         applySearch();
+
     };
 
-    recognition.onend = function(){
+
+    recognition.onend = function() {
+
+        voiceBtn.classList.remove("listening");
         voiceBtn.innerText = "🎤";
+
         searchInput.placeholder = "Search classes...";
+
+        recognition = null;
+
     };
 
-    recognition.onerror = function(){
-        alert("Voice error. Try again.");
+
+    recognition.onerror = function() {
+
+        voiceBtn.classList.remove("listening");
         voiceBtn.innerText = "🎤";
+
         searchInput.placeholder = "Search classes...";
+
+        recognition = null;
+
+        alert("Voice search could not be completed. Please try again.");
+
     };
 
-    recognition.start();
+
+    try {
+
+        recognition.start();
+
+    } catch (error) {
+
+        voiceBtn.classList.remove("listening");
+        voiceBtn.innerText = "🎤";
+
+        searchInput.placeholder = "Search classes...";
+
+    }
+
 }
+
 </script>
 
 {% endblock %}
