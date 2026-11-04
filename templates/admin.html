@@ -40,18 +40,25 @@
         margin-bottom: 24px;
     }
 
+    /* MATCHING OPEN-BOOK BRAND LOGO */
+
     .sidebar-logo {
         width: 40px;
         height: 40px;
+        flex-shrink: 0;
         display: flex;
         align-items: center;
         justify-content: center;
         border-radius: 13px;
-        background: linear-gradient(135deg, #2563eb, #7c3aed);
-        box-shadow: 0 5px 20px rgba(59, 130, 246, .25);
+        background: linear-gradient(135deg, #8b5cf6, #6366f1);
+        box-shadow: 0 5px 25px rgba(139, 92, 246, .25);
         color: white;
-        font-size: 19px;
-        font-weight: 900;
+    }
+
+    .sidebar-logo svg {
+        width: 24px;
+        height: 24px;
+        display: block;
     }
 
     .sidebar-brand h2 {
@@ -226,38 +233,87 @@
         box-shadow: 0 0 0 3px rgba(59, 130, 246, .1);
     }
 
+    /* ================= TOP RIGHT ADMIN PROFILE ================= */
+
     .admin-profile {
         display: flex;
         align-items: center;
-        gap: 10px;
-        padding-left: 13px;
+        gap: 11px;
+        padding-left: 15px;
         border-left: 1px solid rgba(148, 163, 184, .15);
     }
 
     .admin-avatar {
-        width: 36px;
-        height: 36px;
+        width: 39px;
+        height: 39px;
+        flex-shrink: 0;
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 12px;
-        background: linear-gradient(135deg, #2563eb, #7c3aed);
-        box-shadow: 0 4px 14px rgba(59, 130, 246, .2);
+        border-radius: 13px;
+        background: linear-gradient(135deg, #8b5cf6, #6366f1);
+        box-shadow: 0 5px 20px rgba(139, 92, 246, .25);
         color: white;
-        font-size: 13px;
-        font-weight: 800;
+    }
+
+    .admin-avatar svg {
+        width: 23px;
+        height: 23px;
+        display: block;
+    }
+
+    .admin-profile-details {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        min-width: 0;
+    }
+
+    .admin-profile-name-row {
+        display: flex;
+        align-items: center;
+        gap: 7px;
     }
 
     .profile-name {
         color: #e2e8f0;
         font-size: 11px;
         font-weight: 750;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 
-    .profile-role {
-        color: #64748b;
+    .admin-role-badge {
+        padding: 3px 6px;
+        border: 1px solid rgba(139, 92, 246, .25);
+        border-radius: 5px;
+        background: rgba(139, 92, 246, .12);
+        color: #c4b5fd;
+        font-size: 8px;
+        font-weight: 850;
+        letter-spacing: .7px;
+    }
+
+    .admin-profile-status {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        color: #94a3b8;
         font-size: 9px;
-        margin-top: 3px;
+    }
+
+    .admin-status-dot {
+        width: 6px;
+        height: 6px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        background: #34d399;
+        box-shadow: 0 0 8px rgba(52, 211, 153, .55);
+    }
+
+    .admin-status-separator {
+        color: #475569;
     }
 
     .admin-content {
@@ -715,7 +771,6 @@
         font-size: 11px;
     }
 
-
     /* ================= PREMIUM SIDEBAR PROFILE ================= */
 
     .sidebar-bottom {
@@ -726,15 +781,24 @@
         gap: 13px;
     }
 
-    .sidebar-user-wrap { position: relative; }
+    .sidebar-user-wrap {
+        position: relative;
+    }
 
     .sidebar-user-button {
-        width: 100%; display: flex; align-items: center; gap: 12px;
-        padding: 12px; border: 1px solid rgba(148,163,184,.14);
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        border: 1px solid rgba(148,163,184,.14);
         border-radius: 15px;
         background: linear-gradient(145deg,rgba(30,41,59,.78),rgba(15,23,42,.82));
-        color: #f8fafc; text-align: left; cursor: pointer;
-        transition: all .25s ease; box-shadow: 0 8px 25px rgba(0,0,0,.16);
+        color: #f8fafc;
+        text-align: left;
+        cursor: pointer;
+        transition: all .25s ease;
+        box-shadow: 0 8px 25px rgba(0,0,0,.16);
     }
 
     .sidebar-user-button:hover,
@@ -746,56 +810,142 @@
     }
 
     .sidebar-user-avatar {
-        width: 43px; height: 43px; flex-shrink: 0; display: flex;
-        align-items: center; justify-content: center; border-radius: 13px;
+        width: 43px;
+        height: 43px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 13px;
         background: linear-gradient(135deg,#8b5cf6,#6366f1 55%,#4f46e5);
-        color: white; font-size: 16px; font-weight: 850;
+        color: white;
+        font-size: 16px;
+        font-weight: 850;
         box-shadow: 0 5px 16px rgba(99,102,241,.28),inset 0 1px 0 rgba(255,255,255,.2);
     }
 
-    .sidebar-user-details { flex: 1; min-width: 0; }
+    .sidebar-user-details {
+        flex: 1;
+        min-width: 0;
+    }
+
     .sidebar-user-name {
-        display: block; color: #f1f5f9; font-size: 12px; font-weight: 800;
-        overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+        display: block;
+        color: #f1f5f9;
+        font-size: 12px;
+        font-weight: 800;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
+
     .sidebar-user-status {
-        display: flex; align-items: center; gap: 6px; margin-top: 5px;
-        color: #94a3b8; font-size: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 5px;
+        color: #94a3b8;
+        font-size: 10px;
     }
+
     .sidebar-online-dot {
-        width: 7px; height: 7px; flex-shrink: 0; border-radius: 50%;
-        background: #34d399; box-shadow: 0 0 9px rgba(52,211,153,.65);
+        width: 7px;
+        height: 7px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        background: #34d399;
+        box-shadow: 0 0 9px rgba(52,211,153,.65);
     }
-    .sidebar-user-chevron { color: #64748b; font-size: 12px; transition: transform .2s ease; }
-    .sidebar-user-button[aria-expanded="true"] .sidebar-user-chevron { transform: rotate(180deg); }
+
+    .sidebar-user-chevron {
+        color: #64748b;
+        font-size: 12px;
+        transition: transform .2s ease;
+    }
+
+    .sidebar-user-button[aria-expanded="true"] .sidebar-user-chevron {
+        transform: rotate(180deg);
+    }
 
     .sidebar-profile-menu {
-        position: absolute; left: 0; right: 0; bottom: calc(100% + 10px); z-index: 60;
-        padding: 15px; border: 1px solid rgba(148,163,184,.18); border-radius: 15px;
-        background: rgba(15,23,42,.97); backdrop-filter: blur(22px);
-        -webkit-backdrop-filter: blur(22px); box-shadow: 0 16px 45px rgba(0,0,0,.4);
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: calc(100% + 10px);
+        z-index: 60;
+        padding: 15px;
+        border: 1px solid rgba(148,163,184,.18);
+        border-radius: 15px;
+        background: rgba(15,23,42,.97);
+        backdrop-filter: blur(22px);
+        -webkit-backdrop-filter: blur(22px);
+        box-shadow: 0 16px 45px rgba(0,0,0,.4);
         animation: profileMenuIn .2s ease;
     }
+
     @keyframes profileMenuIn {
-        from { opacity: 0; transform: translateY(7px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(7px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
-    .sidebar-profile-menu.hidden { display: none; }
+
+    .sidebar-profile-menu.hidden {
+        display: none;
+    }
+
     .profile-menu-label {
-        color: #64748b; font-size: 9px; font-weight: 800;
-        letter-spacing: 1.4px; text-transform: uppercase; margin-bottom: 8px;
+        color: #64748b;
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: 1.4px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
     }
-    .profile-menu-username { color: #f8fafc; font-size: 13px; font-weight: 800; overflow-wrap: anywhere; }
-    .profile-menu-role { color: #a5b4fc; font-size: 10px; margin-top: 5px; }
-    .profile-menu-divider { height: 1px; margin: 13px 0; background: rgba(148,163,184,.13); }
+
+    .profile-menu-username {
+        color: #f8fafc;
+        font-size: 13px;
+        font-weight: 800;
+        overflow-wrap: anywhere;
+    }
+
+    .profile-menu-role {
+        color: #a5b4fc;
+        font-size: 10px;
+        margin-top: 5px;
+    }
+
+    .profile-menu-divider {
+        height: 1px;
+        margin: 13px 0;
+        background: rgba(148,163,184,.13);
+    }
+
     .profile-menu-logout {
-        display: flex; align-items: center; gap: 9px; width: 100%; padding: 10px 11px;
-        border: 1px solid rgba(248,113,113,.15); border-radius: 10px;
-        background: rgba(239,68,68,.07); color: #fca5a5; font-size: 11px;
-        font-weight: 750; text-decoration: none; transition: all .2s ease;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        width: 100%;
+        padding: 10px 11px;
+        border: 1px solid rgba(248,113,113,.15);
+        border-radius: 10px;
+        background: rgba(239,68,68,.07);
+        color: #fca5a5;
+        font-size: 11px;
+        font-weight: 750;
+        text-decoration: none;
+        transition: all .2s ease;
     }
+
     .profile-menu-logout:hover {
-        background: rgba(239,68,68,.15); border-color: rgba(248,113,113,.3); color: #fecaca;
+        background: rgba(239,68,68,.15);
+        border-color: rgba(248,113,113,.3);
+        color: #fecaca;
     }
 
     /* ================= MOBILE ================= */
@@ -854,6 +1004,30 @@
             text-overflow: ellipsis;
         }
 
+        .admin-profile {
+            gap: 8px;
+            padding-left: 10px;
+        }
+
+        .admin-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 11px;
+        }
+
+        .admin-avatar svg {
+            width: 21px;
+            height: 21px;
+        }
+
+        .admin-role-badge {
+            display: none;
+        }
+
+        .admin-profile-status {
+            font-size: 8px;
+        }
+
         .page-intro h1 {
             font-size: 21px;
         }
@@ -902,7 +1076,21 @@
 
         <div class="sidebar-brand">
 
-            <div class="sidebar-logo">S</div>
+            <!-- Matching Open Book Plus Logo -->
+            <div class="sidebar-logo" aria-label="Sunday School Notes">
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="1.6"
+                     stroke-linecap="round"
+                     stroke-linejoin="round"
+                     aria-hidden="true">
+                    <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22z"/>
+                    <path d="M4 5.5v14A2.5 2.5 0 0 1 6.5 17H20"/>
+                    <path d="M12 7v6"/>
+                    <path d="M9 10h6"/>
+                </svg>
+            </div>
 
             <div>
                 <h2>Sunday School</h2>
@@ -1050,20 +1238,46 @@
                     autocomplete="off"
                 >
 
+                <!-- UPDATED TOP-RIGHT ADMIN PROFILE -->
+
                 <div class="admin-profile">
 
-                    <div class="admin-avatar">
-                        {{ current_user.username[0]|upper }}
+                    <div class="admin-avatar" aria-label="Administrator logo">
+                        <svg viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="1.6"
+                             stroke-linecap="round"
+                             stroke-linejoin="round"
+                             aria-hidden="true">
+                            <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22z"/>
+                            <path d="M4 5.5v14A2.5 2.5 0 0 1 6.5 17H20"/>
+                            <path d="M12 7v6"/>
+                            <path d="M9 10h6"/>
+                        </svg>
                     </div>
 
-                    <div>
-                        <div class="profile-name">
-                            {{ current_user.username }}
+                    <div class="admin-profile-details">
+
+                        <div class="admin-profile-name-row">
+
+                            <div class="profile-name">
+                                {{ current_user.username }}
+                            </div>
+
+                            <span class="admin-role-badge">
+                                ADMIN
+                            </span>
+
                         </div>
 
-                        <div class="profile-role">
-                            Administrator
+                        <div class="admin-profile-status">
+                            <span class="admin-status-dot"></span>
+                            <span>Administrator</span>
+                            <span class="admin-status-separator">·</span>
+                            <span>Active</span>
                         </div>
+
                     </div>
 
                 </div>
