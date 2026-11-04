@@ -1,7 +1,6 @@
-
 {% extends "base.html" %}
 
-{% block title %}Admin Control Center | Sunday School Notes{% endblock %}
+{% block title %}Admin Panel | SS Notes{% endblock %}
 
 {% block head %}
 <style>
@@ -716,6 +715,89 @@
         font-size: 11px;
     }
 
+
+    /* ================= PREMIUM SIDEBAR PROFILE ================= */
+
+    .sidebar-bottom {
+        margin-top: auto;
+        padding-top: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 13px;
+    }
+
+    .sidebar-user-wrap { position: relative; }
+
+    .sidebar-user-button {
+        width: 100%; display: flex; align-items: center; gap: 12px;
+        padding: 12px; border: 1px solid rgba(148,163,184,.14);
+        border-radius: 15px;
+        background: linear-gradient(145deg,rgba(30,41,59,.78),rgba(15,23,42,.82));
+        color: #f8fafc; text-align: left; cursor: pointer;
+        transition: all .25s ease; box-shadow: 0 8px 25px rgba(0,0,0,.16);
+    }
+
+    .sidebar-user-button:hover,
+    .sidebar-user-button[aria-expanded="true"] {
+        border-color: rgba(139,92,246,.48);
+        background: linear-gradient(145deg,rgba(49,46,129,.28),rgba(30,41,59,.9));
+        box-shadow: 0 8px 28px rgba(99,102,241,.12);
+        transform: translateY(-2px);
+    }
+
+    .sidebar-user-avatar {
+        width: 43px; height: 43px; flex-shrink: 0; display: flex;
+        align-items: center; justify-content: center; border-radius: 13px;
+        background: linear-gradient(135deg,#8b5cf6,#6366f1 55%,#4f46e5);
+        color: white; font-size: 16px; font-weight: 850;
+        box-shadow: 0 5px 16px rgba(99,102,241,.28),inset 0 1px 0 rgba(255,255,255,.2);
+    }
+
+    .sidebar-user-details { flex: 1; min-width: 0; }
+    .sidebar-user-name {
+        display: block; color: #f1f5f9; font-size: 12px; font-weight: 800;
+        overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+    }
+    .sidebar-user-status {
+        display: flex; align-items: center; gap: 6px; margin-top: 5px;
+        color: #94a3b8; font-size: 10px;
+    }
+    .sidebar-online-dot {
+        width: 7px; height: 7px; flex-shrink: 0; border-radius: 50%;
+        background: #34d399; box-shadow: 0 0 9px rgba(52,211,153,.65);
+    }
+    .sidebar-user-chevron { color: #64748b; font-size: 12px; transition: transform .2s ease; }
+    .sidebar-user-button[aria-expanded="true"] .sidebar-user-chevron { transform: rotate(180deg); }
+
+    .sidebar-profile-menu {
+        position: absolute; left: 0; right: 0; bottom: calc(100% + 10px); z-index: 60;
+        padding: 15px; border: 1px solid rgba(148,163,184,.18); border-radius: 15px;
+        background: rgba(15,23,42,.97); backdrop-filter: blur(22px);
+        -webkit-backdrop-filter: blur(22px); box-shadow: 0 16px 45px rgba(0,0,0,.4);
+        animation: profileMenuIn .2s ease;
+    }
+    @keyframes profileMenuIn {
+        from { opacity: 0; transform: translateY(7px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .sidebar-profile-menu.hidden { display: none; }
+    .profile-menu-label {
+        color: #64748b; font-size: 9px; font-weight: 800;
+        letter-spacing: 1.4px; text-transform: uppercase; margin-bottom: 8px;
+    }
+    .profile-menu-username { color: #f8fafc; font-size: 13px; font-weight: 800; overflow-wrap: anywhere; }
+    .profile-menu-role { color: #a5b4fc; font-size: 10px; margin-top: 5px; }
+    .profile-menu-divider { height: 1px; margin: 13px 0; background: rgba(148,163,184,.13); }
+    .profile-menu-logout {
+        display: flex; align-items: center; gap: 9px; width: 100%; padding: 10px 11px;
+        border: 1px solid rgba(248,113,113,.15); border-radius: 10px;
+        background: rgba(239,68,68,.07); color: #fca5a5; font-size: 11px;
+        font-weight: 750; text-decoration: none; transition: all .2s ease;
+    }
+    .profile-menu-logout:hover {
+        background: rgba(239,68,68,.15); border-color: rgba(248,113,113,.3); color: #fecaca;
+    }
+
     /* ================= MOBILE ================= */
 
     .sidebar-overlay {
@@ -884,9 +966,40 @@
 
         <div class="sidebar-bottom">
 
-            <div class="admin-sidebar-note">
-                <strong>Admin Workspace</strong>
-                <p>Manage study materials, uploads and registered users from one place.</p>
+            <div class="sidebar-user-wrap">
+                <button
+                    type="button"
+                    class="sidebar-user-button"
+                    id="sidebarUserButton"
+                    aria-expanded="false"
+                    aria-controls="sidebarProfileMenu"
+                    onclick="toggleAdminProfile()"
+                >
+                    <div class="sidebar-user-avatar">
+                        {{ current_user.username[0]|upper }}
+                    </div>
+
+                    <div class="sidebar-user-details">
+                        <span class="sidebar-user-name">{{ current_user.username }}</span>
+                        <span class="sidebar-user-status">
+                            <span class="sidebar-online-dot"></span>
+                            Administrator
+                        </span>
+                    </div>
+
+                    <span class="sidebar-user-chevron">⌃</span>
+                </button>
+
+                <div id="sidebarProfileMenu" class="sidebar-profile-menu hidden">
+                    <div class="profile-menu-label">Signed in as</div>
+                    <div class="profile-menu-username">{{ current_user.username }}</div>
+                    <div class="profile-menu-role">Administrator Account</div>
+                    <div class="profile-menu-divider"></div>
+                    <a href="/logout" class="profile-menu-logout">
+                        <span>↗</span>
+                        Sign out of account
+                    </a>
+                </div>
             </div>
 
         </div>
@@ -1533,6 +1646,43 @@
 {% block scripts %}
 <script>
 document.addEventListener("DOMContentLoaded", () => {
+
+    /* ================= SIDEBAR ADMIN PROFILE ================= */
+
+    window.toggleAdminProfile = function () {
+        const button = document.getElementById("sidebarUserButton");
+        const menu = document.getElementById("sidebarProfileMenu");
+        if (!button || !menu) return;
+
+        const isOpen = !menu.classList.contains("hidden");
+        menu.classList.toggle("hidden", isOpen);
+        button.setAttribute("aria-expanded", String(!isOpen));
+    };
+
+    document.addEventListener("click", function (event) {
+        const profile = document.querySelector(".sidebar-user-wrap");
+        const button = document.getElementById("sidebarUserButton");
+        const menu = document.getElementById("sidebarProfileMenu");
+        if (!profile || !button || !menu) return;
+
+        if (!profile.contains(event.target)) {
+            menu.classList.add("hidden");
+            button.setAttribute("aria-expanded", "false");
+        }
+    });
+
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+            const button = document.getElementById("sidebarUserButton");
+            const menu = document.getElementById("sidebarProfileMenu");
+            if (button && menu) {
+                menu.classList.add("hidden");
+                button.setAttribute("aria-expanded", "false");
+            }
+        }
+    });
+
+
 
     /* ================= TAB NAVIGATION ================= */
 
