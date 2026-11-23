@@ -1365,6 +1365,63 @@
                 </div>
 
 
+                <!-- ANALYTICS OVERVIEW -->
+                {% set max_upload_value = uploads_data|max if uploads_data and (uploads_data|max) > 0 else 1 %}
+                <div class="grid grid-cols-1 xl:grid-cols-5 gap-4 mb-5">
+                    <section class="card chart-card xl:col-span-3">
+                        <div class="chart-head">
+                            <div>
+                                <div class="chart-title">Upload activity</div>
+                                <p class="chart-caption">Daily uploads · last 7 days</p>
+                            </div>
+                            <span class="chart-legend">✦ Weekly trend</span>
+                        </div>
+                        <svg class="upload-chart" viewBox="0 0 600 185" role="img" aria-label="Daily uploads over the last seven days">
+                            <defs>
+                                <linearGradient id="uploadGradient" x1="0" x2="0" y1="0" y2="1">
+                                    <stop offset="0%" stop-color="#a69cff" stop-opacity=".34"/>
+                                    <stop offset="100%" stop-color="#8b7cff" stop-opacity="0"/>
+                                </linearGradient>
+                            </defs>
+                            <line class="chart-gridline" x1="18" y1="40" x2="585" y2="40"/>
+                            <line class="chart-gridline" x1="18" y1="95" x2="585" y2="95"/>
+                            <line class="chart-gridline" x1="18" y1="150" x2="585" y2="150"/>
+                            <polygon class="chart-area" points="20,160 {% for value in uploads_data %}{{ 20 + loop.index0 * 93 }},{{ 150 - ((value / max_upload_value) * 110) }} {% endfor %}578,160"/>
+                            <polyline class="chart-line" points="{% for value in uploads_data %}{{ 20 + loop.index0 * 93 }},{{ 150 - ((value / max_upload_value) * 110) }} {% endfor %}"/>
+                            {% for value in uploads_data %}
+                            <circle class="chart-point" cx="{{ 20 + loop.index0 * 93 }}" cy="{{ 150 - ((value / max_upload_value) * 110) }}" r="4"/>
+                            {% endfor %}
+                        </svg>
+                        <div class="chart-labels"><span>7 days ago</span><span>Today</span></div>
+                    </section>
+                    <section class="card xl:col-span-2">
+                        <div class="chart-head">
+                            <div>
+                                <div class="chart-title">Recent uploads</div>
+                                <p class="chart-caption">Latest files added to your library</p>
+                            </div>
+                            <span class="status-pill">● Live data</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="activity-table">
+                                <thead><tr><th>FILE</th><th>CLASS</th><th>STATUS</th></tr></thead>
+                                <tbody>
+                                    {% for note in recent_notes %}
+                                    <tr>
+                                        <td>{{ note.pdf_url.split('/')[-1] }}</td>
+                                        <td class="muted-cell">{{ note.class_number }}</td>
+                                        <td><span class="status-pill">Available</span></td>
+                                    </tr>
+                                    {% else %}
+                                    <tr><td colspan="3" class="muted-cell">No uploads yet.</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+
+
                 <!-- SYSTEM INFORMATION -->
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-5">
