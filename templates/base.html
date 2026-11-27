@@ -8,6 +8,7 @@
 
     <title>{% block title %}Sunday School Notes{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='premium.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='experience.css') }}">
 
     <!-- Modern Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -230,10 +231,20 @@
             </a>
 
             {% if current_user.is_authenticated %}
-            <a href="{{ url_for('logout') }}" class="logout-button">
-                <span>↗</span>
-                <span>Logout</span>
-            </a>
+            <div class="nav-right">
+                <a href="{{ url_for('dashboard') }}" class="nav-workspace">
+                    <span class="nav-workspace-dot"></span>
+                    <span>STUDY WORKSPACE</span>
+                </a>
+                <a href="{{ url_for('dashboard') }}" class="nav-user" aria-label="Open your study workspace">
+                    <span class="nav-user-avatar">{{ current_user.username[:1]|upper }}</span>
+                    <span class="nav-user-name">{{ current_user.username }}</span>
+                </a>
+                <a href="{{ url_for('logout') }}" class="logout-button">
+                    <span>↗</span>
+                    <span>Sign out</span>
+                </a>
+            </div>
             {% endif %}
 
         </div>
