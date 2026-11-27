@@ -330,7 +330,8 @@ body:has(.admin-page) main{min-height:100vh}
  .welcome-heading h1{font-size:55px!important;letter-spacing:-3.5px!important}
  .login-card{padding:28px!important}
  .admin-sidebar{position:fixed!important;left:0;top:0;height:100dvh!important;transform:translateX(-105%);z-index:60!important}
- .admin-sidebar.open{transform:translateX(0)}
+ .admin-sidebar.sidebar-open{transform:translateX(0)}
+ .sidebar-overlay.visible{opacity:1!important;visibility:visible!important;pointer-events:auto!important}
  .sidebar-toggle{display:inline-grid!important;place-items:center!important}
  .admin-content{padding:24px 18px!important}
 }
@@ -376,3 +377,14 @@ body:has(.admin-page) main{min-height:100vh}
 @media(prefers-reduced-motion:reduce){
  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+/* Library breadcrumb and micro-detail polish */
+.library-back-link{
+ display:inline-flex;align-items:center;gap:8px;margin-bottom:17px;
+ color:#a8a1c8!important;text-decoration:none!important;font-size:10px;font-weight:650;
+ transition:color .2s ease,transform .2s ease;
+}
+.library-back-link:hover{color:#fff!important;transform:translateX(-3px)}
+/* Better focus and selection feedback */
+.class-card:focus-visible,.note-card:focus-within{outline:2px solid rgba(173,162,255,.72)!important;outline-offset:3px}
+::placeholder{opacity:1}
